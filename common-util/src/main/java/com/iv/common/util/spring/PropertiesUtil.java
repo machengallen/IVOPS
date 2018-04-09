@@ -1,4 +1,4 @@
-package com.iv.common.spring.util;
+package com.iv.common.util.spring;
 
 import java.io.File;
 import java.io.FileNotFoundException;

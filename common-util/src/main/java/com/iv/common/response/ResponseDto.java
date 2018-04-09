@@ -1,8 +1,9 @@
-package com.iv.common.dto;
+package com.iv.common.response;
 
 /**
  * @author macheng
  * 2017年3月3日 上午11:14:25
+ * 2018年4月8日：修改ErrorMsg类型为interface
  */
 public class ResponseDto {
 	//返回状态码
@@ -39,11 +40,11 @@ public class ResponseDto {
 	public void setData(Object data) {
 		this.data = data;
 	}
-	public void setErrorMsg(ErrorMsg errorMsg){
+	public void setErrorMsg(IErrorMsg errorMsg){
 		setErrcode(errorMsg.getCode());
 		setErrmsg(errorMsg.getMsg());
 	}
-	public static ResponseDto builder(ErrorMsg errorMsg) {
+	public static ResponseDto builder(IErrorMsg errorMsg) {
 		ResponseDto dto = new ResponseDto();
 		dto.setErrorMsg(errorMsg);
 		return dto;

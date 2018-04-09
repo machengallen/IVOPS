@@ -1,6 +1,6 @@
-package com.iv.common.dto;
+package com.iv.common.response;
 
-public interface ErrorMsg {
+public interface IErrorMsg {
 
 	int getCode();
 	

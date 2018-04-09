@@ -1,4 +1,4 @@
-package com.iv.common.spring.util;
+package com.iv.common.util.spring;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;

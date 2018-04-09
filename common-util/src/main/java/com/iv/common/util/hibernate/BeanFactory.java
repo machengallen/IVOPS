@@ -1,4 +1,4 @@
-package com.iv.common.hibernate.util;
+package com.iv.common.util.hibernate;
 
 import java.io.IOException;
 import java.util.Properties;

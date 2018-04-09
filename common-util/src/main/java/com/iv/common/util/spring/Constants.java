@@ -1,4 +1,4 @@
-package com.iv.common.spring.util;
+package com.iv.common.util.spring;
 
 /**
  * 常量
