@@ -1,0 +1,17 @@
+server:
+  port: 8250
+---
+#redis连接
+spring:
+  redis:
+    host: 10.10.31.26
+    database: 2
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
+    
