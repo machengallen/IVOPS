@@ -1,0 +1,24 @@
+server:
+  port: 8210
+#  context-path: /uaa
+#  
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://10.10.9.55:8110/eureka/
+#    
+#spring:
+#  profiles:
+#    active:
+#    - peer1
+#  application:
+#    name: oauth2
+    
+
+#自定义变量
+#iv:
+#  web:
+#    loginPage: http://10.10.9.25:7100/login
+
+  
+      
