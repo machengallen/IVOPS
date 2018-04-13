@@ -6,8 +6,8 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.iv.common.enumeration.SendType;
 import com.iv.dto.AlarmLifeEntityDto;
-import com.iv.dto.EmailType;
 import com.iv.util.MailSenderUtil;
 
 @Service
@@ -23,7 +23,7 @@ public class EmailService {
 		session.setAttribute("vcode", vcode + "&" + valiDtime);
 	}
 	
-	public void sendToMail(String[] toEmails, EmailType emailType, Object object) {
+	public void sendToMail(String[] toEmails, SendType emailType, Object object) {
 		if(emailType.toString().toLowerCase().contains("alarm") ) {
 			AlarmLifeEntityDto alarmLifeEntityDto = (AlarmLifeEntityDto)object;
 			mailSenderUtil.alarmToMail(toEmails, emailType, alarmLifeEntityDto);

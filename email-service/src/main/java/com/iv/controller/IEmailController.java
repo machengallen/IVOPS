@@ -7,8 +7,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ResponseDto;
-import com.iv.dto.EmailType;
 import com.iv.dto.ErrorMsg;
 import com.iv.service.EmailService;
 import com.iv.service.IEmailService;
@@ -43,7 +43,7 @@ public class IEmailController implements IEmailService {
 
 	@Override
 	@ApiOperation("使用邮箱发送模板消息")
-	public void alarmToMail(String[] toEmails, EmailType emailType, Object object) {
+	public void alarmToMail(String[] toEmails, SendType emailType, Object object) {
 		// TODO Auto-generated method stub		
 		try {
 			emailService.sendToMail(toEmails, emailType,object);						

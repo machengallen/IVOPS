@@ -14,8 +14,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 
+import com.iv.common.enumeration.SendType;
 import com.iv.dto.AlarmLifeEntityDto;
-import com.iv.dto.EmailType;
 import com.iv.entity.dto.LocalAuthDto;
 import com.iv.external.service.UserServiceClient;
 
@@ -48,7 +48,7 @@ public class MailSenderUtil {
 	@Value("${iv.mail.contextVCode}")
 	private String contextVCode;
 
-	public void alarmToMail(String[] toEmails, EmailType emailType, AlarmLifeEntityDto alarmLifeEntityDto) {
+	public void alarmToMail(String[] toEmails, SendType emailType, AlarmLifeEntityDto alarmLifeEntityDto) {
 		// 创建邮件消息体
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
