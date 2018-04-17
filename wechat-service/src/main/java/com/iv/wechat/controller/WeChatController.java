@@ -10,14 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.response.ResponseDto;
-import com.iv.dto.AccountDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.dto.WeChat;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.service.IWechatService;
 import com.iv.wechat.dto.ErrorMsg;
 import com.iv.wechat.dto.QrcodeTicket;
-import com.iv.wechat.dto.TemplateMessage;
 import com.iv.wechat.service.WeChatService;
 import com.iv.wechat.util.SignUtil;
 

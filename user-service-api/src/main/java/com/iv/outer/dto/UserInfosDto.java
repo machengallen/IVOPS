@@ -1,4 +1,4 @@
-package com.iv.dto;
+package com.iv.outer.dto;
 
 /**
  * 封装用户基础信息以及微信信息类

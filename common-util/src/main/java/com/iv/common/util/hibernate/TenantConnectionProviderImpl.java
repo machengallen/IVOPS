@@ -1,4 +1,4 @@
-package com.iv.common.hibernate.util;
+package com.iv.common.util.hibernate;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 
-import com.iv.common.spring.util.ConstantContainer;
+import com.iv.common.util.spring.ConstantContainer;
 
 public class TenantConnectionProviderImpl
 		implements MultiTenantConnectionProvider, Stoppable, Configurable, ServiceRegistryAwareService {

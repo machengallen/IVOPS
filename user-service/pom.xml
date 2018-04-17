@@ -46,6 +46,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 		<dependency>  
             <groupId>org.hibernate</groupId>  
             <artifactId>hibernate-c3p0</artifactId>  
@@ -87,15 +91,13 @@
     		<artifactId>user-service-api</artifactId>
     		<version>1.0.0-SNAPSHOT</version>
     		<type>jar</type>
-    	</dependency>
+    	</dependency>	
     	<dependency>
-    		<groupId>org.springframework.boot</groupId>
-    		<artifactId>spring-boot-starter-security</artifactId>
-    	</dependency>
-    	<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-jwt</artifactId>
-		</dependency>	
+    		<groupId>com.iv</groupId>
+			<artifactId>wechat-service-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>jar</type>
+    	</dependency>    	
 	</dependencies>
 
 	<dependencyManagement>

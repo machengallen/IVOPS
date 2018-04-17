@@ -3,7 +3,7 @@ eureka:
     status-page-url: http://10.10.9.55:${server.port}/swagger-ui.html
   client:
     service-url:
-      defaultZone: http://10.10.9.55:8100/eureka/
+      defaultZone: http://10.10.9.55:8110/eureka/
 spring:
   profiles:
     active:
@@ -47,13 +47,13 @@ security:
     enabled: false
 ---
 server:
-  port: 8202
+  port: 8220
 spring:
   profiles: peer1
     
 ---
 server:
-  port: 8203
+  port: 8221
 spring:
   profiles: peer2
 

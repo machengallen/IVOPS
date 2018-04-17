@@ -1,14 +1,19 @@
 package com.iv.service;
 
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.iv.common.dto.ResponseDto;
-import com.iv.entity.dto.LocalAuthDto;
-import com.iv.entity.dto.UserOauthDto;
+import com.iv.common.response.ResponseDto;
+import com.iv.enter.dto.AccountDto;
+import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.outer.dto.LocalAuthDto;
+import com.iv.outer.dto.UserInfosDto;
+import com.iv.outer.dto.UserOauthDto;
 
 
 /**
@@ -25,7 +30,7 @@ public interface IUserService {
 	 * @param session
 	 * @return
 	 */
-	@RequestMapping(value = "/user/info", method = RequestMethod.POST)
+	@RequestMapping(value = "/user/info", method = RequestMethod.GET)
 	ResponseDto getUserInfo();
 	
 	/**
@@ -37,21 +42,20 @@ public interface IUserService {
 	UserOauthDto bindInfo(@RequestParam String unionid, @RequestParam String loginType);
 	
 	/**
-	 * 根据用户名查询用户信息
-	 * @param userName
+	 * 用户绑定微信信息
+	 * @param accountDto
 	 * @return
 	 */
-	@RequestMapping(value = "/permit/select/localauthInfoByName",method = RequestMethod.POST)
-	LocalAuthDto selectLocalauthInfoByName(@RequestParam String userName);
+	@RequestMapping(value = "/bind/wechatInfo", method = RequestMethod.POST)
+	ResponseDto bindWechatInfo(@RequestBody AccountDto accountDto);
 	
 	/**
-	 * 保存用户信息
-	 * @param localAuthDto
+	 * 注册用户信息
+	 * @param accountDto
 	 * @return
 	 */
-	@RequestMapping(value = "/permit/saveOrUpdate/localauth",method = RequestMethod.POST)
-	LocalAuthDto saveOrUpdateLocalAuth(@RequestBody LocalAuthDto localAuthDto);
-	
+	@RequestMapping(value = "/register/account", method = RequestMethod.POST)
+	ResponseDto registerAccount(@RequestBody AccountDto accountDto);
 	/**
 	 * 根据id查询用户信息
 	 * @param userId
@@ -60,199 +64,24 @@ public interface IUserService {
 	 */
 	@RequestMapping(value = "/permit/select/localAuthById",method = RequestMethod.POST)
 	LocalAuthDto selectLocalAuthById(@RequestParam int userId) throws RuntimeException;
-
+	
 	/**
-	 * 用户信息修改
-	 * @param modifyInfo
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/modify", method = RequestMethod.POST)
-	ResponseDto userOps(@RequestBody(required = true) UserSafeDto modifyInfo);
-
-	*//**
-	 * 查询当前用户所在组信息
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/group/info", method = RequestMethod.GET)
-	ResponseDto groupInfo();
-
-	*//**
-	 * 查询当前用户所在组名称与组id
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/group/detailInfo", method = RequestMethod.GET)
-	ResponseDto groupDetailInfo();
-
-	*//**
-	 * 租户管理系统：查询当前组内分页人员信息
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/group/groupUserPageInfo", method = RequestMethod.POST)
-	ResponseDto groupUserPageInfo(@RequestBody GroupUserQuery groupUserQuery);
-
-	*//**
-	 * 查询所有用户组列表
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "groups/info", method = RequestMethod.POST)
-	ResponseDto groupsInfo();
-
-	*//**
-	 * 成员组操作
-	 * @param groupDto
-	 * @return
-	 *//*
-	@RequestMapping(value = "/group/ops", method = RequestMethod.POST)
-	ResponseDto groupOps(@RequestBody GroupDto groupDto);
-
-	*//**
-	 * 获取微信带参二维码
-	 * 
-	 * @param session
-	 * @return
-	 *//*
-	@RequestMapping(value = "/qrcode/create", method = RequestMethod.GET)
-	ResponseDto qrcodeCreate();
-
-	*//**
-	 * 查询用户信息
-	 * 
-	 * @param session
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/info", method = RequestMethod.POST)
-	ResponseDto getUserInfo();
-
-	*//**
-	 * 获取所有用户列表
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/info/list", method = RequestMethod.GET)
-	ResponseDto getUsersInfo();
-
-	*//**
-	 * 获取所有用户分页列表
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/info/pageList", method = RequestMethod.POST)
-	ResponseDto getUsersPageInfo(@RequestBody UserQuery userQuery);
-
-	*//**
-	 * 获取所有用户分页列表
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/info/fromEnter/pageList", method = RequestMethod.POST)
-	ResponseDto getUsersPageFromParent(@RequestBody UserQuery userQuery);
-
-	*//**
-	 * 获取公众号微信用户列表
-	 * 
-	 * @return
-	 *//*
-	@RequestMapping(value = "/user/wechat", method = RequestMethod.GET)
-	public ResponseDto getUsersWechat();
-	
-	*//**
-	 * 密码找回
-	 * 
-	 * @param session
-	 * @param registerDto
-	 * @return
-	 *//*
-	@RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
-	ResponseDto resetPassword(@RequestBody UserSafeDto userInfo);
-
-	*//**
-	 * 给用户提升权限
-	 * 
-	 * @param groupId
+	 * 根据用户id  登录方式  查询unionid
 	 * @param userId
+	 * @param loginType
 	 * @return
-	 *//*
-	@RequestMapping(value = "/promoteAuthority", method = RequestMethod.POST)
-	ResponseDto promoteAuthority(@RequestBody HireUserRoleDto hireUserRoleDto,
-			SecurityContextHolderAwareRequestWrapper request);
+	 * @throws RuntimeException
+	 */
+	@RequestMapping(value = "/select/UserWechat",method = RequestMethod.POST)
+	String selectUserWechatUnionid(@RequestParam int userId, @RequestParam String loginType) throws RuntimeException;
 	
-	*//**
-	 * 保存多用户微信信息体
-	 * 
-	 * @param session
-	 * @param registerDto
+	/**
+	 * 根据用户id集合，查询用户信息
+	 * @param usersWechatsQuery
 	 * @return
-	 *//*
-	@RequestMapping(value = "/save/usersWechatInfo", method = RequestMethod.POST)
-	void saveUsersInfo(@RequestBody UserWechatDto userWechatEntities);
-	
-	*//**
-	 * 保存用户微信信息体
-	 * 
-	 * @param session
-	 * @param registerDto
-	 * @return
-	 *//*
-	@RequestMapping(value = "/save/userWechatInfo", method = RequestMethod.POST)
-	void saveUserInfo(@RequestBody UserWechatEntityDto userWechatEntity);
-	
-	*//**
-	 * 根据用户id查询用户信息
-	 * @param eventKey
-	 * @return
-	 *//*
-	@RequestMapping(value = "/select/userAuthById",method = RequestMethod.POST)
-	LocalAuthDto selectUserAuthById(@RequestParam int eventKey);
-	
-	*//**
-	 * 根据openId查询用户微信信息
-	 * @param openId
-	 * @return
-	 *//*
-	@RequestMapping(value = "/select/userWeChatById",method = RequestMethod.POST)
-	UserWechatEntityDto selectUserWechatById(@RequestParam String openId);
-	
-	*//**
-	 * 根据openId删除用户信息
-	 * @param openId
-	 *//*
-	@RequestMapping(value = "/delete/userWeChatById",method = RequestMethod.POST)
-	void deleteUserInfoById(@RequestParam String openId);
-	
-	*//**
-	 * 解绑微信
-	 * @param wechatEntity
-	 *//*
-	@RequestMapping(value = "/unbound/wechat",method = RequestMethod.POST)
-	void unboundWechat(@RequestBody UserWechatEntityDto wechatEntity);
-	
-	*//**
-	 * 更新用户openId
-	 * @param weChatInfo
-	 * @return
-	 *//*
-	@RequestMapping(value = "/update/openId",method = RequestMethod.POST)
-	Boolean updateOpenId(@RequestBody UserWechatInfo weChatInfo);
-	
-	*//**
-	 * 根据openId查询用户是否存在，判断微信绑定情况
-	 * @param openId
-	 * @return
-	 *//*
-	@RequestMapping(value = "/select/userInfoByopenId",method = RequestMethod.POST)
-	LocalAuthDto selectUserByOpenId(@RequestParam String openId);
+	 */
+	@RequestMapping(value = "/select/userInfos",method = RequestMethod.POST)
+	List<UserInfosDto> selectUserInfos(@RequestBody UsersWechatsQuery usersWechatsQuery);
 	
 	
-	
-	*//**
-	 * 保存用户信息
-	 * @param localAuth
-	 * @return
-	 *//*
-	@RequestMapping(value = "/save/localAuthInfo", method = RequestMethod.POST)
-	ResponseDto saveUserAuth(LocalAuthDto localAuth);*/
 }

@@ -1,21 +1,21 @@
 package com.iv.external.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
-import com.iv.common.dto.ResponseDto;
-import com.iv.dto.AccountDto;
-import com.iv.dto.GroupDto;
-import com.iv.dto.GroupUserQuery;
-import com.iv.dto.UserQuery;
-import com.iv.dto.UserSafeDto;
-import com.iv.entity.dto.LocalAuthDto;
-import com.iv.entity.dto.UserOauthDto;
+import com.iv.common.response.ResponseDto;
+import com.iv.enter.dto.AccountDto;
+import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.outer.dto.LocalAuthDto;
+import com.iv.outer.dto.UserInfosDto;
+import com.iv.outer.dto.UserOauthDto;
 
 @Component
 public class UserServiceClientFallBack implements UserServiceClient {
 
 	@Override
-	public com.iv.common.response.ResponseDto getUserInfo() {
+	public ResponseDto getUserInfo() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -27,13 +27,13 @@ public class UserServiceClientFallBack implements UserServiceClient {
 	}
 
 	@Override
-	public com.iv.common.response.ResponseDto bindWechatInfo(AccountDto accountDto) {
+	public ResponseDto bindWechatInfo(AccountDto accountDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public com.iv.common.response.ResponseDto registerAccount(AccountDto accountDto) {
+	public ResponseDto registerAccount(AccountDto accountDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -50,4 +50,10 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
+	@Override
+	public List<UserInfosDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

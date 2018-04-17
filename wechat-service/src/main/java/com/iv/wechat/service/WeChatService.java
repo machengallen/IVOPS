@@ -21,11 +21,11 @@ import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.TemplateMessageDto;
-import com.iv.entity.dto.LocalAuthDto;
-import com.iv.entity.dto.UserOauthDto;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.enumeration.LoginType;
 import com.iv.external.service.UserServiceClient;
+import com.iv.outer.dto.LocalAuthDto;
+import com.iv.outer.dto.UserOauthDto;
 import com.iv.wechat.autoReply.EventSubMessage;
 import com.iv.wechat.autoReply.MessageResponse;
 import com.iv.wechat.dao.MessageDaoImpl;

@@ -4,8 +4,6 @@ import java.util.List;
 
 import com.iv.entity.LocalAuth;
 import com.iv.entity.UserOauth;
-import com.iv.entity.UserWechatEntity;
-import com.iv.entity.dto.LocalAuthDto;
 
 /**
  * 平台用户数据库工具类

@@ -1,4 +1,4 @@
-package com.iv.entity.dto;
+package com.iv.outer.dto;
 
 import com.iv.enumeration.LoginType;
 

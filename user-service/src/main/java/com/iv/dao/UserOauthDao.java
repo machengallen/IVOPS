@@ -11,4 +11,6 @@ import com.iv.entity.UserOauth;
 public interface UserOauthDao {
 
 	UserOauth selectUserOauthByUnionid(String unionid, String loginType) throws RuntimeException;
+	
+	String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException;
 }

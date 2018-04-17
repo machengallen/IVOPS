@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.iv.enumeration.LoginType;
@@ -39,6 +40,7 @@ public class UserOauth implements Serializable {
 		this.loginType = loginType;
 		this.unionid = unionid;
 	}
+	@Id
 	public String getId() {
 		return id;
 	}

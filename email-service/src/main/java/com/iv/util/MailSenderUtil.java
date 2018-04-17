@@ -16,8 +16,8 @@ import org.springframework.stereotype.Component;
 
 import com.iv.common.enumeration.SendType;
 import com.iv.dto.AlarmLifeEntityDto;
-import com.iv.entity.dto.LocalAuthDto;
 import com.iv.external.service.UserServiceClient;
+import com.iv.outer.dto.LocalAuthDto;
 
 @Component
 public class MailSenderUtil {
