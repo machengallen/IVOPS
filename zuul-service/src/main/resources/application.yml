@@ -1,0 +1,55 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.9.26:8110/eureka/
+spring:
+  profiles:
+    active:
+    - peer1
+  application:
+    name: zuul-service
+zuul:
+  prefix: /v2
+  routes:
+    api-1:
+      path: /user/**
+      serviceId: user-service
+    api-2:
+      path: /wechat/**
+      serviceId: wechat-service
+    api-3:
+      path: /alarm/aggregation/**
+      serviceId: alarm-aggregation-service
+    api-4:
+      path: /alarm/facade/**
+      serviceId: alarm-facade-service
+    api-5:
+      path: /alarm/strategy/**
+      serviceId: alarm-strategy-service
+    api-6:
+      path: /tenant/mgt/**
+      serviceId: tenant-mgt-service
+    api-7:
+      path: /email/**
+      serviceId: email-service
+    api-8:
+      path: /group/**
+      serviceId: group-service
+
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 5000
+  MaxAutoRetries: 3
+  MaxAutoRetriesNextServer: 1
+
+---
+spring:
+  profiles: peer1
+server:
+  port: 8120
+
+---
+spring:
+  profiles: peer2
+server:
+  port: 8121
