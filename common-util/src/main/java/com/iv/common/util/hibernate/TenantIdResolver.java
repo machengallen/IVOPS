@@ -1,36 +1,35 @@
 package com.iv.common.util.hibernate;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.hibernate.context.spi.CurrentTenantIdentifierResolver;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.iv.common.util.spring.ConstantContainer;
+import com.iv.common.util.spring.JWTUtil;
 
 @Component
 public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 
 	@Override
 	public String resolveCurrentTenantIdentifier() {
-		
-		Authentication authentication =  SecurityContextHolder.getContext().getAuthentication();
-		/*if(null != authentication && authentication.getPrincipal() instanceof LocalAuthDetails) {
-			
-			// 登录用户，从数据库中获取当前的租户标识符
-			LocalAuthDetails localAuthDetails = (LocalAuthDetails) authentication.getPrincipal();
-			return localAuthDetails.getCurTenantId() != null ? localAuthDetails.getCurTenantId() : ConstantContainer.TENANT_SHARED_ID;
-		
-		} else {*/
-			
+
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String token = request.getHeader("Authorization");
+
+		if (StringUtils.isEmpty(token)) {
 			return ConstantContainer.TENANT_SHARED_ID;
-		//}
+		} else {
+			return JWTUtil.getJWtJson(token).getString("curTenantId");
+		}
 	}
 
 	@Override
 	public boolean validateExistingCurrentSessions() {
-		// TODO Auto-generated method stub
 		return true;
 	}
 
