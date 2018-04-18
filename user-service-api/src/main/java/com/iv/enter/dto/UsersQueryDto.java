@@ -2,7 +2,13 @@ package com.iv.enter.dto;
 
 import java.util.List;
 
-public class UsersWechatsQuery {
+/**
+ * 根据userIds批量查询用户信息(包含微信头像信息)
+ * @author zhangying
+ * 2018年4月18日
+ * aggregation-1.4.0-SNAPSHOT
+ */
+public class UsersQueryDto {
 	private List<Integer> userIds;
 	private String loginType;
 	

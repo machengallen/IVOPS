@@ -1,18 +1,17 @@
-package com.iv.aggregation.feign.fallback;
+package com.iv.external.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import com.iv.aggregation.feign.clients.IUserServiceClient;
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersQueryDto;
+import com.iv.enter.dto.UsersWechatsQuery;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 
 @Component
-public class UserServiceClientFallBack implements IUserServiceClient {
+public class UserServiceClientFallBack implements UserServiceClient {
 
 	@Override
 	public ResponseDto getUserInfo() {
@@ -45,13 +44,13 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	}
 
 	@Override
-	public String selectUserWechatUnionid(int userId, String loginType) {
+	public String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
+	public List<LocalAuthDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -63,16 +62,8 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	}
 
 	@Override
-	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto) {
+	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto) throws RuntimeException {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
 }

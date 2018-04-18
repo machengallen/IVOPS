@@ -7,26 +7,31 @@ package com.iv.enter.dto;
  * @author zhangying
  *
  */
-public class AccountDto {
+public class AccountDto {	
 	/**微信标识：unionid*/
 	private String unionid;
+	private int userId;
 	/**平台用户名：用于登录*/
 	private String userName;
-	/**真实姓名或者昵称*/
+	/**真实姓名*/
 	private String realName;
-	/**密码*/
+	/**昵称*/
+	private String nickName;
+	/**原密码*/
 	private String passWord;
-	/**确认密码*/
+	/**新密码*/
 	private String passWord1;
+	/**确认密码*/
+	private String passWord2;
+	private String email;
 	/**电话*/
 	private String tel;
+	/**租户Id*/
+	private String curTenantId;
 	/**邮箱校验码*/
 	private String vcode;
 	/**登录方式*/
 	private String loginType;
-	/**租户Id*/
-	private String tenantId;
-			
 	
 	public String getUnionid() {
 		return unionid;
@@ -34,37 +39,29 @@ public class AccountDto {
 	public void setUnionid(String unionid) {
 		this.unionid = unionid;
 	}
+	public int getUserId() {
+		return userId;
+	}
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 	public String getUserName() {
 		return userName;
 	}
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
-	
 	public String getRealName() {
 		return realName;
 	}
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
-
-	public String getTel() {
-		return tel;
+	public String getNickName() {
+		return nickName;
 	}
-	public void setTel(String tel) {
-		this.tel = tel;
-	}
-	public String getVcode() {
-		return vcode;
-	}
-	public void setVcode(String vcode) {
-		this.vcode = vcode;
-	}
-	public String getLoginType() {
-		return loginType;
-	}
-	public void setLoginType(String loginType) {
-		this.loginType = loginType;
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 	public String getPassWord() {
 		return passWord;
@@ -78,12 +75,44 @@ public class AccountDto {
 	public void setPassWord1(String passWord1) {
 		this.passWord1 = passWord1;
 	}
-	public String getTenantId() {
-		return tenantId;
+	public String getPassWord2() {
+		return passWord2;
 	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
+	public void setPassWord2(String passWord2) {
+		this.passWord2 = passWord2;
 	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
+	}
+	public String getCurTenantId() {
+		return curTenantId;
+	}
+	public void setCurTenantId(String curTenantId) {
+		this.curTenantId = curTenantId;
+	}
+	public String getVcode() {
+		return vcode;
+	}
+	public void setVcode(String vcode) {
+		this.vcode = vcode;
+	}
+	public String getLoginType() {
+		return loginType;
+	}
+	public void setLoginType(String loginType) {
+		this.loginType = loginType;
+	}
+	
+			
 	
 	
 }

@@ -1,18 +1,20 @@
 package com.iv.outer.dto;
 
-import java.util.Set;
-
+/**
+ * 用户基础信息供其他服务调用类（无三方登录信息）
+ * @author zhangying
+ * 2018年4月18日
+ * aggregation-1.4.0-SNAPSHOT
+ */
 public class LocalAuthDto {
 	private int id;
 	private String userName;
-	//private Set<RoleEntity> roles;
 	private String realName;
-	private String tel;
-	private byte boundFlag;
-	private Set<Integer> enterprisIds;
-	private Set<Integer> subEnterpriIds;
+	private String nickName;
+	private String email;
+	private String tel;	
 	private String curTenantId;
-	private Set<UserOauthDto> UserOauthes;
+	private String headimgurl;
 	public int getId() {
 		return id;
 	}
@@ -31,29 +33,23 @@ public class LocalAuthDto {
 	public void setRealName(String realName) {
 		this.realName = realName;
 	}
+	public String getNickName() {
+		return nickName;
+	}
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
 	public String getTel() {
 		return tel;
 	}
 	public void setTel(String tel) {
 		this.tel = tel;
-	}
-	public byte getBoundFlag() {
-		return boundFlag;
-	}
-	public void setBoundFlag(byte boundFlag) {
-		this.boundFlag = boundFlag;
-	}
-	public Set<Integer> getEnterprisIds() {
-		return enterprisIds;
-	}
-	public void setEnterprisIds(Set<Integer> enterprisIds) {
-		this.enterprisIds = enterprisIds;
-	}
-	public Set<Integer> getSubEnterpriIds() {
-		return subEnterpriIds;
-	}
-	public void setSubEnterpriIds(Set<Integer> subEnterpriIds) {
-		this.subEnterpriIds = subEnterpriIds;
 	}
 	public String getCurTenantId() {
 		return curTenantId;
@@ -61,17 +57,34 @@ public class LocalAuthDto {
 	public void setCurTenantId(String curTenantId) {
 		this.curTenantId = curTenantId;
 	}
-	public Set<UserOauthDto> getUserOauthes() {
-		return UserOauthes;
+	public String getHeadimgurl() {
+		return headimgurl;
 	}
-	public void setUserOauthes(Set<UserOauthDto> userOauthes) {
-		UserOauthes = userOauthes;
+	public void setHeadimgurl(String headimgurl) {
+		this.headimgurl = headimgurl;
 	}
 	@Override
-	public String toString() {
-		return "LocalAuthDto [id=" + id + ", userName=" + userName + ", realName=" + realName + ", tel=" + tel
-				+ ", boundFlag=" + boundFlag + ", enterprisIds=" + enterprisIds + ", subEnterpriIds=" + subEnterpriIds
-				+ ", curTenantId=" + curTenantId + ", UserOauthes=" + UserOauthes + "]";
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		result = prime * result + ((nickName == null) ? 0 : nickName.hashCode());
+		result = prime * result + ((realName == null) ? 0 : realName.hashCode());
+		result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+		return result;
 	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		LocalAuthDto other = (LocalAuthDto) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}	
 	
 }

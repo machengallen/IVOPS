@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.outer.dto.LocalAuthDto;
-import com.iv.outer.dto.UserInfosDto;
 import com.iv.outer.dto.UserOauthDto;
 
 
@@ -25,7 +24,7 @@ import com.iv.outer.dto.UserOauthDto;
 public interface IUserService {
 	
 	/**
-	 * 例子：查询用户信息
+	 * 查询用户信息
 	 * 
 	 * @param session
 	 * @return
@@ -38,7 +37,7 @@ public interface IUserService {
 	 * @param unionid
 	 * @return
 	 */
-	@RequestMapping(value = "/permit/user/bindInfo", method = RequestMethod.POST)
+	@RequestMapping(value = "/permit/user/bindInfo", method = RequestMethod.GET)
 	UserOauthDto bindInfo(@RequestParam String unionid, @RequestParam String loginType);
 	
 	/**
@@ -56,13 +55,14 @@ public interface IUserService {
 	 */
 	@RequestMapping(value = "/register/account", method = RequestMethod.POST)
 	ResponseDto registerAccount(@RequestBody AccountDto accountDto);
+	
 	/**
 	 * 根据id查询用户信息
 	 * @param userId
 	 * @return
 	 * @throws RuntimeException
 	 */
-	@RequestMapping(value = "/permit/select/localAuthById",method = RequestMethod.POST)
+	@RequestMapping(value = "/permit/select/localAuthById",method = RequestMethod.GET)
 	LocalAuthDto selectLocalAuthById(@RequestParam int userId) throws RuntimeException;
 	
 	/**
@@ -72,8 +72,8 @@ public interface IUserService {
 	 * @return
 	 * @throws RuntimeException
 	 */
-	@RequestMapping(value = "/select/UserWechat",method = RequestMethod.POST)
-	String selectUserWechatUnionid(@RequestParam int userId, @RequestParam String loginType) throws RuntimeException;
+	@RequestMapping(value = "/select/UserWechat",method = RequestMethod.GET)
+	String selectUserWechatUnionid(@RequestParam int userId, @RequestParam String loginType);
 	
 	/**
 	 * 根据用户id集合，查询用户信息
@@ -81,7 +81,29 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/userInfos",method = RequestMethod.POST)
-	List<UserInfosDto> selectUserInfos(@RequestBody UsersWechatsQuery usersWechatsQuery);
+	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery);
 	
+	/**
+	 * 根据用户名称查询用户信息
+	 * @param userName
+	 * @return
+	 */
+	@RequestMapping(value = "/select/localauthInfoByName",method = RequestMethod.GET)
+	LocalAuthDto selectLocalauthInfoByName(@RequestParam String userName);
 	
+	/**
+	 * 更改用户信息
+	 * @param user
+	 * @return
+	 * @throws RuntimeException
+	 */
+	@RequestMapping(value = "/saveOrUpdate/localAuth",method = RequestMethod.POST)
+	ResponseDto saveOrUpdateUserAuth(@RequestBody AccountDto accountDto);
+	
+	/**
+	 * 找回用户密码
+	 * @return
+	 */
+	@RequestMapping(value = "/find/localAuthPassWord",method = RequestMethod.POST)
+	ResponseDto findLocalAuthPassWord(@RequestBody AccountDto accountDto);
 }

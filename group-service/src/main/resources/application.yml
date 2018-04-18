@@ -1,0 +1,8 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://10.10.9.55:8110/eureka/
+spring:
+  profiles: peer1
+server:
+  port: 8280

@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * 
+ * 用户基础信息
  * @author zhangying
  * 2018年4月10日
  * aggregation-1.4.0-SNAPSHOT
@@ -31,27 +31,24 @@ public class LocalAuth implements Serializable {
 	private int id;
 	private String userName;
 	@JsonIgnore
-	private String passWord;
-	//private Set<RoleEntity> roles;
+	private String passWord;	
 	private String realName;
+	private String nickName;
+	private String email;
 	private String tel;
-	private byte boundFlag;
-	private Set<Integer> enterprisIds;
-	private Set<Integer> subEnterpriIds;
 	private String curTenantId;
-	private Set<UserOauth> UserOauthes;
+	private Set<UserOauth> UserOauthes;		
 
-	public LocalAuth(int id, String userName, String passWord, String realName, String tel, byte boundFlag,
-			Set<Integer> enterprisIds, Set<Integer> subEnterpriIds, String curTenantId, Set<UserOauth> userOauthes) {
+	public LocalAuth(int id, String userName, String passWord, String realName, String nickName, String email,
+			String tel, String curTenantId, Set<UserOauth> userOauthes) {
 		super();
 		this.id = id;
 		this.userName = userName;
 		this.passWord = passWord;
 		this.realName = realName;
+		this.nickName = nickName;
+		this.email = email;
 		this.tel = tel;
-		this.boundFlag = boundFlag;
-		this.enterprisIds = enterprisIds;
-		this.subEnterpriIds = subEnterpriIds;
 		this.curTenantId = curTenantId;
 		UserOauthes = userOauthes;
 	}
@@ -97,14 +94,6 @@ public class LocalAuth implements Serializable {
 		this.tel = tel;
 	}
 
-	public byte getBoundFlag() {
-		return boundFlag;
-	}
-
-	public void setBoundFlag(byte boundFlag) {
-		this.boundFlag = boundFlag;
-	}
-
 	public String getRealName() {
 		return realName;
 	}
@@ -121,22 +110,6 @@ public class LocalAuth implements Serializable {
 		this.curTenantId = curTenantId;
 	}
 	
-	public Set<Integer> getEnterprisIds() {
-		return enterprisIds;
-	}
-
-	public void setEnterprisIds(Set<Integer> enterprisIds) {
-		this.enterprisIds = enterprisIds;
-	}
-
-	public Set<Integer> getSubEnterpriIds() {
-		return subEnterpriIds;
-	}
-
-	public void setSubEnterpriIds(Set<Integer> subEnterpriIds) {
-		this.subEnterpriIds = subEnterpriIds;
-	}
-
 	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
 	public Set<UserOauth> getUserOauthes() {
 		return UserOauthes;
@@ -144,6 +117,22 @@ public class LocalAuth implements Serializable {
 
 	public void setUserOauthes(Set<UserOauth> userOauthes) {
 		UserOauthes = userOauthes;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override

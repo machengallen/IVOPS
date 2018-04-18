@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.LocalAuth;
 import com.iv.outer.dto.LocalAuthDto;
-import com.iv.outer.dto.UserInfosDto;
 import com.iv.outer.dto.UserOauthDto;
 import com.iv.service.IUserService;
 import com.iv.service.UserService;
@@ -60,6 +59,7 @@ public class UserController implements IUserService {
 	}
 	
 	@Override
+	@ApiOperation("查看用户是否已绑定三方登录")
 	public UserOauthDto bindInfo(String unionid,String loginType) {
 		// TODO Auto-generated method stub
 		Jwt jwt = JwtHelper.decode("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw");
@@ -73,7 +73,8 @@ public class UserController implements IUserService {
 	}	
 
 	@Override
-	public LocalAuthDto selectLocalAuthById(int userId) throws RuntimeException {
+	@ApiOperation("根据id查询用户信息")
+	public LocalAuthDto selectLocalAuthById(int userId) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectLocalAuthById(userId);
@@ -129,7 +130,7 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("根据用户id集合，查询用户信息")
-	public List<UserInfosDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery) {
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectUserInfos(usersWechatsQuery);
@@ -138,6 +139,49 @@ public class UserController implements IUserService {
 			LOGGER.error("系统错误：获取用户信息失败", e);	
 		}
 		return null;
+	}
+
+	@Override
+	@ApiOperation("根据用户名称查询用户信息")
+	public LocalAuthDto selectLocalauthInfoByName(String userName) {
+		// TODO Auto-generated method stub
+		try {
+			return userService.selectLocalauthInfoByName(userName);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("系统错误：获取用户信息失败", e);	
+		}
+		return null;
+	}
+
+	@Override
+	@ApiOperation("更改用户信息")
+	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto){
+		// TODO Auto-generated method stub		
+		try {			
+			return userService.saveOrUpdateLocalAuth(accountDto);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("系统错误：获取用户信息失败", e);
+			ResponseDto dto = new ResponseDto();
+			dto.setErrorMsg(ErrorMsg.UPDATE_USERINFO_FAILED);
+			return dto;
+		}		
+	}	
+
+	@Override
+	@ApiOperation("找回用户密码")
+	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
+		// TODO Auto-generated method stub
+		ResponseDto dto = null;
+		try {
+			return userService.findLocalAuthPassWord(accountDto);
+		} catch (Exception e) {						
+			dto = new ResponseDto();
+			LOGGER.error("系统错误:用户找回密码失败", e);
+			dto.setErrorMsg(com.iv.common.response.ErrorMsg.UNKNOWN);
+			return dto;
+		}
 	}
 	
 
