@@ -1,9 +1,6 @@
 package com.iv.dao;
 
-import java.util.List;
-
 import com.iv.entity.LocalAuth;
-import com.iv.entity.UserOauth;
 
 /**
  * 平台用户数据库工具类
@@ -18,6 +15,8 @@ public interface ILocalAuthDao {
 	LocalAuth saveOrUpdateLocalAuth(LocalAuth user) throws RuntimeException;
 	
 	LocalAuth selectLocalAuthById(int userId) throws RuntimeException;
+	
+	LocalAuth selectLocalAuthByUserName(String userName) throws RuntimeException;
 
 	/*LocalAuth selectUserAuthByUserName(String userName) throws RuntimeException;
 	

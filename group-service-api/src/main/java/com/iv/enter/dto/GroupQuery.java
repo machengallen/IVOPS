@@ -1,5 +1,7 @@
 package com.iv.enter.dto;
 
+import java.util.List;
+
 /**
  * 查询、操作用户组入参
  * @author zhangying
@@ -11,8 +13,9 @@ public class GroupQuery {
 	private int items;
 	private short groupId;
 	private String tenantId;
-	private boolean ifPaging;
-		
+	private String groupName;
+	private List<Integer> userIds;
+	private OpsGroup ops;	
 	public int getCurPage() {
 		return curPage;
 	}
@@ -37,11 +40,23 @@ public class GroupQuery {
 	public void setTenantId(String tenantId) {
 		this.tenantId = tenantId;
 	}
-	public boolean isIfPaging() {
-		return ifPaging;
+	public String getGroupName() {
+		return groupName;
 	}
-	public void setIfPaging(boolean ifPaging) {
-		this.ifPaging = ifPaging;
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+	public List<Integer> getUserIds() {
+		return userIds;
+	}
+	public void setUserIds(List<Integer> userIds) {
+		this.userIds = userIds;
+	}
+	public OpsGroup getOps() {
+		return ops;
+	}
+	public void setOps(OpsGroup ops) {
+		this.ops = ops;
 	}
 	
 }

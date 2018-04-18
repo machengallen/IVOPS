@@ -1,4 +1,4 @@
-package com.iv.outer.dto;
+package com.iv.dto;
 
 /**
  * 封装用户基础信息以及微信信息类
@@ -6,12 +6,14 @@ package com.iv.outer.dto;
  * 2018年4月16日
  * aggregation-1.4.0-SNAPSHOT
  */
-public class UserInfosDto {
+public class GroupUserInfosDto {
 	private int id;
-	private String userName;	
+	private String userName;
 	private String realName;
 	private String tel;
-	private String headimgurl;
+	private byte boundFlag;
+	private String headimgurl;	
+	private String curTenantId;
 	public int getId() {
 		return id;
 	}
@@ -36,11 +38,23 @@ public class UserInfosDto {
 	public void setTel(String tel) {
 		this.tel = tel;
 	}
+	public byte getBoundFlag() {
+		return boundFlag;
+	}
+	public void setBoundFlag(byte boundFlag) {
+		this.boundFlag = boundFlag;
+	}
 	public String getHeadimgurl() {
 		return headimgurl;
 	}
 	public void setHeadimgurl(String headimgurl) {
 		this.headimgurl = headimgurl;
-	} 
+	}
+	public String getCurTenantId() {
+		return curTenantId;
+	}
+	public void setCurTenantId(String curTenantId) {
+		this.curTenantId = curTenantId;
+	}
 	
 }
