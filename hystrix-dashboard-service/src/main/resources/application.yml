@@ -1,0 +1,29 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.9.26:8110/eureka/
+spring:
+  profiles:
+    active:
+    - peer1
+  application:
+    name: hystrix-dashboard-service
+turbine:
+  app-config: zuul-service,user-service,wechat-service,alarm-aggregation-service,alarm-facade-service,alarm-strategy-service,tenant-mgt-service,email-service,group-service
+  combine-host-port: true
+#  aggregator:
+#    cluster-config:
+#    - default
+  cluster-name-expression: "'default'"
+  
+---
+spring:
+  profiles: peer1
+server:
+  port: 8130
+
+---
+spring:
+  profiles: peer2
+server:
+  port: 8131
