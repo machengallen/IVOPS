@@ -1,0 +1,72 @@
+spring:
+  profiles:
+    active:
+    - dev-peer1
+  application:
+    name: eureka-server
+security:
+  user:
+    name: ivops
+    password: 123abcd
+  basic:
+    enabled: true
+eureka:
+  instance:
+    prefer-ip-address: true
+
+#多环境支持配置# 
+---
+spring:
+  profiles: dev-peer1
+server:
+  port: 8110
+eureka:
+#  instance:
+#    prefer-ip-address: true
+#    ip-address: 10.10.9.26
+#    hostname: eureka-server-2
+  client:
+    serviceUrl:
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8111/eureka/
+
+---
+spring:
+  profiles: dev-peer2
+server:
+  port: 8111
+eureka:
+#  instance:
+#    prefer-ip-address: true
+#    ip-address: 10.10.9.26
+#    hostname: eureka-server-2
+  client:
+    serviceUrl:
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8110/eureka/
+      
+---
+spring:
+  profiles: product-peer1
+server:
+  port: 8110
+eureka:
+#  instance:
+#    prefer-ip-address: true
+#    ip-address: 10.10.9.26
+#    hostname: eureka-server-2
+  client:
+    serviceUrl:
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8111/eureka/
+
+---
+spring:
+  profiles: product-peer2
+server:
+  port: 8111
+eureka:
+#  instance:
+#    prefer-ip-address: true
+#    ip-address: 10.10.9.26
+#    hostname: eureka-server-2
+  client:
+    serviceUrl:
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8110/eureka/
