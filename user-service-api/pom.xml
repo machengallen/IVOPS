@@ -37,8 +37,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<version>${springboot.project}</version>
-		</dependency>
-		
+		</dependency>		
 		<dependency>
 	      <groupId>com.iv</groupId>
 		  <artifactId>common-util</artifactId>

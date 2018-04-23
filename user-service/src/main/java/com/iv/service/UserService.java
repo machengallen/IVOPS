@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -41,8 +44,10 @@ public class UserService {
 	@Autowired
 	private WechatServiceClient wechatService;
 	@Autowired
+	private StringRedisTemplate stringtemplate;
+	@Autowired
 	private Md5PasswordEncoder md5PasswordEncoder;
-	public UserOauthDto bindInfo(String unionid, String loginType) {
+	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
 		UserOauth userOauth = userOauthDao.selectUserOauthByUnionid(unionid, loginType);
 		UserOauthDto userOauthDto = new UserOauthDto();
 		BeanCopier copy=BeanCopier.create(UserOauth.class, UserOauthDto.class, false);
@@ -234,7 +239,7 @@ public class UserService {
 		String passWord2 = accountDto.getPassWord2();
 		if (!StringUtils.isEmpty(passWord) && !StringUtils.isEmpty(passWord1) && !StringUtils.isEmpty(passWord2)) {
 			// 检验原密码
-			if (!md5PasswordEncoder.encodePassword(passWord, null).equals(localAuth.getPassWord())) {
+			/*if (!md5PasswordEncoder.encodePassword(passWord, null).equals(localAuth.getPassWord())) {
 				dto.setErrorMsg(ErrorMsg.AUTH_ILLEGAL);
 				return dto;
 			}
@@ -244,7 +249,7 @@ public class UserService {
 			} else {
 				dto.setErrorMsg(ErrorMsg.PASSWORD_DIFF);
 				return dto;
-			}
+			}*/
 		}
 		localAuth = localAuthDao.saveOrUpdateLocalAuth(localAuth);
 		dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
@@ -269,48 +274,60 @@ public class UserService {
 	 * @return
 	 */
 	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
-		ResponseDto dto = new ResponseDto();/*
-		LocalAuth localAuth = localAuthDao.selectLocalAuthByUserName(accountDto.getUserName());
-		//用户不存在
-		if(null == localAuth) {
-			dto.setErrorMsg(ErrorMsg.USER_NOT_EXIST);
-			return dto;
-		}else {
-			dto.setData(localAuth);
-		}
-		//
-		if(StringUtils.isEmpty(accountDto.getPassWord()) || StringUtils.isEmpty(accountDto.getVcode())) {
-			
-		}
-		if (StringUtils.isEmpty(accountDto.getPassWord())) {
-			// 用户存在情况下，返回用户信息
-			if (StringUtils.isEmpty(userInfo.getVcode())) {
-				dto.setData(localAuth);
+		LocalAuth localAuth = null;
+		switch (accountDto.getPasswordRecStep().ordinal()) {
+		case 0://验证账号（用户名或者邮箱或者已验证的手机）			
+			localAuth = localAuthDao.selectLocalAuthByUserBaseInfo(accountDto.getUserName());					
+			if(null == localAuth) {
+				return ResponseDto.builder(ErrorMsg.USER_NOT_EXIST);
+			}			
+			return ResponseDto.builder(ErrorMsg.OK, localAuth);	
+		case 1://验证身份			
+			if (StringUtils.isEmpty((String) stringtemplate.opsForValue().get("vcode")) 
+					|| StringUtils.isEmpty(accountDto.getVcode()) || !vcodeCheck(accountDto.getVcode(), 
+					(String) stringtemplate.opsForValue().get("vcode"))) {
+				return ResponseDto.builder(ErrorMsg.EMAIL_VCODE_ERROR);
 			} else {
-				// 验证码校验
-				if (null == (String) session.getAttribute("vcode")
-						|| !vcodeCheck(userInfo.getVcode(), (String) session.getAttribute("vcode"))) {
-					dto.setErrorMsg(ErrorMsg.EMAIL_VCODE_ERROR);
-				} else {
-					dto.setErrorMsg(ErrorMsg.OK);
-				}
+				return ResponseDto.builder(ErrorMsg.OK);
+			}
+		case 2://新密码校验与保存
+			Pattern p = Pattern.compile("(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,16}$");
+			if (!p.matcher(accountDto.getPassWord()).matches() || !p.matcher(accountDto.getPassWord1()).matches()) {
+				return ResponseDto.builder(ErrorMsg.PASSWORD_ILLEGAL);
+			} 
+			if (!accountDto.getPassWord().equals(accountDto.getPassWord1())) {
+				return ResponseDto.builder(ErrorMsg.PASSWORD_DIFF);
+			} else {
+				localAuth = localAuthDao.selectLocalAuthByUserBaseInfo(accountDto.getUserName());
+				localAuth.setPassWord(md5PasswordEncoder.encodePassword(accountDto.getPassWord(), null));
+				// 更新用户密码信息
+				localAuthDao.saveOrUpdateLocalAuth(localAuth);
+				return ResponseDto.builder(ErrorMsg.OK);
 			}
 
-		} else {
-			// 新密码校验与保存
-			Pattern p = Pattern.compile("(?!^[0-9]+$)(?!^[A-z]+$)(?!^[^A-z0-9]+$)^.{8,16}$");
-			if (!p.matcher(userInfo.getPassWord()).matches() || !p.matcher(userInfo.getPassWord1()).matches()) {
-				dto.setErrorMsg(ErrorMsg.PASSWORD_ILLEGAL);
-			} else if (!userInfo.getPassWord().equals(userInfo.getPassWord1())) {
-				dto.setErrorMsg(ErrorMsg.PASSWORD_DIFF);
-			} else {
-				localAuth.setPassWord(md5PasswordEncoder.encodePassword(userInfo.getPassWord(), null));
-				// 更新用户密码信息
-				USER_DAO.saveUserAuth(localAuth);
-				dto.setErrorMsg(ErrorMsg.OK);
-			}
-		}*/
+		default:
+			break;
+		}
+		return null;
+	}
 	
-		return dto;
+	/**
+	 * 校验邮箱验证码
+	 * @param vcode
+	 * @param cache
+	 * @return
+	 */
+	private boolean vcodeCheck(String vcode, String cache) {
+		String[] strs = cache.split("&");
+		String valiDvcode = strs[0];
+		String valiDtime = strs[1];
+
+		if (!vcode.equals(valiDvcode)) {
+			return false;
+		}
+		if (System.currentTimeMillis() > Long.parseLong(valiDtime)) {
+			return false;
+		}
+		return true;
 	}
 }

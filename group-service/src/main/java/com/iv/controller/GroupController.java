@@ -1,11 +1,17 @@
 package com.iv.controller;
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.dto.ErrorMsg;
+import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupQuery;
 import com.iv.outer.dto.GroupEntityDto;
 import com.iv.service.GroupService;
@@ -96,6 +102,16 @@ public class GroupController implements IGroupService{
 	public ResponseDto selectUsersInfoByTenantId(GroupQuery groupQuery) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	@ApiOperation("测试")
+	public GroupUserInfosDto test() {
+		// TODO Auto-generated method stub	
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String token = request.getHeader("cook");
+		return groupService.test();
 	}
 
 	

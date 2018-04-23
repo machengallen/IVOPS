@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.TemplateMessageDto;
@@ -40,8 +41,8 @@ public interface IWechatService {
 	 * @param wc
 	 * @return
 	 */
-	@RequestMapping(value = "/wechat", method = RequestMethod.GET)
-	public String xxtInterface(WeChat wc);
+	@RequestMapping(value = "/wechat", method = RequestMethod.POST)
+	public String xxtInterface(@RequestBody WeChat wc);
 		
 	
 	/**
@@ -49,7 +50,7 @@ public interface IWechatService {
 	 * @return
 	 */
 	@RequestMapping(value = "/wechat/qrcodeCreate", method = RequestMethod.GET)
-	public ResponseDto qrcodeCreate(@RequestParam int userId);
+	public ResponseDto qrcodeCreate(@RequestParam("userId") int userId);
 	
 	/**
 	 * 微信服务器推送消息入口
@@ -57,7 +58,7 @@ public interface IWechatService {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/wechat", method = RequestMethod.POST, produces = "text/xml;charset=UTF-8")
+	@RequestMapping(value = "/wechat", method = RequestMethod.GET, produces = "text/xml;charset=UTF-8")
 	public String getWeiXinMessage(HttpServletRequest request) throws Exception;				
 	
 	/**
@@ -66,14 +67,14 @@ public interface IWechatService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/userWechatByUnionid", method = RequestMethod.GET)	
-	public UserWechatEntityDto selectUserWechatByUnionid(String unionid);
+	public UserWechatEntityDto selectUserWechatByUnionid(@RequestParam("unionid") String unionid);
 	
 	/**
 	 * 发送微信模板消息
 	 * @param templateMessageDto
 	 */
 	@RequestMapping(value = "/send/weChatInfo", method = RequestMethod.POST)
-	void SendWeChatInfo(TemplateMessageDto templateMessageDto);
+	void SendWeChatInfo(@RequestBody TemplateMessageDto templateMessageDto);
 	
 	/**
 	 * 根据userId判断是否已关注微信公众号
@@ -81,5 +82,5 @@ public interface IWechatService {
 	 * @return
 	 */
 	@RequestMapping(value = "/boolean/ifFocusWechat", method = RequestMethod.GET)
-	boolean ifFocusWechat(int userId);
+	boolean ifFocusWechat(@RequestParam("userId") int userId);
 }

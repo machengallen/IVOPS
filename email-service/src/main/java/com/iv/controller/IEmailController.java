@@ -12,7 +12,6 @@ import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
 import com.iv.service.EmailService;
 import com.iv.service.IEmailService;
-import com.iv.util.MailSenderUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

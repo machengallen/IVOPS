@@ -49,5 +49,11 @@ public class ResponseDto {
 		dto.setErrorMsg(errorMsg);
 		return dto;
 	}
+	public static ResponseDto builder(IErrorMsg errorMsg, Object data) {
+		ResponseDto dto = new ResponseDto();
+		dto.setErrorMsg(errorMsg);
+		dto.setData(data);
+		return dto;
+	}
 	
 }

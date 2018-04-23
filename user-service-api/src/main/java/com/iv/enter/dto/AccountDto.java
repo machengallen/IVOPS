@@ -1,5 +1,8 @@
 package com.iv.enter.dto;
 
+import com.iv.enumeration.LoginType;
+import com.iv.enumeration.PasswordRecStep;
+
 /**
  * 平台账号信息
  * 1)微信扫码登录后，无平台账号，新注册实体类
@@ -31,7 +34,9 @@ public class AccountDto {
 	/**邮箱校验码*/
 	private String vcode;
 	/**登录方式*/
-	private String loginType;
+	private LoginType loginType;
+	/**密码找回步骤*/
+	private PasswordRecStep passwordRecStep;
 	
 	public String getUnionid() {
 		return unionid;
@@ -105,14 +110,16 @@ public class AccountDto {
 	public void setVcode(String vcode) {
 		this.vcode = vcode;
 	}
-	public String getLoginType() {
+	public LoginType getLoginType() {
 		return loginType;
 	}
-	public void setLoginType(String loginType) {
+	public void setLoginType(LoginType loginType) {
 		this.loginType = loginType;
 	}
-	
-			
-	
-	
+	public PasswordRecStep getPasswordRecStep() {
+		return passwordRecStep;
+	}
+	public void setPasswordRecStep(PasswordRecStep passwordRecStep) {
+		this.passwordRecStep = passwordRecStep;
+	}	
 }

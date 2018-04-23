@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
 import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 
@@ -30,7 +31,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/user/info", method = RequestMethod.GET)
-	ResponseDto getUserInfo();
+	LocalAuthDto getUserInfo();
 	
 	/**
 	 * 查看用户是否已绑定三方登录
@@ -38,7 +39,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/permit/user/bindInfo", method = RequestMethod.GET)
-	UserOauthDto bindInfo(@RequestParam String unionid, @RequestParam String loginType);
+	UserOauthDto bindInfo(@RequestParam("unionid") String unionid, @RequestParam("loginType") LoginType loginType);
 	
 	/**
 	 * 用户绑定微信信息
@@ -63,7 +64,7 @@ public interface IUserService {
 	 * @throws RuntimeException
 	 */
 	@RequestMapping(value = "/permit/select/localAuthById",method = RequestMethod.GET)
-	LocalAuthDto selectLocalAuthById(@RequestParam int userId) throws RuntimeException;
+	LocalAuthDto selectLocalAuthById(@RequestParam("userId") int userId) throws RuntimeException;
 	
 	/**
 	 * 根据用户id  登录方式  查询unionid
@@ -73,7 +74,7 @@ public interface IUserService {
 	 * @throws RuntimeException
 	 */
 	@RequestMapping(value = "/select/UserWechat",method = RequestMethod.GET)
-	String selectUserWechatUnionid(@RequestParam int userId, @RequestParam String loginType);
+	String selectUserWechatUnionid(@RequestParam("userId") int userId, @RequestParam("loginType") String loginType);
 	
 	/**
 	 * 根据用户id集合，查询用户信息
@@ -89,7 +90,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/localauthInfoByName",method = RequestMethod.GET)
-	LocalAuthDto selectLocalauthInfoByName(@RequestParam String userName);
+	LocalAuthDto selectLocalauthInfoByName(@RequestParam("userName") String userName);
 	
 	/**
 	 * 更改用户信息

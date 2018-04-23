@@ -1,17 +1,23 @@
 package com.iv.controller;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
 import com.iv.enter.dto.AccountDto;
 import com.iv.enter.dto.UsersWechatsQuery;
 import com.iv.entity.LocalAuth;
+import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 import com.iv.service.IUserService;
@@ -19,7 +25,6 @@ import com.iv.service.UserService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import net.sf.json.JSONObject;
 
 @RestController
 @Api(description = "用户与团队管理接口")
@@ -33,34 +38,38 @@ public class UserController implements IUserService {
 	 * 例子
 	 */
 	@Override
-	public ResponseDto getUserInfo() {
+	public LocalAuthDto getUserInfo() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String token = request.getHeader("cook");
 		ResponseDto dto = new ResponseDto();
 		try {
 			//Thread.sleep(3000);
-			String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw";
-			Jwt jwt = JwtHelper.decode(token);			
-			String jwt1 = jwt.getClaims();	
-			JSONObject jsonObject = JSONObject.fromObject(jwt1);
-			String username = jsonObject.get("user_name").toString();
+			//String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw";
+//			Jwt jwt = JwtHelper.decode(token);			
+//			String jwt1 = jwt.getClaims();	
+//			JSONObject jsonObject = JSONObject.fromObject(jwt1);
+//			String username = jsonObject.get("user_name").toString();
 			LocalAuth user = new LocalAuth();
 			user.setUserName("mac@inno-view.cn");
 			user.setRealName("马成");
 			user.setId(1);
-			dto.setData(user);
-			dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
-			return dto;
+			/*dto.setData(user);
+			dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);*/
+			return userService.convertLocalAuthDto(user);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			
 			LOGGER.error("系统内部错误", e);
 			dto.setErrorMsg(com.iv.common.response.ErrorMsg.UNKNOWN);
-			return dto;
+			//return dto;
 		}
+		return null;
 	}
 	
 	@Override
 	@ApiOperation("查看用户是否已绑定三方登录")
-	public UserOauthDto bindInfo(String unionid,String loginType) {
+	public UserOauthDto bindInfo(String unionid,LoginType loginType) {
 		// TODO Auto-generated method stub
 		Jwt jwt = JwtHelper.decode("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw");
 		try {

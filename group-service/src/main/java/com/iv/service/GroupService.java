@@ -3,10 +3,15 @@ package com.iv.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
 import com.iv.dao.IGroupDaoImpl;
 import com.iv.dto.GroupUserInfosDto;
 import com.iv.dto.UserIdsPagingDto;
@@ -27,6 +32,20 @@ public class GroupService {
 	private IGroupDaoImpl groupDao;
 	@Autowired
 	private UserServiceClient userService;
+	
+	public GroupUserInfosDto test() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+				.getRequest();
+		String token = request.getHeader("cook");
+		GroupUserInfosDto groupUserInfosDto = new GroupUserInfosDto();		
+		LocalAuthDto dto = userService.getUserInfo();
+		if(null != dto) {
+			groupUserInfosDto.setId(dto.getId());
+			groupUserInfosDto.setUserName(dto.getUserName());
+		}
+		
+		return groupUserInfosDto;
+	}
 	
 	/**
 	 * 根据组id、租户id/或根据组id查询组信息

@@ -17,6 +17,8 @@ public interface ILocalAuthDao {
 	LocalAuth selectLocalAuthById(int userId) throws RuntimeException;
 	
 	LocalAuth selectLocalAuthByUserName(String userName) throws RuntimeException;
+	
+	LocalAuth selectLocalAuthByUserBaseInfo(String userBaseInfo) throws RuntimeException;
 
 	/*LocalAuth selectUserAuthByUserName(String userName) throws RuntimeException;
 	

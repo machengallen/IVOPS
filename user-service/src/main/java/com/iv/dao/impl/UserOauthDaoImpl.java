@@ -9,12 +9,13 @@ import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
 import com.iv.common.util.spring.ConstantContainer;
 import com.iv.dao.UserOauthDao;
 import com.iv.entity.UserOauth;
+import com.iv.enumeration.LoginType;
 
 @Repository
 public class UserOauthDaoImpl implements UserOauthDao {
 
 	@Override
-	public UserOauth selectUserOauthByUnionid(String unionid, String loginType) throws RuntimeException {
+	public UserOauth selectUserOauthByUnionid(String unionid, LoginType loginType) throws RuntimeException {
 		// TODO Auto-generated method stub
 		return (UserOauth) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
 			

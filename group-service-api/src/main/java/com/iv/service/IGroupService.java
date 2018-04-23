@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupQuery;
 import com.iv.outer.dto.GroupEntityDto;
 
@@ -14,6 +15,13 @@ import com.iv.outer.dto.GroupEntityDto;
  * aggregation-1.4.0-SNAPSHOT
  */
 public interface IGroupService {
+	
+	/**
+	 * 测试
+	 * @return
+	 */
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	GroupUserInfosDto test();
 	
 	/**
 	 * 根据组id、租户id/或根据组id查询组信息
@@ -28,7 +36,7 @@ public interface IGroupService {
 	 * @param groupUserQuery
 	 * @return
 	 */
-	@RequestMapping(value = "/select/groupUsersInfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/select/groupUsersInfo", method = RequestMethod.POST)
 	ResponseDto groupUsersInfo(@RequestBody GroupQuery groupQuery);
 	
 	/**
@@ -36,7 +44,7 @@ public interface IGroupService {
 	 * @param groupUserQuery
 	 * @return
 	 */
-	@RequestMapping(value = "/select/groupUsersPageInfo", method = RequestMethod.GET)
+	@RequestMapping(value = "/select/groupUsersPageInfo", method = RequestMethod.POST)
 	ResponseDto groupUsersPageInfo(@RequestBody GroupQuery groupQuery);
 	
 	/**

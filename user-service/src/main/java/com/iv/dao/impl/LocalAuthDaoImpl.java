@@ -73,6 +73,24 @@ public class LocalAuthDaoImpl implements ILocalAuthDao {
 			}
 		}, ConstantContainer.TENANT_SHARED_ID);
 	}
+
+	@Override
+	/**
+	 * 根据用户名、或者邮箱、或者已验证手机查询用户信息
+	 */
+	public LocalAuth selectLocalAuthByUserBaseInfo(String userBaseInfo) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return (LocalAuth) HibernateTemplate.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				// TODO Auto-generated method stub
+				return ses.createQuery("from LocalAuth l where l.userName=? or l.email=? or l.tel=?")
+						.setParameter(0, userBaseInfo).setParameter(1, userBaseInfo).setParameter(2, userBaseInfo)
+						.uniqueResult();
+			}
+		});
+	}
 	
 	
 	/*

@@ -1,6 +1,7 @@
 package com.iv.dao;
 
 import com.iv.entity.UserOauth;
+import com.iv.enumeration.LoginType;
 
 /**
  * 用户绑定信息数据库工具类
@@ -10,7 +11,7 @@ import com.iv.entity.UserOauth;
  */
 public interface UserOauthDao {
 
-	UserOauth selectUserOauthByUnionid(String unionid, String loginType) throws RuntimeException;
+	UserOauth selectUserOauthByUnionid(String unionid, LoginType loginType) throws RuntimeException;
 	
 	String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException;
 }

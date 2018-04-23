@@ -107,7 +107,7 @@ public class WeChatService {
         //用户标识	            
         String unionid = weixinOauth2Token.getUnionid();
         //根据unionid、登录方式，查询用户绑定情况
-        UserOauthDto userOauthDto = userService.bindInfo(unionid, LoginType.WECHAT.toString());
+        UserOauthDto userOauthDto = userService.bindInfo(unionid, LoginType.WECHAT);
         if(null == userOauthDto) {
         	//无绑定用户，将微信信息存入数据库，并跳转到绑定注册页面
         	UserWechatEntity userWechatEntity = authorizationUtil.getUserInfo(openUserInfo, weixinOauth2Token.getAccessToken(), weixinOauth2Token.getOpenId());       	
@@ -237,7 +237,7 @@ public class WeChatService {
 						eventKey = eventKey.split("_")[1];
 						if (!StringUtils.isEmpty(eventKey)) {
 							//boolean result = LOCAL_USER_DAO.updateOpenId(Integer.parseInt(eventKey), userWechatEntity);
-							UserOauthDto userOauthDto = userService.bindInfo(userWechatEntity.getUnionid(), LoginType.WECHAT.toString());
+							UserOauthDto userOauthDto = userService.bindInfo(userWechatEntity.getUnionid(), LoginType.WECHAT);
 							if (null == userOauthDto) {
 								// 感知前端，页面跳转
 								ResponseDto responseDto = new ResponseDto();

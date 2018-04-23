@@ -7,23 +7,12 @@ import org.springframework.stereotype.Component;
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
 import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 
 @Component
 public class UserServiceClientFallBack implements UserServiceClient {
-
-	@Override
-	public ResponseDto getUserInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UserOauthDto bindInfo(String unionid, String loginType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ResponseDto bindWechatInfo(AccountDto accountDto) {
@@ -63,6 +52,24 @@ public class UserServiceClientFallBack implements UserServiceClient {
 
 	@Override
 	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public LocalAuthDto getUserInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

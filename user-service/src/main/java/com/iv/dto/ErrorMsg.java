@@ -4,6 +4,8 @@ import com.iv.common.response.IErrorMsg;
 
 public enum ErrorMsg implements IErrorMsg {
 	
+	OK(0,"ok"),
+	
 	AUTH_ILLEGAL(42200,"用户名或密码错误"),
 	
 	USERNAME_EXIST(42201,"用户名已存在"),
@@ -22,7 +24,11 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	PASSWORD_DIFF(42208,"密码确认失败"),
 	
-	UPDATE_USERINFO_FAILED(42209,"用户信息更新失败");
+	UPDATE_USERINFO_FAILED(42209,"用户信息更新失败"),
+	
+	EMAIL_VCODE_ERROR(42210,"验证码错误或已失效"),
+	
+	PASSWORD_ILLEGAL(42211,"密码非法");
 
 	private int code;
     private String msg;
