@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
@@ -38,11 +38,6 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
-	@Override
-	public List<LocalAuthDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
@@ -70,6 +65,12 @@ public class UserServiceClientFallBack implements UserServiceClient {
 
 	@Override
 	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		return null;
 	}

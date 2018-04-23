@@ -17,7 +17,7 @@ import com.iv.dto.GroupUserInfosDto;
 import com.iv.dto.UserIdsPagingDto;
 import com.iv.dto.UserPagingDto;
 import com.iv.enter.dto.GroupQuery;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.GroupEntity;
 import com.iv.enumeration.LoginType;
 import com.iv.external.service.UserServiceClient;
@@ -112,7 +112,7 @@ public class GroupService {
 	 */
 	public UserPagingDto convertUsersInfo(List<Integer> userIds) {
 		UserPagingDto userPagingDto = new UserPagingDto();
-		UsersWechatsQuery usersWechatsQuery = new UsersWechatsQuery();
+		UsersQueryDto usersWechatsQuery = new UsersQueryDto();
 		usersWechatsQuery.setUserIds(userIds);
 		usersWechatsQuery.setLoginType(LoginType.WECHAT.toString());
 		List<LocalAuthDto> UserInfosDtos = userService.selectUserInfos(usersWechatsQuery);			
