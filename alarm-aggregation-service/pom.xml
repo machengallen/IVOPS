@@ -27,6 +27,12 @@
 
 	<dependencies>
 		<dependency>
+    		<groupId>com.iv</groupId>
+			<artifactId>message-service-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>jar</type>
+    	</dependency>
+		<dependency>
 			<groupId>com.iv</groupId>
 			<artifactId>group-service-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>

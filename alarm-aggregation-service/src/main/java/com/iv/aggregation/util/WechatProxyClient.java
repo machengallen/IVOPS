@@ -13,7 +13,6 @@ import org.springframework.util.CollectionUtils;
 
 import com.iv.aggregation.api.constant.AlarmStatus;
 import com.iv.aggregation.api.constant.NoticeModel;
-import com.iv.aggregation.api.constant.NoticeType;
 import com.iv.aggregation.dao.impl.AlarmMsgDaoImpl;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmMsgEntity;
@@ -22,6 +21,7 @@ import com.iv.aggregation.feign.clients.IEmailServiceClient;
 import com.iv.aggregation.feign.clients.IGroupServiceClient;
 import com.iv.aggregation.feign.clients.IUserServiceClient;
 import com.iv.aggregation.feign.clients.IWechatServiceClient;
+import com.iv.common.enumeration.NoticeType;
 import com.iv.common.enumeration.SendType;
 import com.iv.common.enumeration.Severity;
 import com.iv.dto.TemplateMessageDto;

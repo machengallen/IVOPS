@@ -2,9 +2,9 @@ package com.iv.aggregation.dao;
 
 import java.util.List;
 
-import com.iv.aggregation.api.constant.NoticeType;
 import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.common.dto.ObjectPageDto;
+import com.iv.common.enumeration.NoticeType;
 
 
 public interface IAlarmMsgDao {

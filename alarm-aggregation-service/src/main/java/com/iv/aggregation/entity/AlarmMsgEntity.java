@@ -15,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iv.aggregation.api.constant.AlarmStatus;
-import com.iv.aggregation.api.constant.NoticeType;
+import com.iv.common.enumeration.NoticeType;
 
 /**
  * 消息中心-告警通知消息体
