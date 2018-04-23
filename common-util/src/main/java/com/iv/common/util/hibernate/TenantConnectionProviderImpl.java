@@ -57,11 +57,11 @@ public class TenantConnectionProviderImpl
 	@Override
 	public Connection getConnection(String tenantIdentifier) throws SQLException {
 		final Connection connection = getAnyConnection();
-		RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+		/*RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
 		if (null != attributes && null != attributes.getAttribute("tenantMgt", 0)) {
 			useDatabase((String) attributes.getAttribute("tenantMgt", 0), connection);
 			return connection;
-		}
+		}*/
 		useDatabase(tenantIdentifier, connection);
 		return connection;
 	}
