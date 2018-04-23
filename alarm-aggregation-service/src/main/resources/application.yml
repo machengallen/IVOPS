@@ -15,7 +15,7 @@ spring:
     encoding:
       enabled: true
   datasource:
-    url: jdbc:mysql://10.10.31.25:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.25:3306/personal?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd
     driver-class-name: com.mysql.jdbc.Driver

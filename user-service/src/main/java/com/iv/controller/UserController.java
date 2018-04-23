@@ -15,7 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.LocalAuth;
 import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
@@ -139,7 +139,7 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("根据用户id集合，查询用户信息")
-	public List<LocalAuthDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery) {
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectUserInfos(usersWechatsQuery);

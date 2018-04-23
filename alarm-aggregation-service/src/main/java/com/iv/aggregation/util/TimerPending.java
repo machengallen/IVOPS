@@ -14,7 +14,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.CollectionUtils;
 
 import com.iv.aggregation.api.constant.NoticeModel;
-import com.iv.aggregation.api.constant.NoticeType;
 import com.iv.aggregation.api.constant.OpsType;
 import com.iv.aggregation.dao.IAlarmLifeDao;
 import com.iv.aggregation.dao.IAlarmMsgDao;
@@ -26,7 +25,7 @@ import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.aggregation.entity.AlarmSourceEntity;
 import com.iv.aggregation.feign.clients.IAlarmStrategyClient;
 import com.iv.aggregation.service.CoreService;
-import com.iv.common.enumeration.Severity;
+import com.iv.common.enumeration.NoticeType;
 import com.iv.common.util.spring.SpringContextUtil;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
 import com.iv.strategy.api.dto.StrategyQueryDto;

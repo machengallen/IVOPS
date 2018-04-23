@@ -3,7 +3,7 @@ eureka:
     status-page-url: http://10.10.9.55:${server.port}/swagger-ui.html
   client:
     service-url:
-      defaultZone: http://10.10.9.55:8110/eureka/
+      defaultZone: http://ivops:123abcd@10.10.9.55:8110/eureka/
 spring:
   profiles:
     active:
@@ -14,7 +14,7 @@ spring:
     encoding:
       enabled: true
   datasource:
-    url: jdbc:mysql://10.10.31.26:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.26:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd
     driver-class-name: com.mysql.jdbc.Driver
@@ -28,15 +28,15 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
-      hibernate.connection.url: jdbc:mysql://10.10.31.26:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://10.10.31.26:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: root
       hibernate.hbm2ddl.auto: update
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       hibernate.event.merge.entity_copy_observer: allow
       #------------------------以下多租户配置属性---------------------------#
       hibernate.multiTenancy: SCHEMA
-      hibernate.tenant_identifier_resolver: com.iv.common.hibernate.util.TenantIdResolver
-      hibernate.multi_tenant_connection_provider: com.iv.common.hibernate.util.TenantConnectionProviderImpl
+      hibernate.tenant_identifier_resolver: com.iv.common.util.hibernate.TenantIdResolver
+      hibernate.multi_tenant_connection_provider: com.iv.common.util.hibernate.TenantConnectionProviderImpl
       hibernate.connection.password: 123@abcd
       hibernate.connection.driver_class: com.mysql.jdbc.Driver
       hibernate.c3p0.minPoolSize: 5

@@ -27,7 +27,7 @@ eureka:
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8111/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8111/eureka/
 
 ---
 spring:
@@ -41,7 +41,7 @@ eureka:
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8110/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8110/eureka/
       
 ---
 spring:
@@ -55,7 +55,7 @@ eureka:
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8111/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8111/eureka/
 
 ---
 spring:
@@ -69,4 +69,4 @@ eureka:
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8110/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8110/eureka/

@@ -8,7 +8,7 @@ import java.util.List;
  * 2018年4月18日
  * aggregation-1.4.0-SNAPSHOT
  */
-public class UsersWechatsQuery {
+public class UsersQueryDto {
 	private List<Integer> userIds;
 	private String loginType;
 	

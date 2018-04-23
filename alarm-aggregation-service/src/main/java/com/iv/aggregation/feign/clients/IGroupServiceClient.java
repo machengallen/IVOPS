@@ -23,7 +23,13 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 	}
 
 	@Override
-	public ResponseDto groupUserPageInfo(GroupQuery groupQuery) {
+	public ResponseDto groupUsersInfo(GroupQuery groupQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto groupUsersPageInfo(GroupQuery groupQuery) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -33,5 +39,12 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public ResponseDto selectUsersInfoByTenantId(GroupQuery groupQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

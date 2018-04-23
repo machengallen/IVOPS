@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
+<<<<<<< HEAD
 import com.iv.enter.dto.UsersWechatsQuery;
 import com.iv.enumeration.LoginType;
+=======
+import com.iv.enter.dto.UsersQueryDto;
+>>>>>>> 34d307b460c662969ff838ffa630338c27886e1d
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 
@@ -82,7 +86,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/userInfos",method = RequestMethod.POST)
-	List<LocalAuthDto> selectUserInfos(@RequestBody UsersWechatsQuery usersWechatsQuery);
+	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery);
 	
 	/**
 	 * 根据用户名称查询用户信息

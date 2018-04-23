@@ -52,7 +52,6 @@
             <artifactId>hibernate-c3p0</artifactId>  
             <version>5.0.12.Final</version>  
         </dependency>
-        
 		<dependency>
 		    <groupId>net.sf.json-lib</groupId>
 		    <artifactId>json-lib-ext-spring</artifactId>

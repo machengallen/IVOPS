@@ -19,7 +19,7 @@ import com.iv.dao.impl.LocalAuthDaoImpl;
 import com.iv.dao.impl.UserOauthDaoImpl;
 import com.iv.dto.ErrorMsg;
 import com.iv.enter.dto.AccountDto;
-import com.iv.enter.dto.UsersWechatsQuery;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.LocalAuth;
 import com.iv.entity.UserOauth;
 import com.iv.entity.dto.UserWechatEntityDto;
@@ -183,7 +183,7 @@ public class UserService {
 	 * @param usersWechatsQuery
 	 * @return
 	 */
-	public List<LocalAuthDto> selectUserInfos(UsersWechatsQuery usersWechatsQuery){
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery){
 		String loginType = usersWechatsQuery.getLoginType();
 		List<Integer> userIds = usersWechatsQuery.getUserIds();
 		LocalAuthDto localAuthDto = new LocalAuthDto();

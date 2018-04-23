@@ -6,10 +6,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
-import com.iv.aggregation.api.constant.NoticeType;
 import com.iv.aggregation.dao.IAlarmMsgDao;
 import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.common.dto.ObjectPageDto;
+import com.iv.common.enumeration.NoticeType;
 import com.iv.common.util.hibernate.HibernateCallBack;
 import com.iv.common.util.hibernate.HibernateTemplate;
 import com.iv.common.util.hibernate.HibernateTemplateWithTenant;

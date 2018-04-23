@@ -6,8 +6,12 @@ import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.enter.dto.AccountDto;
+<<<<<<< HEAD
 import com.iv.enter.dto.UsersWechatsQuery;
 import com.iv.enumeration.LoginType;
+=======
+import com.iv.enter.dto.UsersQueryDto;
+>>>>>>> 34d307b460c662969ff838ffa630338c27886e1d
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
 
@@ -56,7 +60,11 @@ public class UserServiceClientFallBack implements UserServiceClient {
 	}
 
 	@Override
+<<<<<<< HEAD
 	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
+=======
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
+>>>>>>> 34d307b460c662969ff838ffa630338c27886e1d
 		// TODO Auto-generated method stub
 		return null;
 	}

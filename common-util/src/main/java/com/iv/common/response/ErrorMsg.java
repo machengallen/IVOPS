@@ -5,7 +5,9 @@ public enum ErrorMsg implements IErrorMsg{
 
 	OK(0,"ok"),
 	
-	UNKNOWN(4001,"系统未知错误");
+	UNKNOWN(4001,"系统未知错误"),
+	
+	GET_DATA_FAILED(4002,"获取数据失败");
 	
 	private int code;
     private String msg;
