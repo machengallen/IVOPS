@@ -12,7 +12,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	WECHAT_BINDING_ILLEGAL(42405,"该微信号已绑定其他账户"),
 
-	QRCODE_CREATE_FAILED(42406,"二维码加载失败");
+	QRCODE_CREATE_FAILED(42406,"二维码加载失败"),
+	
+	SEND_WECHATINFO_FAILED(42407,"发送微信消息失败");
 	
 	private int code;
     private String msg;

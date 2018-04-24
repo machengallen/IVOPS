@@ -1,6 +1,7 @@
 package com.iv.external.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
@@ -71,6 +72,12 @@ public class UserServiceClientFallBack implements UserServiceClient {
 
 	@Override
 	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

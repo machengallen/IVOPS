@@ -4,8 +4,11 @@ import com.iv.common.response.IErrorMsg;
 
 public enum ErrorMsg implements IErrorMsg {
 	
-	EMAIL_VCODE_SEND_FAILED(42500,"验证码发送失败"),;
-
+	OK(0,"ok"),
+	
+	EMAIL_VCODE_SEND_FAILED(42500,"验证码发送失败"),
+	
+	EMAIL_SEND_INFo_FAILED(42501,"邮箱发送信息失败");
 	private int code;
     private String msg;
 	

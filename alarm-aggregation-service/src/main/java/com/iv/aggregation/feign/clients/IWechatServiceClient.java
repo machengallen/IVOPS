@@ -55,9 +55,9 @@ class WechatServiceClientFallBack implements IWechatServiceClient{
 	}
 
 	@Override
-	public void SendWeChatInfo(TemplateMessageDto templateMessageDto) {
+	public ResponseDto SendWeChatInfo(TemplateMessageDto templateMessageDto) {
 		// TODO Auto-generated method stub
-		
+		return null;		
 	}
 
 	@Override

@@ -4,7 +4,7 @@ server:
 #redis连接
 spring:
   redis:
-    host: 10.10.31.26
+    host: 10.10.31.25
     database: 2
     port: 6379
     password: 123@abcd

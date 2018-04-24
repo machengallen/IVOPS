@@ -14,7 +14,7 @@ spring:
     encoding:
       enabled: true
   datasource:
-    url: jdbc:mysql://10.10.31.26:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.25:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd
     driver-class-name: com.mysql.jdbc.Driver
@@ -28,7 +28,7 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
-      hibernate.connection.url: jdbc:mysql://10.10.31.26:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: root
       hibernate.hbm2ddl.auto: update
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -50,5 +50,10 @@ server:
   port: 8280
 spring:
   profiles: peer1
+---
+server:
+  port: 8281
+spring:
+  profiles: peer2
 
       

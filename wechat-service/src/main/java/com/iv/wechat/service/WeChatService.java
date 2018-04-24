@@ -3,8 +3,10 @@ package com.iv.wechat.service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.TemplateMessageDto;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.enumeration.LoginType;
 import com.iv.external.service.UserServiceClient;
@@ -356,19 +359,23 @@ public class WeChatService {
 		}
 		String encodeUrl = URLEncoder.encode(templateMessageDto.getRedirect_uri(), "UTF-8");
 		String url = String.format(urlAlarmDetails, appId,encodeUrl);
-		templateMessage.setUrl(url);		
-		String unionid = userService.selectUserWechatUnionid(templateMessageDto.getUserId(),LoginType.WECHAT.toString());
-		UserWechatEntity userWechatEntity = userWechatDao.selectUserWechatByUnionid(unionid);
-		String openId = userWechatEntity.getPlatformSigns().get(appId);
-		templateMessage.setOpenId(openId);
+		templateMessage.setUrl(url);	
+		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateMessageDto.getUserIds(),LoginType.WECHAT.toString());
+		Set<String> unionids = userService.selectUsersWechatUnionid(UsersQueryDto);
+		List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
 		String token = wechatUtil.getToken().getAccessToken();
 		String uri = urlTemplateMsg;
-		JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
-		if (null == jsonObject) {
-			// token异常，重新获取
-			System.out.println("****************更新 wechat token****************");
-			jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
-		}
+		for (UserWechatEntity userWechatEntity : userWechatEntitys) {
+			String openId = userWechatEntity.getPlatformSigns().get(appId);
+			templateMessage.setOpenId(openId);		
+			JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
+			if (null == jsonObject) {
+				// token异常，重新获取
+				System.out.println("****************更新 wechat token****************");
+				jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
+			}
+		}				
+		
 	}
 	
 	/**

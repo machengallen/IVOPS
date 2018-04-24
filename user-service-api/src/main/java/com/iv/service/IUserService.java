@@ -2,6 +2,7 @@ package com.iv.service;
 
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -107,4 +108,12 @@ public interface IUserService {
 	 */
 	@RequestMapping(value = "/find/localAuthPassWord",method = RequestMethod.POST)
 	ResponseDto findLocalAuthPassWord(@RequestBody AccountDto accountDto);
+	
+	/**
+	 * 根据用户列表id、登录方式查找联合主键
+	 * @param UsersQueryDto
+	 * @return
+	 */
+	@RequestMapping(value = "/select/usersUnionid",method = RequestMethod.POST)
+	Set<String> selectUsersWechatUnionid(@RequestBody UsersQueryDto UsersQueryDto);
 }

@@ -4,6 +4,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupQuery;
 import com.iv.outer.dto.GroupEntityDto;
 import com.iv.service.IGroupService;
@@ -42,6 +43,12 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 
 	@Override
 	public ResponseDto selectUsersInfoByTenantId(GroupQuery groupQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public GroupUserInfosDto test() {
 		// TODO Auto-generated method stub
 		return null;
 	}

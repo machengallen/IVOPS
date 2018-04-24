@@ -26,11 +26,11 @@ public class IEmailController implements IEmailService {
 
 	@Override
 	@ApiOperation("发送邮箱验证码")
-	public ResponseDto emailVCode(HttpSession session, String email) {
+	public ResponseDto emailVCode(String email) {
 		// TODO Auto-generated method stub
 		ResponseDto dto = new ResponseDto();
 		try {
-			emailService.emailVCode(session, email);
+			emailService.emailVCode(email);
 			dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
 			return dto;
 		} catch (Exception e) {
@@ -42,12 +42,14 @@ public class IEmailController implements IEmailService {
 
 	@Override
 	@ApiOperation("使用邮箱发送模板消息")
-	public void alarmToMail(String[] toEmails, SendType emailType, Object object) {
+	public ResponseDto alarmToMail(String[] toEmails, SendType emailType, Object object) {
 		// TODO Auto-generated method stub		
 		try {
-			emailService.sendToMail(toEmails, emailType,object);						
+			emailService.sendToMail(toEmails, emailType,object);
+			return ResponseDto.builder(ErrorMsg.OK);
 		} catch (Exception e) {
 			LOGGER.error("系统错误：邮箱发送模板消息失败", e);
+			return ResponseDto.builder(ErrorMsg.EMAIL_SEND_INFo_FAILED);
 		}
 	}
 

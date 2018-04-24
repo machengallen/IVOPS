@@ -11,7 +11,16 @@ import java.util.List;
 public class UsersQueryDto {
 	private List<Integer> userIds;
 	private String loginType;
-	
+		
+	public UsersQueryDto() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public UsersQueryDto(List<Integer> userIds, String loginType) {
+		super();
+		this.userIds = userIds;
+		this.loginType = loginType;
+	}
 	public List<Integer> getUserIds() {
 		return userIds;
 	}

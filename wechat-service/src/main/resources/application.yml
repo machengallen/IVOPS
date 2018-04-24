@@ -1,11 +1,20 @@
-server:
-  port: 8240
+eureka:
+  instance:
+    status-page-url: http://10.10.9.55:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.9.55:8110/eureka/
 spring:
+  profiles:
+    active:
+    - peer1
+  application:
+    name: wechat-server
   http:
     encoding:
       enabled: true
   datasource:
-    url: jdbc:mysql://10.10.31.26:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.25:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd
     driver-class-name: com.mysql.jdbc.Driver
@@ -19,11 +28,34 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
-      hibernate.connection.url: jdbc:mysql://10.10.31.26:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/iv_test?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: root
       hibernate.hbm2ddl.auto: update
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-      hibernate.event.merge.entity_copy_observer: allow      
-
+      hibernate.event.merge.entity_copy_observer: allow   
+security:
+  basic:
+    enabled: false
+---
+server:
+  port: 8240
+spring:
+  profiles: peer1
+---
+server:
+  port: 8241
+spring:
+  profiles: peer2   
+  redis:
+    host: 10.10.31.25
+    database: 2
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
     
       

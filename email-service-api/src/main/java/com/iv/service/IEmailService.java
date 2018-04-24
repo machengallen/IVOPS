@@ -19,11 +19,11 @@ public interface IEmailService {
 	 * @return
 	 */
 	@RequestMapping(value = "/register/vcode", method = RequestMethod.GET)
-	ResponseDto emailVCode(HttpSession session, @RequestParam String email);
+	ResponseDto emailVCode(@RequestParam("email") String email);
 	
 	/**
 	 * 邮箱发送告警信息
 	 */
 	@RequestMapping(value = "/send/templateMessage", method = RequestMethod.GET)
-	void alarmToMail(String[] toEmails, SendType emailType, Object object);
+	ResponseDto alarmToMail(String[] toEmails, SendType emailType, Object object);
 }

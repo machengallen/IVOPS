@@ -1,5 +1,7 @@
 package com.iv.dao;
 
+import java.util.List;
+
 import com.iv.entity.UserOauth;
 import com.iv.enumeration.LoginType;
 
@@ -14,4 +16,6 @@ public interface UserOauthDao {
 	UserOauth selectUserOauthByUnionid(String unionid, LoginType loginType) throws RuntimeException;
 	
 	String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException;
+	
+	List<UserOauth> selectUsersWechatUnionid(List<Integer> userIds, String loginType);
 }

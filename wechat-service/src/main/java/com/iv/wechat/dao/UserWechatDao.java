@@ -1,5 +1,8 @@
 package com.iv.wechat.dao;
 
+import java.util.List;
+import java.util.Set;
+
 import com.iv.wechat.entity.UserWechatEntity;
 
 /**
@@ -13,4 +16,6 @@ public interface UserWechatDao {
 	void saveOrUpdateUserWechat(UserWechatEntity userWechatEntity) throws RuntimeException; 
 	
 	UserWechatEntity selectUserWechatByUnionid(String unionid) throws RuntimeException;
+	
+	List<UserWechatEntity> selectUserWechatsByUnionids(Set<String> unionids) throws RuntimeException;
 }

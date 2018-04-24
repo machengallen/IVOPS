@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.TemplateMessageDto;
@@ -72,9 +71,10 @@ public interface IWechatService {
 	/**
 	 * 发送微信模板消息
 	 * @param templateMessageDto
+	 * @return 
 	 */
 	@RequestMapping(value = "/send/weChatInfo", method = RequestMethod.POST)
-	void SendWeChatInfo(@RequestBody TemplateMessageDto templateMessageDto);
+	ResponseDto SendWeChatInfo(@RequestBody TemplateMessageDto templateMessageDto);
 	
 	/**
 	 * 根据userId判断是否已关注微信公众号

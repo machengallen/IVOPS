@@ -142,14 +142,15 @@ public class WeChatController implements IWechatService{
 
 	@Override
 	@ApiOperation("发送微信模板消息")
-	public void SendWeChatInfo(TemplateMessageDto templateMessageDto) {
+	public ResponseDto SendWeChatInfo(TemplateMessageDto templateMessageDto) {
 		// TODO Auto-generated method stub
 		try {
-			weChatService.SendWeChatInfo(templateMessageDto);
-			
+			weChatService.SendWeChatInfo(templateMessageDto);	
+			return ResponseDto.builder(com.iv.common.response.ErrorMsg.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("系统错误：发送微信模板消息失败", e);
+			return ResponseDto.builder(ErrorMsg.SEND_WECHATINFO_FAILED);
 		}		
 	}
 

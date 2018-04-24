@@ -1,5 +1,6 @@
 package com.iv.controller;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -191,6 +192,19 @@ public class UserController implements IUserService {
 			dto.setErrorMsg(com.iv.common.response.ErrorMsg.UNKNOWN);
 			return dto;
 		}
+	}
+
+	@Override
+	@ApiOperation("根据用户列表id、登录方式查找联合主键")
+	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto) {
+		// TODO Auto-generated method stub
+		try {
+			return userService.selectUsersWechatUnionid(UsersQueryDto);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("系统错误:获取联合主键集失败", e);
+		}
+		return null;
 	}
 	
 

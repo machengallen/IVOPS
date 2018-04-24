@@ -100,21 +100,29 @@ public class UserService {
 	public ResponseDto registerAccount(AccountDto accountDto) {
 
 		ResponseDto dto = new ResponseDto();
-		/*// 验证码校验
-		if (!vcodeCheck(accountDto.getVcode(), (String) session.getAttribute("vcode"))) {
+		// 验证码校验
+		if (!vcodeCheck(accountDto.getVcode(), (String) stringtemplate.opsForValue().get("vcode"))) {
 			dto.setErrorMsg(ErrorMsg.EMAIL_VCODE_ERROR);
 			return dto;
-		}*/
-		//自动生成用户名：ivops_ + 注册时间戳 + 0~1000之间的随机数字		
-		String userName = "ivops_" + System.currentTimeMillis() + randomNumber(1000);		
+		}
+		//自动生成用户名：ivops_ + 注册时间戳 + 0~1000之间的随机数字
+		String userName = accountDto.getUserName();
+		if(StringUtils.isEmpty(userName)) {
+			userName = "ivops_" + System.currentTimeMillis() + randomNumber(1000);
+		}	
+		// 账号校验
+		if (!accountUniqCheck(userName)) {
+			dto.setErrorMsg(ErrorMsg.USERNAME_EXIST);
+			return dto;
+		}		
 		// 密码验证并存储
 		if (!StringUtils.isEmpty(accountDto.getPassWord()) && !StringUtils.isEmpty(accountDto.getPassWord1())) {
 			if (accountDto.getPassWord().equals(accountDto.getPassWord1())) {
 				// MD5加密				
-				//String passWord = md5PasswordEncoder.encodePassword(accountDto.getPassword(), null);
+				String passWord = md5PasswordEncoder.encodePassword(accountDto.getPassWord(), null);
 				LocalAuth localAuth = new LocalAuth();				
 				localAuth.setUserName(userName);
-				//localAuth.setPassWord(passWord);
+				localAuth.setPassWord(passWord);
 				localAuth.setTel(accountDto.getTel());
 				localAuth = localAuthDao.saveOrUpdateLocalAuth(localAuth);
 				UserOauth userOauth = new UserOauth();
@@ -133,6 +141,20 @@ public class UserService {
 			dto.setErrorMsg(ErrorMsg.INCOMPLETE_INFO);
 			return dto;
 		}	
+	}
+	
+	/**
+	 * 账号唯一性校验
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	public boolean accountUniqCheck(String userName) {
+
+		if (null != localAuthDao.selectLocalAuthByUserName(userName)) {
+			return false;
+		}
+		return true;
 	}
 	
 	/**
@@ -329,5 +351,18 @@ public class UserService {
 			return false;
 		}
 		return true;
+	}
+	/**
+	 * 根据用户列表id、登录方式查找联合主键
+	 * @param UsersQueryDto
+	 * @return
+	 */
+	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto){
+		List<UserOauth> userOauths = userOauthDao.selectUsersWechatUnionid(UsersQueryDto.getUserIds(),UsersQueryDto.getLoginType());
+		Set<String> unionds = new HashSet<String>();
+		for (UserOauth userOauth : userOauths) {
+			unionds.add(userOauth.getUnionid());
+		}
+		return unionds;
 	}
 }
