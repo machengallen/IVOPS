@@ -25,5 +25,5 @@ public interface IEmailService {
 	 * 邮箱发送告警信息
 	 */
 	@RequestMapping(value = "/send/templateMessage", method = RequestMethod.GET)
-	ResponseDto alarmToMail(String[] toEmails, SendType emailType, Object object);
+	ResponseDto alarmToMail(@RequestParam("toEmails")String[] toEmails, @RequestParam("emailType")SendType emailType, @RequestParam("object")Object object);
 }
