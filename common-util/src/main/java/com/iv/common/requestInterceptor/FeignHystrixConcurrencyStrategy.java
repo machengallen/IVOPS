@@ -1,4 +1,4 @@
-package com.iv.requestInterceptor;
+package com.iv.common.requestInterceptor;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Callable;

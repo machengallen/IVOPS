@@ -1,4 +1,4 @@
-package com.iv.requestInterceptor;
+package com.iv.common.requestInterceptor;
 
 import java.util.Enumeration;
 
