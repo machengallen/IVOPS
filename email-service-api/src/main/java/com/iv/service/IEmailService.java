@@ -1,14 +1,13 @@
 package com.iv.service;
 
-
-import javax.servlet.http.HttpSession;
-
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.AlarmInfoTemplate;
 
 
 public interface IEmailService {
@@ -24,6 +23,6 @@ public interface IEmailService {
 	/**
 	 * 邮箱发送告警信息
 	 */
-	@RequestMapping(value = "/send/templateMessage", method = RequestMethod.GET)
-	ResponseDto alarmToMail(@RequestParam("toEmails")String[] toEmails, @RequestParam("emailType")SendType emailType, @RequestParam("object")Object object);
+	@RequestMapping(value = "/send/templateMessage", method = RequestMethod.POST)
+	ResponseDto alarmToMail(@RequestBody AlarmInfoTemplate alarmInfoTemplate);
 }

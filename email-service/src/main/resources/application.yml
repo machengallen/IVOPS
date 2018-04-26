@@ -24,6 +24,14 @@ spring:
       max-idle: 20
       max-wait: -1
       min-idle: 0
+  mail:
+    host: smtp.163.com
+    username: ivops_mas@163.com
+    password: 123abcd
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.timeout: 25000
 ---
 server:
   port: 8250

@@ -5,6 +5,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.iv.common.enumeration.SendType;
+import com.iv.dto.AlarmInfoTemplate;
 import com.iv.dto.AlarmLifeEntityDto;
 import com.iv.util.MailSenderUtil;
 
@@ -23,10 +24,7 @@ public class EmailService {
 		//session.setAttribute("vcode", vcode + "&" + valiDtime);
 	}
 	
-	public void sendToMail(String[] toEmails, SendType emailType, Object object) {
-		if(emailType.toString().toLowerCase().contains("alarm") ) {
-			AlarmLifeEntityDto alarmLifeEntityDto = (AlarmLifeEntityDto)object;
-			mailSenderUtil.alarmToMail(toEmails, emailType, alarmLifeEntityDto);
-		}
+	public void sendToMail(AlarmInfoTemplate alarmInfoTemplate) {		
+		mailSenderUtil.alarmToMail(alarmInfoTemplate.getToEmails(), alarmInfoTemplate.getEmailType(), alarmInfoTemplate.getAlarmLifeEntity());
 	}
 }

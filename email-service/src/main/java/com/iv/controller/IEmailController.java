@@ -1,14 +1,14 @@
 package com.iv.controller;
 
-import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.AlarmInfoTemplate;
 import com.iv.dto.ErrorMsg;
 import com.iv.service.EmailService;
 import com.iv.service.IEmailService;
@@ -42,10 +42,10 @@ public class IEmailController implements IEmailService {
 
 	@Override
 	@ApiOperation("使用邮箱发送模板消息")
-	public ResponseDto alarmToMail(String[] toEmails, SendType emailType, Object object) {
+	public ResponseDto alarmToMail(@RequestBody AlarmInfoTemplate alarmInfoTemplate) {
 		// TODO Auto-generated method stub		
 		try {
-			emailService.sendToMail(toEmails, emailType,object);
+			emailService.sendToMail(alarmInfoTemplate);
 			return ResponseDto.builder(ErrorMsg.OK);
 		} catch (Exception e) {
 			LOGGER.error("系统错误：邮箱发送模板消息失败", e);

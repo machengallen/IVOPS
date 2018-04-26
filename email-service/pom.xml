@@ -24,18 +24,19 @@
 		<java.version>1.8</java.version>
 		<spring-cloud.version>Edgware.SR1</spring-cloud.version>
 	</properties>
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.springframework.cloud</groupId>
-				<artifactId>spring-cloud-dependencies</artifactId>
-				<version>${spring-cloud.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -44,26 +45,32 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
-		</dependency>	
+		</dependency>
 		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-eureka</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-feign</artifactId>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-hystrix</artifactId>
+		</dependency>			
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>com.iv</groupId>
-			<artifactId>email-service-api</artifactId>
-			<version>1.0.0-SNAPSHOT</version>
-			<type>jar</type>
-		</dependency>
+		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
+		
 		<dependency>
              <groupId>io.springfox</groupId>
              <artifactId>springfox-swagger2</artifactId>
@@ -76,13 +83,15 @@
         </dependency>
         
         <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-		
+	      <groupId>com.iv</groupId>
+	      <artifactId>common-util</artifactId>
+	      <version>1.0.0-SNAPSHOT</version>
+	      <type>jar</type>
+    	</dependency>
+    	
 		<dependency>
 			<groupId>com.iv</groupId>
-			<artifactId>user-service-api</artifactId>
+			<artifactId>email-service-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
@@ -92,10 +101,20 @@
 			<artifactId>user-service-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
-		</dependency>
-		
+		</dependency>				
 	</dependencies>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${spring-cloud.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<build>
 		<plugins>
 			<plugin>
