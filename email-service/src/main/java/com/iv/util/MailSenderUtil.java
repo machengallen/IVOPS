@@ -108,9 +108,7 @@ public class MailSenderUtil {
 				.replace("CONTENT", alarmLifeEntityDto.getContent())
 				.replace("SEVERITY", alarmLifeEntityDto.getSeverity().toString())
 				.replace("UPGRADE", String.valueOf(alarmLifeEntityDto.getUpgrade()))
-				.replace("DATE",
-						alarmLifeEntityDto.getEventData().toString() + " "
-								+ alarmLifeEntityDto.getEventTime().toString());
+				.replace("DATE",alarmLifeEntityDto.getTime());
 		
 		if(null != localAuthDto) {
 			result = result.replace("CURRENT",

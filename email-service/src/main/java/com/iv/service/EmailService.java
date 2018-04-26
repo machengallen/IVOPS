@@ -3,10 +3,7 @@ package com.iv.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-
-import com.iv.common.enumeration.SendType;
 import com.iv.dto.AlarmInfoTemplate;
-import com.iv.dto.AlarmLifeEntityDto;
 import com.iv.util.MailSenderUtil;
 
 @Service
