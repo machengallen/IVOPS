@@ -100,17 +100,17 @@ public class MailSenderUtil {
 		}
 
 		@SuppressWarnings("unlikely-arg-type")
-		String result = this.context.replace("TITLE", alarmLifeEntityDto.getAlarm().getTitle())
+		String result = this.context.replace("TITLE", alarmLifeEntityDto.getTitle())
 				.replace("STATUS", "CLOSED".equals(alarmLifeEntityDto.getAlarmStatus())? "已恢复" : "已触发")
-				.replace("HOSTNAME", alarmLifeEntityDto.getAlarm().getHostName())
-				.replace("HOSTIP", alarmLifeEntityDto.getAlarm().getHostIp())
+				.replace("HOSTNAME", alarmLifeEntityDto.getHostName())
+				.replace("HOSTIP", alarmLifeEntityDto.getHostIp())
 				.replace("ALARMID", alarmLifeEntityDto.getId())
-				.replace("CONTENT", alarmLifeEntityDto.getAlarm().getContent())
-				.replace("SEVERITY", alarmLifeEntityDto.getAlarm().getSeverity().toString())
+				.replace("CONTENT", alarmLifeEntityDto.getContent())
+				.replace("SEVERITY", alarmLifeEntityDto.getSeverity().toString())
 				.replace("UPGRADE", String.valueOf(alarmLifeEntityDto.getUpgrade()))
 				.replace("DATE",
-						alarmLifeEntityDto.getAlarm().getEventData().toString() + " "
-								+ alarmLifeEntityDto.getAlarm().getEventTime().toString());
+						alarmLifeEntityDto.getEventData().toString() + " "
+								+ alarmLifeEntityDto.getEventTime().toString());
 		
 		if(null != localAuthDto) {
 			result = result.replace("CURRENT",
