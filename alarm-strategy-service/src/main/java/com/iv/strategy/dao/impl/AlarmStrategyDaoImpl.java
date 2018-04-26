@@ -8,9 +8,9 @@ import org.hibernate.Session;
 import org.springframework.util.StringUtils;
 
 import com.iv.common.enumeration.Severity;
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
-import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 import com.iv.strategy.api.dto.StrategyQueryDto;
 import com.iv.strategy.dao.IAlarmStrategyDao;
 import com.iv.strategy.dao.StrategyPaging;

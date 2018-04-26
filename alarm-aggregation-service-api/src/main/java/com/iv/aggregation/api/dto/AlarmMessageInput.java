@@ -50,7 +50,7 @@ public class AlarmMessageInput implements Serializable{
 	//告警事件详情
 	private String details;
 	//租户id
-	private String tenantId;
+	private String token;
 	
 	public AlarmMessageInput() {
 		
@@ -200,12 +200,12 @@ public class AlarmMessageInput implements Serializable{
 		this.details = details;
 	}
 
-	public String getTenantId() {
-		return tenantId;
+	public String getToken() {
+		return token;
 	}
 
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public void upgrade(){
@@ -298,8 +298,8 @@ public class AlarmMessageInput implements Serializable{
 		builder.append(recoveryTime);
 		builder.append(", details=");
 		builder.append(details);
-		builder.append(", tenantId=");
-		builder.append(tenantId);
+		builder.append(", token=");
+		builder.append(token);
 		builder.append("]");
 		return builder.toString();
 	}

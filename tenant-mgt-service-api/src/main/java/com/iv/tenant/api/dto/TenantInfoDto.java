@@ -15,6 +15,7 @@ public class TenantInfoDto implements Serializable{
 	private String industry;
 	private String businessInvolves;
 	private String staffSize;
+	private String subEnterpriseName;
 	public String getName() {
 		return name;
 	}
@@ -56,6 +57,12 @@ public class TenantInfoDto implements Serializable{
 	}
 	public void setStaffSize(String staffSize) {
 		this.staffSize = staffSize;
+	}
+	public String getSubEnterpriseName() {
+		return subEnterpriseName;
+	}
+	public void setSubEnterpriseName(String subEnterpriseName) {
+		this.subEnterpriseName = subEnterpriseName;
 	}
 	
 }

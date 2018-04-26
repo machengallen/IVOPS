@@ -38,43 +38,49 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 	}
 
 	@Override
-	public ResponseDto newTenantApply(TenantInfoDto dto, HttpServletRequest request) {
+	public ResponseDto getSubTenant(String subTenantId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto taskApprove(TenantApproveReq dto, HttpServletRequest request) {
+	public ResponseDto newTenantApply(HttpServletRequest request, TenantInfoDto dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto getUserTasksRegis(int first, int max, HttpServletRequest request) {
+	public ResponseDto taskApprove(HttpServletRequest request, TenantApproveReq dto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto getHistoryProcessRegis(int first, int max, HttpServletRequest request) {
+	public ResponseDto getUserTasksRegis(HttpServletRequest request, int first, int max) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto applyJoinTenant(String tenantId, HttpServletRequest request) {
+	public ResponseDto getHistoryProcessRegis(HttpServletRequest request, int first, int max) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto getUserTasksJoin(int first, int max, HttpServletRequest request) {
+	public ResponseDto applyJoinTenant(HttpServletRequest request, String tenantId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto getHistoryProcessJoin(int first, int max, HttpServletRequest request) {
+	public ResponseDto getUserTasksJoin(HttpServletRequest request, int first, int max) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto getHistoryProcessJoin(HttpServletRequest request, int first, int max) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -86,25 +92,7 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 	}
 
 	@Override
-	public ResponseDto switchTenant(String tenantId, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto deleteSubTenant(int id, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<EnterpriseInfoDto> getEnterpriseAll() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public List<SubEnterpriseInfoDto> getSubEnterpriseAll() {
+	public ResponseDto switchTenant(HttpServletRequest request, String tenantId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -122,10 +110,21 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 	}
 
 	@Override
-	public ResponseDto getSubTenant(String subTenantId) {
+	public ResponseDto deleteSubTenant(HttpServletRequest request, int id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	@Override
+	public List<EnterpriseInfoDto> getEnterpriseAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SubEnterpriseInfoDto> getSubEnterpriseAll() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

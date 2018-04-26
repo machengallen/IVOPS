@@ -32,7 +32,7 @@ public interface IWechatService {
 	 * @return
 	 */
 	@RequestMapping(value = "/wechat/wxLoginCallBack", method = RequestMethod.GET)
-	public ResponseDto wxLoginCallBack(HttpServletRequest request);
+	public ResponseDto wxLoginCallBack(@RequestParam("request") HttpServletRequest request);
 	
 	
 	/**
@@ -58,7 +58,7 @@ public interface IWechatService {
 	 * @throws Exception
 	 */
 	@RequestMapping(value = "/wechat", method = RequestMethod.GET, produces = "text/xml;charset=UTF-8")
-	public String getWeiXinMessage(HttpServletRequest request) throws Exception;				
+	public String getWeiXinMessage(@RequestParam("request") HttpServletRequest request) throws Exception;				
 	
 	/**
 	 * 根据unionid查询微信信息

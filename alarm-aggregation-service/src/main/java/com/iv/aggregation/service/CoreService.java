@@ -16,12 +16,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.iv.aggregation.api.constant.AlarmStatus;
 import com.iv.aggregation.api.constant.OpsType;
 import com.iv.aggregation.api.dto.AlarmMessageInput;
 import com.iv.aggregation.dao.IAlarmLifeDao;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
-import com.iv.aggregation.entity.AlarmEventDateEntity;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmLogEntity;
 import com.iv.aggregation.entity.AlarmRecoveryEntity;
@@ -31,6 +29,8 @@ import com.iv.aggregation.util.DataConvert;
 import com.iv.aggregation.util.DispatchUtil;
 import com.iv.aggregation.util.TimerPending;
 import com.iv.aggregation.util.WechatProxyClient;
+import com.iv.common.enumeration.AlarmStatus;
+import com.iv.common.response.ResponseDto;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
 import com.iv.strategy.api.dto.StrategyQueryDto;
 
@@ -60,16 +60,16 @@ public class CoreService {
 	 * 
 	 * @param AlarmTempMessage
 	 */
-	public AlarmLifeEntity alarmProcessing(AlarmMessageInput ami) {
+	public AlarmLifeEntity alarmProcessing(AlarmMessageInput ami, String tenantId) {
 
 		try {
 
 			if (StringUtils.isEmpty(ami.getEventRecoveryId())) {
 				// 告警触发
-				return alarmTrigger(DataConvert.zabbixAlarmConvert(ami));
+				return alarmTrigger(DataConvert.zabbixAlarmConvert(ami, tenantId));
 			} else {
 				// 告警恢复
-				alarmRecovery(DataConvert.zabbixRecoveryConvert(ami));
+				alarmRecovery(DataConvert.zabbixRecoveryConvert(ami, tenantId));
 				return null;
 			}
 		} catch (Exception e) {
@@ -86,16 +86,13 @@ public class CoreService {
 		// 创建告警生命周期对象
 		AlarmLifeEntity alarmLifeEntity = new AlarmLifeEntity();
 		Long tridate = System.currentTimeMillis();
-		alarmLifeEntity.setTriDate(tridate);
 		alarmLifeEntity.setAlarmStatus(AlarmStatus.PENDING);
 		alarmLifeEntity.setUpgrade((byte) 0);
 		alarmLifeEntity.setAlarm(alarmSourceEntity);
 		alarmLifeEntity.setItemType(DispatchUtil.getItemType(alarmSourceEntity.getItemKey()));
 		alarmLifeEntity.getLogs()
 				.add(AlarmLogEntity.builder(new Date(tridate), OpsType.TRIGGER, null, null, 0));
-		AlarmEventDateEntity alarmEvent = new AlarmEventDateEntity();
-		alarmEvent.setTriDate(tridate);
-		alarmLifeEntity.setAlarmEvent(alarmEvent);
+		alarmLifeEntity.setTriDate(tridate);
 		// 告警存储
 		ALARM_LIFE_DAO.saveOrUpdateAlarmLife(alarmLifeEntity);
 		//Timer timer = new Timer();
@@ -105,7 +102,11 @@ public class CoreService {
 		strategyQuery.setSeverity(alarmSourceEntity.getSeverity());
 		strategyQuery.setItemType(alarmLifeEntity.getItemType());
 		strategyQuery.setTenantId(alarmSourceEntity.getTenantId());
-		AlarmStrategyDto dispatchStrategy = (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
+		ResponseDto responseDto = alarmStrategyClient.getStrategy(strategyQuery);
+		AlarmStrategyDto dispatchStrategy = null;
+		if(null != responseDto) {
+			dispatchStrategy = (AlarmStrategyDto)responseDto.getData();
+		}
 		
 		int delayTime;// 单位秒
 		if (null != dispatchStrategy) {
@@ -115,7 +116,7 @@ public class CoreService {
 			return alarmLifeEntity;
 		}
 		Short pushTeam = 1;
-		TimerPending pending = new TimerPending(pushTeam, alarmSourceEntity, wechatProxyClient, alarmStrategyClient);
+		TimerPending pending = new TimerPending(pushTeam, alarmSourceEntity);
 
 		// 告警存入redis
 		Object map0 = redisTemplate.opsForValue().get(alarmSourceEntity.getTenantId());
@@ -147,9 +148,6 @@ public class CoreService {
 		Long recdate = System.currentTimeMillis();
 		lifeEntity.setRecDate(recdate);
 		lifeEntity.setRecovery(alarmRecoveryEntity);
-		if(null != lifeEntity.getAlarmEvent()) {
-			lifeEntity.getAlarmEvent().setRecDate(recdate);
-		}		
 		// 记录操作日志
 		lifeEntity.getLogs()
 				.add(AlarmLogEntity.builder(new Date(recdate), OpsType.RECOVER, null, null, 0));

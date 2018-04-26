@@ -1,6 +1,7 @@
 package com.iv.aggregation.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -17,8 +18,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import com.iv.aggregation.api.constant.AlarmStatus;
 import com.iv.aggregation.api.constant.OpsType;
 import com.iv.aggregation.api.constant.StrategyCycle;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
@@ -29,26 +31,29 @@ import com.iv.aggregation.dao.IAlarmCleanStrategyDao;
 import com.iv.aggregation.dao.IAlarmLifeDao;
 import com.iv.aggregation.dao.impl.AlarmCleanStrategyDaoImpl;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
-import com.iv.aggregation.dao.impl.AlarmMsgDaoImpl;
 import com.iv.aggregation.entity.AlarmCleanStrategyEntity;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmLogEntity;
-import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.aggregation.feign.clients.IEmailServiceClient;
+import com.iv.aggregation.feign.clients.IMessageServiceClient;
 import com.iv.aggregation.feign.clients.IUserServiceClient;
 import com.iv.aggregation.feign.clients.IWechatServiceClient;
 import com.iv.aggregation.util.WechatProxyClient;
+import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.NoticeType;
 import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ErrorMsg;
 import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.common.util.spring.SpringContextUtil;
+import com.iv.dto.AlarmInfoTemplate;
+import com.iv.dto.AlarmLifeEntityDto;
 import com.iv.facade.dto.AlarmLifeDto;
 import com.iv.facade.dto.AlarmLogDto;
 import com.iv.facade.dto.AlarmPagingDto;
 import com.iv.facade.dto.AlarmRecoveryDto;
 import com.iv.facade.dto.AlarmSourceDto;
+import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.outer.dto.LocalAuthDto;
 
 import net.sf.json.JSONObject;
@@ -60,6 +65,7 @@ import net.sf.json.JSONObject;
  * alarm-aggregation-service-1.0.0-SNAPSHOT
  * 
  */
+@RestController
 public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 
 	private static final IAlarmLifeDao ALARM_LIFE_DAO = AlarmLifeDaoImpl.getInstance();
@@ -67,8 +73,6 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 
 	@Autowired
 	private RedisTemplate redisTemplate;
-	@Autowired
-	private AlarmMsgDaoImpl alarmMsgDao;
 	@Autowired
 	private AlarmCleanStrategyDaoImpl cleanStrategyDao;
 	@Autowired
@@ -78,7 +82,7 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 	@Autowired
 	private WechatProxyClient wechatProxyClient;
 	@Autowired
-	private IWechatServiceClient wechatServiceClient;
+	private IMessageServiceClient messageServiceClient;
 
 	@Override
 	public ResponseDto claimAlarm(String token, String lifeId) {
@@ -91,11 +95,10 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 			if (null != alarmLifeEntity) {
 				alarmLifeEntity.setHandlerCurrent(userId);
 				alarmLifeEntity.setAlarmStatus(AlarmStatus.PROCESSING);
-				Date date = new Date();
 				if (alarmLifeEntity.getLogs().size() == 1) {
-					alarmLifeEntity.getAlarmEvent().setResDate(date.getTime());
+					alarmLifeEntity.setResDate(System.currentTimeMillis());
 				}
-				alarmLifeEntity.getLogs().add(AlarmLogEntity.builder(date, OpsType.CLAIM, realName, null, 0));
+				alarmLifeEntity.getLogs().add(AlarmLogEntity.builder(new Date(), OpsType.CLAIM, realName, null, 0));
 				ALARM_LIFE_DAO.updateAlarmLife(alarmLifeEntity);
 			}
 		} catch (RuntimeException e) {
@@ -107,39 +110,57 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 	}
 
 	@Override
-	public ResponseDto transferAlarm(AlarmTransferDto dto) {
+	public ResponseDto transferAlarm(@RequestBody AlarmTransferDto dto) {
 		// 获取用户基本信息
 		LocalAuthDto toUser = userServiceClient.selectLocalAuthById(dto.getToUser());
-		
+		ArrayList<String> toEmails = new ArrayList<String>(1);
+		String transferee = null;
+		if(null != toUser) {
+			// 被转让人
+			transferee = toUser.getRealName() == null ? toUser.getUserName() : toUser.getRealName();
+			toEmails.add(toUser.getUserName());
+		}
 		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(dto.getLifeId());
 		if (null != alarmLifeEntity) {
-			// 被转让人
-			String transferee = toUser.getRealName() == null ? toUser.getUserName() : toUser.getRealName();
+			
 			boolean flag = false;
-			// 调用微信服务判断用户是否关注告警公众号
-			if (wechatServiceClient.ifFocusWechat(toUser.getId())) {
-				// 已绑定微信，模板消息推送
-				// 获取告警源信息
-				Object map0 = redisTemplate.opsForValue().get(alarmLifeEntity.getAlarm().getTenantId());
-				if (null != map0) {
-					//Map<String, AlarmSourceEntity> map = (Map<String, AlarmSourceEntity>) map0;
-					//AlarmSourceEntity alarmSourceEntity = map.get(alarmLifeEntity.getAlarm().getAlarmId());
-					// 微信通知被转让人
-					try {
-						wechatProxyClient.alarmNotice(alarmLifeEntity, null, null, toUser.getId());
-						flag = true;
-					} catch (Exception e) {
-						LOGGER.error("告警转让：微信通知失败");
-					}
-					
+			// 已绑定微信，模板消息推送
+			// 获取告警源信息
+			Object map0 = redisTemplate.opsForValue().get(alarmLifeEntity.getAlarm().getTenantId());
+			if (null != map0) {
+				//Map<String, AlarmSourceEntity> map = (Map<String, AlarmSourceEntity>) map0;
+				//AlarmSourceEntity alarmSourceEntity = map.get(alarmLifeEntity.getAlarm().getAlarmId());
+				// 微信通知被转让人
+				try {
+					wechatProxyClient.alarmNotice(alarmLifeEntity, null, null, dto.getToUser());
+					flag = true;
+				} catch (Exception e) {
+					LOGGER.error("告警转让：微信通知失败");
 				}
-			} 
-			ArrayList<String> toEmails = new ArrayList<String>(1);
-			toEmails.add(toUser.getUserName());
+				
+			}
+			
 			// 调用邮件服务
 			try {
-				emailServiceClient.alarmToMail(toEmails.toArray(new String[toEmails.size()]), SendType.ALARMTRIGGER, alarmLifeEntity);
-				flag = true;
+				if(!toEmails.isEmpty()) {
+					AlarmInfoTemplate alarmInfoTemplate = new AlarmInfoTemplate();
+					alarmInfoTemplate.setToEmails(toEmails.toArray(new String[toEmails.size()]));
+					alarmInfoTemplate.setEmailType(SendType.ALARMTRIGGER);
+					AlarmLifeEntityDto alarmLifeEntityDto = new AlarmLifeEntityDto();
+					alarmLifeEntityDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+					alarmLifeEntityDto.setContent(alarmLifeEntity.getAlarm().getContent());
+					alarmLifeEntityDto.setCurrentHandlerId(alarmLifeEntity.getHandlerCurrent());
+					alarmLifeEntityDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+					alarmLifeEntityDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+					alarmLifeEntityDto.setId(alarmLifeEntity.getId());
+					alarmLifeEntityDto.setSeverity(alarmLifeEntity.getAlarm().getSeverity());
+					alarmLifeEntityDto.setTime(new Date(alarmLifeEntity.getTriDate()).toLocaleString());
+					alarmLifeEntityDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+					alarmLifeEntityDto.setUpgrade(alarmLifeEntityDto.getUpgrade());
+					alarmInfoTemplate.setAlarmLifeEntity(alarmLifeEntityDto);
+					emailServiceClient.alarmToMail(alarmInfoTemplate);
+					flag = true;
+				}
 			} catch (Exception e) {
 				LOGGER.error("告警转让：邮件通知失败");
 			}
@@ -149,10 +170,10 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 			}
 			
 			// 加入处理人信息
-			alarmLifeEntity.getToHandlers().add(dto.getToUser());
+			alarmLifeEntity.getToHireUserIds().add(dto.getToUser());
 			Date date = new Date();
 			if(alarmLifeEntity.getLogs().size() == 1) {
-				alarmLifeEntity.getAlarmEvent().setResDate(date.getTime());
+				alarmLifeEntity.setResDate(date.getTime());
 			}
 			// 记录操作日志
 			alarmLifeEntity.getLogs()
@@ -166,21 +187,19 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 			groupEntity.getAlarmLifeEntity().add(alarmLifeEntity);
 			I_Group_Dao.saveGroup(groupEntity);*/
 			//保存转让消息
-			AlarmMsgEntity alarmMsgEntityselected = alarmMsgDao.selectUnconfirmedMsgById(alarmLifeEntity.getId(),dto.getToUser(),alarmLifeEntity.getAlarm().getTenantId());
-			if(null == alarmMsgEntityselected) {
-				AlarmMsgEntity AlarmMsgEntity = new AlarmMsgEntity();
-				AlarmMsgEntity.setUserId(dto.getToUser());
-				AlarmMsgEntity.setConfirmed(false);
-				AlarmMsgEntity.setMsgDate(System.currentTimeMillis());
-				AlarmMsgEntity.setAlarmId(alarmLifeEntity.getId());
-				AlarmMsgEntity.setType(NoticeType.ALARM);
-				AlarmMsgEntity.setTitle(alarmLifeEntity.getAlarm().getTitle());
-				AlarmMsgEntity.setHostName(alarmLifeEntity.getAlarm().getHostName());
-				AlarmMsgEntity.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
-				AlarmMsgEntity.setTriDate(alarmLifeEntity.getTriDate());
-				AlarmMsgEntity.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
-				alarmMsgDao.save(AlarmMsgEntity, alarmLifeEntity.getAlarm().getTenantId());
-			}
+			AlarmMsgDto msgDto = new AlarmMsgDto();
+			msgDto.setUserIds(Arrays.asList(dto.getToUser()));
+			msgDto.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
+			msgDto.setMsgDate(System.currentTimeMillis());
+			msgDto.setAlarmId(alarmLifeEntity.getId());
+			msgDto.setType(NoticeType.ALARM);
+			msgDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+			msgDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+			msgDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+			msgDto.setTriDate(alarmLifeEntity.getTriDate());
+			msgDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+			// 调用用户消息服务
+			messageServiceClient.produceAlarmMsg(msgDto);
 			return ResponseDto.builder(ErrorMsg.OK);
 		}
 		return ResponseDto.builder(ErrorMsg.UNKNOWN);
@@ -188,20 +207,20 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 	}
 
 	@Override
-	public ResponseDto getMyAlarmPaging(AlarmQueryDto query) {
+	public ResponseDto getMyAlarmPaging(@RequestBody AlarmQueryDto query) {
 		// 查询我的告警
 		AlarmPagingDto alarmPagingDto = getAlarmLifeDto(
-				ALARM_LIFE_DAO.selectPaging(query.getCurPage(), query.getItems(), query, query.getHandlerCurrent()));
+				ALARM_LIFE_DAO.selectPaging((query.getCurPage() - 1) * query.getItems(), query.getItems(), query, query.getHandlerCurrent()));
 		ResponseDto response = ResponseDto.builder(ErrorMsg.OK);
 		response.setData(alarmPagingDto);
 		return response;
 	}
 
 	@Override
-	public ResponseDto getAlarmPaging(AlarmQueryDto query) {
+	public ResponseDto getAlarmPaging(@RequestBody AlarmQueryDto query) {
 
 		AlarmPagingDto alarmPagingDto = getAlarmLifeDto(
-				ALARM_LIFE_DAO.selectPaging(query.getCurPage(), query.getItems(), query, null));
+				ALARM_LIFE_DAO.selectPaging((query.getCurPage() - 1) * query.getItems(), query.getItems(), query, null));
 		ResponseDto response = ResponseDto.builder(ErrorMsg.OK);
 		response.setData(alarmPagingDto);
 		return response;
@@ -220,11 +239,16 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 			alarmPagingDto.setTotalCount(alarmPaging.getTotalCount());
 			List<AlarmLifeDto> AlarmLifeDtos = new ArrayList<AlarmLifeDto>();
 			for (AlarmLifeEntity alarmLifeEntity : alarmPaging.getEntries()) {
+				AlarmLifeDto alarmLifeDto = new AlarmLifeDto();
 				// copy entity
 				AlarmSourceDto alarmSourceDto = new AlarmSourceDto();
+				alarmLifeDto.setAlarm(alarmSourceDto);
 				BeanUtils.copyProperties(alarmLifeEntity.getAlarm(), alarmSourceDto);
 				AlarmRecoveryDto alarmRecoveryDto = new AlarmRecoveryDto();
-				BeanUtils.copyProperties(alarmLifeEntity.getRecovery(), alarmRecoveryDto);
+				if(null != alarmLifeEntity.getRecovery()) {
+					BeanUtils.copyProperties(alarmLifeEntity.getRecovery(), alarmRecoveryDto);
+					alarmLifeDto.setRecovery(alarmRecoveryDto);
+				}
 				Set<AlarmLogDto> alarmLogDtos = new HashSet<AlarmLogDto>();
 				for (AlarmLogEntity entity : alarmLifeEntity.getLogs()) {
 					AlarmLogDto dto = new AlarmLogDto();
@@ -232,9 +256,6 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 					alarmLogDtos.add(dto);
 				}
 
-				AlarmLifeDto alarmLifeDto = new AlarmLifeDto();
-				alarmLifeDto.setAlarm(alarmSourceDto);
-				alarmLifeDto.setRecovery(alarmRecoveryDto);
 				alarmLifeDto.setLogs(alarmLogDtos);
 				alarmLifeDto.setAlarmStatus(
 						com.iv.facade.constant.AlarmStatus.valueOf(alarmLifeEntity.getAlarmStatus().name()));
@@ -250,6 +271,8 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 				AlarmLifeDtos.add(alarmLifeDto);
 			}
 			alarmPagingDto.setEntries(AlarmLifeDtos);
+		}else {
+			alarmPagingDto.setEntries(new ArrayList<AlarmLifeDto>());
 		}
 		return alarmPagingDto;
 	}

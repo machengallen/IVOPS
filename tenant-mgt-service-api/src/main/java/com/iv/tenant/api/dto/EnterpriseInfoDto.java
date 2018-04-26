@@ -7,7 +7,6 @@ public class EnterpriseInfoDto {
 	private int id;
 	private String name;
 	private String identifier;// 租户号，对外租户唯一识别号
-	private String tenantId;// 租户id，系统内部使用，对应租户db名
 	private String orgCode;
 	private String address;
 	private String industry;
@@ -31,12 +30,6 @@ public class EnterpriseInfoDto {
 	}
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
-	}
-	public String getTenantId() {
-		return tenantId;
-	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
 	}
 	public String getOrgCode() {
 		return orgCode;

@@ -1,5 +1,6 @@
 package com.iv.tenant.api.dto;
 
+import com.iv.common.enumeration.WorkflowType;
 
 public class TaskTenantApplyResp {
 

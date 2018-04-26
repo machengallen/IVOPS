@@ -60,6 +60,6 @@ public interface IAlarmAggregationService {
 	 * @return
 	 */
 	@RequestMapping(value = "/update/store", method = RequestMethod.GET)
-	ResponseDto updateAlarmCleanCycle(@RequestParam StrategyCycle cycle);
+	ResponseDto updateAlarmCleanCycle(@RequestParam("cycle") StrategyCycle cycle);
 	
 }

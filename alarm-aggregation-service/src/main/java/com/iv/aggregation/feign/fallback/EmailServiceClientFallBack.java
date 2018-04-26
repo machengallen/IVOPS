@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import com.iv.aggregation.feign.clients.IEmailServiceClient;
 import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.AlarmInfoTemplate;
 
 @Component
 public class EmailServiceClientFallBack implements IEmailServiceClient {
@@ -16,11 +17,9 @@ public class EmailServiceClientFallBack implements IEmailServiceClient {
 	}
 
 	@Override
-	public ResponseDto alarmToMail(String[] toEmails, SendType emailType, Object object) {
+	public ResponseDto alarmToMail(AlarmInfoTemplate alarmInfoTemplate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
 
 }

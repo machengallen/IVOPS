@@ -1,7 +1,7 @@
 package com.iv.aggregation.api.dto;
 
 import com.iv.aggregation.api.constant.AlarmQueryType;
-import com.iv.aggregation.api.constant.AlarmStatus;
+import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.Severity;
 
 

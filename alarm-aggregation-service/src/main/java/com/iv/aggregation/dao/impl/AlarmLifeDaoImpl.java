@@ -10,17 +10,17 @@ import org.hibernate.criterion.Restrictions;
 import org.springframework.util.StringUtils;
 
 import com.iv.aggregation.api.constant.AgentType;
-import com.iv.aggregation.api.constant.AlarmStatus;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.dao.AlarmPaging;
 import com.iv.aggregation.dao.IAlarmLifeDao;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmRecoveryEntity;
 import com.iv.aggregation.entity.AlarmSourceEntity;
+import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.CycleType;
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
-import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 
 /**
  * 统一告警数据dao实现
@@ -396,7 +396,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 					hql.append(" and ").append("a.itemType=").append("'").append(query.getItemType()).append("'");
 				}
 				if (query.getAlarmQueryType().ordinal() == 0 && null != localAuthId) {
-					hql.append(" and ").append("a.handlerCurrent.userId=").append(localAuthId);
+					hql.append(" and ").append("a.handlerCurrent=").append(localAuthId);
 				}
 				// System.out.println(hql.toString());
 				AlarmPaging paging = new AlarmPaging();

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Repository;
 
 import com.iv.aggregation.dao.IAlarmCleanStrategyDao;
 import com.iv.aggregation.entity.AlarmCleanStrategyEntity;
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
-import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 
 @Repository
 public class AlarmCleanStrategyDaoImpl implements IAlarmCleanStrategyDao {

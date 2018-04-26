@@ -1,7 +1,7 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://ivops:123abcd@10.10.9.26:8110/eureka/
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
 spring:
   profiles:
     active:
@@ -9,7 +9,7 @@ spring:
   application:
     name: hystrix-dashboard-service
 turbine:
-  app-config: zuul-service,user-service,wechat-service,alarm-aggregation-service,alarm-facade-service,alarm-strategy-service,tenant-mgt-service,email-service,group-service
+  app-config: zuul-service,user-service,wechat-service,alarm-aggregation-service,alarm-facade-service,alarm-strategy-service,tenant-mgt-service,email-service,group-service,message-service
   combine-host-port: true
 #  aggregator:
 #    cluster-config:

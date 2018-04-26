@@ -5,7 +5,6 @@ public class AlarmTransferDto {
 	private int toUser;
 	private String lifeId;
 	private String remark;
-	private short groupId;
 	public String getLifeId() {
 		return lifeId;
 	}
@@ -23,12 +22,6 @@ public class AlarmTransferDto {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
-	}
-	public short getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(short groupId) {
-		this.groupId = groupId;
 	}
 	
 }

@@ -1,10 +1,16 @@
 eureka:
   instance:
+    prefer-ip-address: true
     status-page-url: http://10.10.9.26:${server.port}/swagger-ui.html
   client:
     service-url:
-      defaultZone: http://ivops:123abcd@10.10.9.26:8110/eureka/
-
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+security:
+  basic:
+    enabled: false
+feign:
+  hystrix:
+    enabled: true
 spring:
   profiles:
     active:
@@ -14,8 +20,18 @@ spring:
   http:
     encoding:
       enabled: true
+  redis:
+    database: 1
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
   datasource:
-    url: jdbc:mysql://10.10.31.25:3306/personal?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.25:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd
     driver-class-name: com.mysql.jdbc.Driver
@@ -29,15 +45,15 @@ spring:
           implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
           physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
       properties:
-        hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+        hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
         hibernate.connection.username: root
         hibernate.hbm2ddl.auto: update
         hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         hibernate.event.merge.entity_copy_observer: allow
         #------------------------以下多租户配置属性---------------------------#
         hibernate.multiTenancy: SCHEMA
-        hibernate.tenant_identifier_resolver: com.iv.common.hibernate.util.TenantIdResolver
-        hibernate.multi_tenant_connection_provider: com.iv.common.hibernate.util.TenantConnectionProviderImpl
+        hibernate.tenant_identifier_resolver: com.iv.aggregation.util.TenantIdResolver
+        hibernate.multi_tenant_connection_provider: com.iv.aggregation.util.MultiTenantConnectionProviderImpl
         hibernate.connection.password: 123@abcd
         hibernate.connection.driver_class: com.mysql.jdbc.Driver
         hibernate.c3p0.minPoolSize: 5
@@ -66,12 +82,16 @@ server:
   port: 8410
 spring:
   profiles: dev-peer1
+  redis:
+    host: 10.10.31.25
     
 ---
 server:
   port: 8411
 spring:
   profiles: dev-peer2
+  redis:
+    host: 10.10.31.25
 
 #生产环境#  
 ---
@@ -80,8 +100,11 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://db.mas.ivops:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: mas
+  redis:
+    host: redis.mas.ivops
+    database: 2
   rabbitmq:
     virtual-host: /mas
     username: admin
@@ -91,7 +114,7 @@ spring:
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: mas
 logging:
    file: /var/log/ivops/alarm/alarm-aggregation-service/peer1/alarm-aggregation-service.log
@@ -102,8 +125,11 @@ server:
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://db.mas.ivops:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: mas
+  redis:
+    host: redis.mas.ivops
+    database: 2
   rabbitmq:
     virtual-host: /mas
     username: admin
@@ -113,7 +139,7 @@ spring:
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: mas
 logging:
    file: /var/log/ivops/alarm/alarm-aggregation-service/peer2/alarm-aggregation-service.log       

@@ -15,14 +15,14 @@ public class NagiosAlarmHandler {
 	@Autowired
 	private CoreService coreService;
 	
-	public AlarmLifeEntity alarmProcessing(NagiosMessageInput nmi) throws Exception {
+	public AlarmLifeEntity alarmProcessing(NagiosMessageInput nmi, String tenantId) throws Exception {
 		NagiosNoticeType noticeType = NagiosNoticeType.valueOf(nmi.getNotificationType());
 		switch (noticeType) {
 		case PROBLEM:
-			return coreService.alarmTrigger(DataConvert.nagiosAlarmConvert(nmi));
+			return coreService.alarmTrigger(DataConvert.nagiosAlarmConvert(nmi, tenantId));
 			
 		case RECOVERY:
-			coreService.alarmRecovery(DataConvert.nagiosRecoveryConvert(nmi));
+			coreService.alarmRecovery(DataConvert.nagiosRecoveryConvert(nmi, tenantId));
 			return null;
 			
 		default:

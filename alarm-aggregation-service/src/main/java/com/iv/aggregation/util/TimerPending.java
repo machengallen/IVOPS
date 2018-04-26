@@ -16,17 +16,16 @@ import org.springframework.util.CollectionUtils;
 import com.iv.aggregation.api.constant.NoticeModel;
 import com.iv.aggregation.api.constant.OpsType;
 import com.iv.aggregation.dao.IAlarmLifeDao;
-import com.iv.aggregation.dao.IAlarmMsgDao;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
-import com.iv.aggregation.dao.impl.AlarmMsgDaoImpl;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmLogEntity;
-import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.aggregation.entity.AlarmSourceEntity;
 import com.iv.aggregation.feign.clients.IAlarmStrategyClient;
+import com.iv.aggregation.feign.clients.IMessageServiceClient;
 import com.iv.aggregation.service.CoreService;
 import com.iv.common.enumeration.NoticeType;
 import com.iv.common.util.spring.SpringContextUtil;
+import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
 import com.iv.strategy.api.dto.StrategyQueryDto;
 
@@ -41,38 +40,32 @@ public class TimerPending implements Runnable {
 	private final static Logger LOGGER = LoggerFactory.getLogger(TimerPending.class);
 	// 数据库工具类
 	private final static IAlarmLifeDao ALARM_LIFE_DAO = AlarmLifeDaoImpl.getInstance();
-	// private final static IGroupDao groupDao = GroupDaoImpl.getInstance();
-	private IAlarmMsgDao alarmMsgDao = SpringContextUtil.getBean("alarmMsgDaoImpl", AlarmMsgDaoImpl.class);
 	// 团队数量
 	private int groupNum;
 	// 推送团队位置（pushTeam==1，推送给第一团队）
 	private Short pushTeam;
 	// 告警源
 	private AlarmSourceEntity alarmSourceEntity;
-	// 微信服务客户端
-	private WechatProxyClient wechatProxyClient;
-	// 策略服务客户端
-	private IAlarmStrategyClient alarmStrategyClient;
-
+	
 	public TimerPending() {
 		super();
 	}
 
-	public TimerPending(Short pushTeam, AlarmSourceEntity alarmSourceEntity, WechatProxyClient wechatProxyClient,
-			IAlarmStrategyClient alarmStrategyClient) {
+	public TimerPending(Short pushTeam, AlarmSourceEntity alarmSourceEntity) {
 		super();
 		this.pushTeam = pushTeam;
 		this.alarmSourceEntity = alarmSourceEntity;
-		this.wechatProxyClient = wechatProxyClient;
-		this.alarmStrategyClient = alarmStrategyClient;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
+		IAlarmStrategyClient alarmStrategyClient = SpringContextUtil.getBean(IAlarmStrategyClient.class);
+		WechatProxyClient wechatProxyClient = SpringContextUtil.getBean(WechatProxyClient.class);
+		IMessageServiceClient messageServiceClient = SpringContextUtil.getBean(IMessageServiceClient.class);
 		RedisTemplate redisTemplate = SpringContextUtil.getBean("redisTemplate", RedisTemplate.class);
-		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeByAlarmSrc(this.alarmSourceEntity);
 		
+		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeByAlarmSrc(this.alarmSourceEntity);
 		// 调用策略服务获取分派策略
 		StrategyQueryDto strategyQuery = new StrategyQueryDto();
 		strategyQuery.setSeverity(alarmSourceEntity.getSeverity());
@@ -91,7 +84,7 @@ public class TimerPending implements Runnable {
 				this.groupNum = dispatchStrategy.getGroupIds().size();
 				ArrayList<Integer> toUserIds = new ArrayList<Integer>(1);
 				if (pushTeam == 1) {
-					Map<String, Object> infoMap = this.wechatProxyClient.alarmNotice(alarmLifeEntity, pushTeam - 1, noticeModels.get(pushTeam - 1), null);
+					Map<String, Object> infoMap = wechatProxyClient.alarmNotice(alarmLifeEntity, pushTeam - 1, noticeModels.get(pushTeam - 1), null);
 					String dispatcher = (String) infoMap.get("dispatcher");
 					toUserIds = (ArrayList<Integer>) infoMap.get("toUserIds");
 					alarmLifeEntity.getLogs().add(AlarmLogEntity.builder(new Date(), OpsType.ASSIGN, dispatcher, null,
@@ -101,21 +94,20 @@ public class TimerPending implements Runnable {
 					// 未认领超过三次推送，告警升级
 					// this.ami.upgrade();
 					alarmLifeEntity.setUpgrade((byte) (alarmLifeEntity.getUpgrade() + 1));
-					Map<String, Object> infoMap = this.wechatProxyClient.alarmNotice(alarmLifeEntity, pushTeam - 1, noticeModels.get(pushTeam - 1), null);
+					Map<String, Object> infoMap = wechatProxyClient.alarmNotice(alarmLifeEntity, pushTeam - 1, noticeModels.get(pushTeam - 1), null);
 					String dispatcher = (String) infoMap.get("dispatcher");
 					toUserIds = (ArrayList<Integer>) infoMap.get("toUserIds");
 					alarmLifeEntity.upgrade(dispatcher, parse2Short(dispatchStrategy.getUpgradeTime()).get(pushTeam - 2));
 				}
 				pushTeam++;
 				if (pushTeam <= groupNum && null != sourceEntity) {
-					TimerPending pending = new TimerPending(pushTeam, this.alarmSourceEntity, this.wechatProxyClient,
-							this.alarmStrategyClient);
+					TimerPending pending = new TimerPending(pushTeam, this.alarmSourceEntity);
 					CoreService.SCHEDULED_EXECUTOR_SERVICE.schedule(pending,
 							parse2Short(dispatchStrategy.getUpgradeTime()).get(pushTeam - 2) * 60, TimeUnit.SECONDS);
 				}
 				// 先清空联合主键表，再更新
-				Set<Integer> mapUsers = new HashSet<Integer>(alarmLifeEntity.getToHandlers());
-				alarmLifeEntity.getToHandlers().clear();
+				Set<Integer> mapUsers = new HashSet<Integer>(alarmLifeEntity.getToHireUserIds());
+				alarmLifeEntity.getToHireUserIds().clear();
 				ALARM_LIFE_DAO.saveOrUpdateAlarmLife(alarmLifeEntity);
 				alarmLifeEntity.setToHireUserIds(mapUsers);
 				ALARM_LIFE_DAO.saveOrUpdateAlarmLife(alarmLifeEntity);
@@ -128,24 +120,19 @@ public class TimerPending implements Runnable {
 				 */
 				// 保存告警消息体
 				if (!CollectionUtils.isEmpty(toUserIds)) {
-					for (int userId : toUserIds) {
-						AlarmMsgEntity alarmMsgEntityselected = alarmMsgDao.selectUnconfirmedMsgById(
-								alarmLifeEntity.getId(), userId, alarmLifeEntity.getAlarm().getTenantId());
-						if (null == alarmMsgEntityselected) {
-							AlarmMsgEntity AlarmMsgEntity = new AlarmMsgEntity();
-							AlarmMsgEntity.setUserId(userId);
-							AlarmMsgEntity.setConfirmed(false);
-							AlarmMsgEntity.setMsgDate(System.currentTimeMillis());
-							AlarmMsgEntity.setAlarmId(alarmLifeEntity.getId());
-							AlarmMsgEntity.setType(NoticeType.ALARM);
-							AlarmMsgEntity.setTitle(alarmLifeEntity.getAlarm().getTitle());
-							AlarmMsgEntity.setHostName(alarmLifeEntity.getAlarm().getHostName());
-							AlarmMsgEntity.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
-							AlarmMsgEntity.setTriDate(alarmLifeEntity.getTriDate());
-							AlarmMsgEntity.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
-							alarmMsgDao.save(AlarmMsgEntity, alarmLifeEntity.getAlarm().getTenantId());
-						}
-					}
+					AlarmMsgDto msgDto = new AlarmMsgDto();
+					msgDto.setUserIds(toUserIds);
+					msgDto.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
+					msgDto.setMsgDate(System.currentTimeMillis());
+					msgDto.setAlarmId(alarmLifeEntity.getId());
+					msgDto.setType(NoticeType.ALARM);
+					msgDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+					msgDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+					msgDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+					msgDto.setTriDate(alarmLifeEntity.getTriDate());
+					msgDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+					// 调用用户消息服务
+					messageServiceClient.produceAlarmMsg(msgDto);
 				}
 			}
 

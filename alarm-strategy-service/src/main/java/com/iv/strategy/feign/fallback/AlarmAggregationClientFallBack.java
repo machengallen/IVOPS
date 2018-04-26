@@ -1,11 +1,14 @@
 package com.iv.strategy.feign.fallback;
 
+import org.springframework.stereotype.Component;
+
 import com.iv.aggregation.api.constant.StrategyCycle;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.common.response.ResponseDto;
 import com.iv.strategy.feign.client.IAlarmAggregationClient;
 
+@Component
 public class AlarmAggregationClientFallBack implements IAlarmAggregationClient {
 
 	@Override

@@ -21,13 +21,13 @@ spring:
 server:
   port: 8110
 eureka:
-#  instance:
-#    prefer-ip-address: true
+  instance:
+    prefer-ip-address: true
 #    ip-address: 10.10.9.26
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8111/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.31.21:8111/eureka/
 
 ---
 spring:
@@ -35,13 +35,13 @@ spring:
 server:
   port: 8111
 eureka:
-#  instance:
-#    prefer-ip-address: true
+  instance:
+    prefer-ip-address: true
 #    ip-address: 10.10.9.26
 #    hostname: eureka-server-2
   client:
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8110/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.31.21:8110/eureka/
       
 ---
 spring:
@@ -49,8 +49,8 @@ spring:
 server:
   port: 8110
 eureka:
-#  instance:
-#    prefer-ip-address: true
+  instance:
+    prefer-ip-address: true
 #    ip-address: 10.10.9.26
 #    hostname: eureka-server-2
   client:
@@ -63,8 +63,8 @@ spring:
 server:
   port: 8111
 eureka:
-#  instance:
-#    prefer-ip-address: true
+  instance:
+    prefer-ip-address: true
 #    ip-address: 10.10.9.26
 #    hostname: eureka-server-2
   client:

@@ -3,6 +3,7 @@ package com.iv.aggregation.feign.clients;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.TemplateMessageDto;
@@ -15,7 +16,7 @@ public interface IWechatServiceClient extends IWechatService {
 
 }
 
-
+@Component
 class WechatServiceClientFallBack implements IWechatServiceClient{
 
 	@Override

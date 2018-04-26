@@ -1,7 +1,10 @@
 package com.iv.aggregation.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -11,21 +14,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.iv.aggregation.api.constant.AlarmStatus;
 import com.iv.aggregation.api.constant.NoticeModel;
-import com.iv.aggregation.dao.impl.AlarmMsgDaoImpl;
 import com.iv.aggregation.entity.AlarmLifeEntity;
-import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.aggregation.feign.clients.IAlarmStrategyClient;
 import com.iv.aggregation.feign.clients.IEmailServiceClient;
 import com.iv.aggregation.feign.clients.IGroupServiceClient;
+import com.iv.aggregation.feign.clients.IMessageServiceClient;
 import com.iv.aggregation.feign.clients.IUserServiceClient;
 import com.iv.aggregation.feign.clients.IWechatServiceClient;
+import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.NoticeType;
 import com.iv.common.enumeration.SendType;
 import com.iv.common.enumeration.Severity;
+import com.iv.common.response.ResponseDto;
+import com.iv.dto.AlarmInfoTemplate;
+import com.iv.dto.AlarmLifeEntityDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.enter.dto.GroupQuery;
+import com.iv.enter.dto.UsersQueryDto;
+import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.outer.dto.GroupEntityDto;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
@@ -44,8 +51,6 @@ public class WechatProxyClient {
 	@Autowired
 	private IAlarmStrategyClient alarmStrategyClient;
 	@Autowired
-	private AlarmMsgDaoImpl alarmMsgDao;
-	@Autowired
 	private IUserServiceClient userServiceClient;
 	@Autowired
 	private IEmailServiceClient emailServiceClient;
@@ -53,6 +58,8 @@ public class WechatProxyClient {
 	private IWechatServiceClient wechatServiceClient;
 	@Autowired
 	private IGroupServiceClient groupServiceClient;
+	@Autowired
+	private IMessageServiceClient messageServiceClient;
 	@Value("${iv.wechat.urlAlarmDetails}")
 	private String urlAlarmDetails;
 
@@ -87,13 +94,28 @@ public class WechatProxyClient {
 		} else {
 			// 转让事件
 			// atm.setTouser(toUser);
+			templateMessageDto.setUserIds(Arrays.asList(toUser));
 			transferNotice(alarmLifeEntity, templateMessageDto, toEmails);
 		}
 
 		// 发送通知至邮件
 		if (!CollectionUtils.isEmpty(toEmails)) {
-			emailServiceClient.alarmToMail(toEmails.toArray(new String[toEmails.size()]), SendType.ALARMTRIGGER,
-					alarmLifeEntity);
+			AlarmInfoTemplate alarmInfoTemplate = new AlarmInfoTemplate();
+			alarmInfoTemplate.setToEmails(toEmails.toArray(new String[toEmails.size()]));
+			alarmInfoTemplate.setEmailType(SendType.ALARMTRIGGER);
+			AlarmLifeEntityDto alarmLifeEntityDto = new AlarmLifeEntityDto();
+			alarmLifeEntityDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+			alarmLifeEntityDto.setContent(alarmLifeEntity.getAlarm().getContent());
+			alarmLifeEntityDto.setCurrentHandlerId(alarmLifeEntity.getHandlerCurrent());
+			alarmLifeEntityDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+			alarmLifeEntityDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+			alarmLifeEntityDto.setId(alarmLifeEntity.getId());
+			alarmLifeEntityDto.setSeverity(alarmLifeEntity.getAlarm().getSeverity());
+			alarmLifeEntityDto.setTime(new Date(alarmLifeEntity.getTriDate()).toLocaleString());
+			alarmLifeEntityDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+			alarmLifeEntityDto.setUpgrade(alarmLifeEntityDto.getUpgrade());
+			alarmInfoTemplate.setAlarmLifeEntity(alarmLifeEntityDto);
+			emailServiceClient.alarmToMail(alarmInfoTemplate);
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("dispatcher", dispatcher);
@@ -119,18 +141,27 @@ public class WechatProxyClient {
 		strategyQuery.setSeverity(Severity.valueOf(alarmLifeEntity.getAlarm().getSeverity().name()));
 		strategyQuery.setItemType(alarmLifeEntity.getItemType());
 		strategyQuery.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
-		AlarmStrategyDto dispatchStrategy = (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
+		ResponseDto responseDto = alarmStrategyClient.getStrategy(strategyQuery);
+		AlarmStrategyDto dispatchStrategy = null;
+		if(null != responseDto) {
+			dispatchStrategy = (AlarmStrategyDto)responseDto.getData();
+		} else {
+			return infoMap;
+		}
+		//AlarmStrategyDto dispatchStrategy = (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
 		short groupId = dispatchStrategy.getGroupIds().get(index);
 		// 调用组服务获取组信息
 		GroupQuery groupQuery = new GroupQuery();
 		groupQuery.setGroupId(groupId);
 		groupQuery.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
 		GroupEntityDto groupDto = groupServiceClient.selectGroupInfo(groupQuery);
+		if(null == groupDto) {
+			return infoMap;
+		}
 		
 		switch (model) {
 		case ROUND_ROBIN:// 轮询通知方式
 			Integer targetUserId = TeamRoundRobin.getToUser(alarmLifeEntity.getAlarm().getTenantId(), groupId, groupDto.getUserId());
-			LocalAuthDto localAuth = userServiceClient.selectLocalAuthById(targetUserId);
 			// HireUser targetUser1 = hireUserDao.selectHireUserByUserId(hirer.getUserId());
 			if (null == targetUserId) {
 				break;
@@ -141,48 +172,54 @@ public class WechatProxyClient {
 				alarmLifeEntity.setHandlerCurrent(targetUserId);
 			}
 			
-			// 判断用户是否已关注公众号
-			if (wechatServiceClient.ifFocusWechat(targetUserId)) {// 微信推送
-				LOGGER.info("推送人员：" + localAuth.toString());
-				// 记录告警生命周期-推送人
-				alarmLifeEntity.getToHandlers().add(targetUserId);
-				// 调用微信管理服务，发送模板消息
-				atm.setUserId(targetUserId);
-				wechatServiceClient.SendWeChatInfo(atm);
+			//LOGGER.info("推送人员：" + localAuth.toString());
+			// 记录告警生命周期-推送人
+			alarmLifeEntity.getToHireUserIds().add(targetUserId);
+			// 调用微信管理服务，发送模板消息
+			atm.setUserIds(Arrays.asList(targetUserId));
+			wechatServiceClient.SendWeChatInfo(atm);
 				
-			}
 			// 记录邮件发送人
-			toEmails.add(localAuth.getUserName());
-			toUserIds.add(localAuth.getId());
-			// 返回告警派送人
-			String dispatcher = null;
-			if (null == localAuth.getRealName()) {
-				dispatcher = localAuth.getUserName();
-			} else {
-				dispatcher = localAuth.getRealName();
+			LocalAuthDto localAuth = userServiceClient.selectLocalAuthById(targetUserId);
+			if(null != localAuth) {
+				toEmails.add(localAuth.getUserName());
+				// 返回告警派送人
+				String dispatcher = null;
+				if (null == localAuth.getRealName()) {
+					dispatcher = localAuth.getUserName();
+				} else {
+					dispatcher = localAuth.getRealName();
+				}
+				infoMap.put("dispatcher", dispatcher);
 			}
-			infoMap.put("dispatcher", dispatcher);
+			
+			toUserIds.add(targetUserId);
 			infoMap.put("toUserIds", toUserIds);
 			return infoMap;
 
 		case BROADCAST:// 广播通知方式
-			for (int userId : groupDto.getUserId()) {
-				LocalAuthDto localAuthDto = userServiceClient.selectLocalAuthById(userId);
-				
-				//TODO 判断用户是否已关注公众号
-				if (wechatServiceClient.ifFocusWechat(userId)) {
-					LOGGER.info("推送人员：" + localAuthDto.toString());
+			List<Integer> userIds = new ArrayList<Integer>();
+			UsersQueryDto usersQuery = new UsersQueryDto();
+			usersQuery.setUserIds(groupDto.getUserId());
+			List<LocalAuthDto> authDtos = userServiceClient.selectUserInfos(usersQuery);
+			if(null != authDtos) {
+				for (LocalAuthDto user : authDtos) {
+					
+					LOGGER.info("推送人员：" + user.toString());
 					// 写入当前处理人
 					// alarmLifeEntity.setHandlerCurrent(user);
 					// 记录告警生命周期-推送人
-					alarmLifeEntity.getToHandlers().add(userId);
-					// 调用微信管理服务，发送模板消息
-					atm.setUserId(userId);
-					wechatServiceClient.SendWeChatInfo(atm);
+					alarmLifeEntity.getToHireUserIds().add(user.getId());
+					userIds.add(user.getId());
+					// 记录邮件发送人
+					toEmails.add(user.getUserName());
+					toUserIds.add(user.getId());
 				}
-				// 记录邮件发送人
-				toEmails.add(localAuthDto.getUserName());
-				toUserIds.add(localAuthDto.getId());
+			}
+			// 调用微信管理服务，发送模板消息
+			atm.setUserIds(userIds);
+			if(!userIds.isEmpty()) {
+				wechatServiceClient.SendWeChatInfo(atm);
 			}
 			infoMap.put("dispatcher", groupDto.getGroupName());
 			infoMap.put("toUserIds", toUserIds);
@@ -206,12 +243,14 @@ public class WechatProxyClient {
 	private void transferNotice(AlarmLifeEntity alarmLifeEntity, TemplateMessageDto atm, ArrayList<String> toEmails) throws Exception {
 		// 调用微信管理服务，发送模板消息
 		wechatServiceClient.SendWeChatInfo(atm);
-		LocalAuthDto user = userServiceClient.selectLocalAuthById(atm.getUserId());
-		LOGGER.info("转让人员：" + user.toString());
-		// 记录被通知人
-		alarmLifeEntity.getToHandlers().add(atm.getUserId());
+		LocalAuthDto user = userServiceClient.selectLocalAuthById(atm.getUserIds().get(0));
 		// 记录邮件发送人
-		toEmails.add(user.getUserName());
+		if(null != user) {
+			toEmails.add(user.getUserName());
+		}
+		//LOGGER.info("转让人员：" + user.toString());
+		// 记录被通知人
+		alarmLifeEntity.getToHireUserIds().add(atm.getUserIds().get(0));
 	}
 
 	/**
@@ -226,8 +265,6 @@ public class WechatProxyClient {
 
 		// 用于记录邮件发送人
 		ArrayList<String> toEmails = new ArrayList<String>(1);
-		// 用于记录邮件发送人Id
-		ArrayList<Integer> toUserIds = new ArrayList<Integer>(1);
 		// 转换为微信模板消息体
 		// 转换为微信模板消息体
 		TemplateMessageDto templateMessageDto = DataConvert.AlarmTempConvert(alarmLifeEntity.getAlarm());
@@ -235,41 +272,53 @@ public class WechatProxyClient {
 		templateMessageDto.setRedirect_uri(urlAlarmDetails + alarmLifeEntity.getId() + "$" +
 				alarmLifeEntity.getAlarm().getTenantId());
 
-		// 发送消息至微信服务器
-		for (int targetUserId : alarmLifeEntity.getToHandlers()) {
-			// 调用微信管理服务，发送模板消息
-			if(wechatServiceClient.ifFocusWechat(targetUserId)) {
-				templateMessageDto.setUserId(targetUserId);
-				wechatServiceClient.SendWeChatInfo(templateMessageDto);
+		UsersQueryDto usersQuery = new UsersQueryDto();
+		usersQuery.setUserIds(new ArrayList<>(alarmLifeEntity.getToHireUserIds()));
+		List<LocalAuthDto> authDtos = userServiceClient.selectUserInfos(usersQuery);
+		if(null != authDtos) {
+			for (LocalAuthDto user : authDtos) {
+				// 记录邮箱发送人
+				toEmails.add(user.getUserName());
 			}
-			// 记录邮箱发送人
-			toEmails.add(userServiceClient.selectLocalAuthById(targetUserId).getUserName());
-			toUserIds.add(targetUserId);
 		}
+		// 发送消息至微信服务器
+		templateMessageDto.setUserIds(new ArrayList<>(alarmLifeEntity.getToHireUserIds()));
+		wechatServiceClient.SendWeChatInfo(templateMessageDto);
 
 		// 调用邮件服务
 		if (!CollectionUtils.isEmpty(toEmails)) {
-			emailServiceClient.alarmToMail(toEmails.toArray(new String[toEmails.size()]), SendType.ALARMRECOVERY,
-					alarmLifeEntity);
+			AlarmInfoTemplate alarmInfoTemplate = new AlarmInfoTemplate();
+			alarmInfoTemplate.setToEmails(toEmails.toArray(new String[toEmails.size()]));
+			alarmInfoTemplate.setEmailType(SendType.ALARMRECOVERY);
+			AlarmLifeEntityDto alarmLifeEntityDto = new AlarmLifeEntityDto();
+			alarmLifeEntityDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+			alarmLifeEntityDto.setContent(alarmLifeEntity.getAlarm().getContent());
+			alarmLifeEntityDto.setCurrentHandlerId(alarmLifeEntity.getHandlerCurrent());
+			alarmLifeEntityDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+			alarmLifeEntityDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+			alarmLifeEntityDto.setId(alarmLifeEntity.getId());
+			alarmLifeEntityDto.setSeverity(alarmLifeEntity.getAlarm().getSeverity());
+			alarmLifeEntityDto.setTime(new Date(alarmLifeEntity.getRecDate()).toLocaleString());
+			alarmLifeEntityDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+			alarmLifeEntityDto.setUpgrade(alarmLifeEntityDto.getUpgrade());
+			alarmInfoTemplate.setAlarmLifeEntity(alarmLifeEntityDto);
+			emailServiceClient.alarmToMail(alarmInfoTemplate);
 		}
 
 		// 保存恢复信息
-		if (!CollectionUtils.isEmpty(toUserIds)) {
-			for (int userId : toUserIds) {
-				AlarmMsgEntity AlarmMsgEntity = new AlarmMsgEntity();
-				AlarmMsgEntity.setUserId(userId);
-				AlarmMsgEntity.setConfirmed(false);
-				AlarmMsgEntity.setMsgDate(System.currentTimeMillis());
-				AlarmMsgEntity.setAlarmId(alarmLifeEntity.getId());
-				AlarmMsgEntity.setType(NoticeType.RECOVERY);
-				AlarmMsgEntity.setTitle(alarmLifeEntity.getAlarm().getTitle());
-				AlarmMsgEntity.setHostName(alarmLifeEntity.getAlarm().getHostName());
-				AlarmMsgEntity.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
-				AlarmMsgEntity.setTriDate(alarmLifeEntity.getRecDate());
-				AlarmMsgEntity.setAlarmStatus(AlarmStatus.CLOSED);
-				alarmMsgDao.save(AlarmMsgEntity, alarmLifeEntity.getAlarm().getTenantId());
-			}
-		}
+		AlarmMsgDto msgDto = new AlarmMsgDto();
+		msgDto.setUserIds(new ArrayList<>(alarmLifeEntity.getToHireUserIds()));
+		msgDto.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
+		msgDto.setMsgDate(System.currentTimeMillis());
+		msgDto.setAlarmId(alarmLifeEntity.getId());
+		msgDto.setType(NoticeType.RECOVERY);
+		msgDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
+		msgDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
+		msgDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
+		msgDto.setTriDate(alarmLifeEntity.getTriDate());
+		msgDto.setAlarmStatus(AlarmStatus.CLOSED);
+		// 调用用户消息服务
+		messageServiceClient.produceAlarmMsg(msgDto);
 	}
 
 }

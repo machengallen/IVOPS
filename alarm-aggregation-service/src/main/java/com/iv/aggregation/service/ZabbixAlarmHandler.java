@@ -28,16 +28,16 @@ public class ZabbixAlarmHandler {
 	 * 
 	 * @param AlarmTempMessage
 	 */
-	public AlarmLifeEntity alarmProcessing(AlarmMessageInput ami) {
+	public AlarmLifeEntity alarmProcessing(AlarmMessageInput ami, String tenantId) {
 
 		try {
 
 			if (StringUtils.isEmpty(ami.getEventRecoveryId())) {
 				// 告警触发
-				return coreService.alarmTrigger(DataConvert.zabbixAlarmConvert(ami));
+				return coreService.alarmTrigger(DataConvert.zabbixAlarmConvert(ami, tenantId));
 			} else {
 				// 告警恢复
-				coreService.alarmRecovery(DataConvert.zabbixRecoveryConvert(ami));
+				coreService.alarmRecovery(DataConvert.zabbixRecoveryConvert(ami, tenantId));
 				return null;
 			}
 		} catch (Exception e) {

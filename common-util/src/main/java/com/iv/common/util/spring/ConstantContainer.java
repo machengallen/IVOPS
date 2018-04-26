@@ -1,5 +1,11 @@
 package com.iv.common.util.spring;
 
+/**
+ * @author macheng
+ * 2018年4月25日
+ * common-util
+ * 
+ */
 public interface ConstantContainer {
 
 	/**
@@ -26,4 +32,13 @@ public interface ConstantContainer {
 	 * 业务数据库初始化sql脚本名
 	 */
 	String BUS_SQL_SCRIPT_NAME = "init_table.sql";
+	
+	/**
+	 * 各服务初始化数据库名
+	 */
+	String ALARM_AGGREGATION_DB = "alarm_aggregation_service";
+	
+	String MESSAGE_DB = "message_service";
+	
+	String ALARM_STRATEGY_DB = "alarm_strategy_service";
 }

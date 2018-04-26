@@ -37,7 +37,7 @@ public class DataConvert {
 	 * @param ami
 	 * @return
 	 */
-	public static AlarmSourceEntity zabbixAlarmConvert(AlarmMessageInput ami) {
+	public static AlarmSourceEntity zabbixAlarmConvert(AlarmMessageInput ami, String tenantId) {
 
 		AlarmSourceEntity alarmSourceEntity = new AlarmSourceEntity();
 		alarmSourceEntity.setAgentType(AgentType.Zabbix);
@@ -50,7 +50,7 @@ public class DataConvert {
 		alarmSourceEntity.setSeverity(Severity.values()[Byte.parseByte(ami.getSeverity())]);
 		alarmSourceEntity.setItemKey(ami.getItemKey());
 		alarmSourceEntity.setDetails(ami.getDetails());
-		alarmSourceEntity.setTenantId(ami.getTenantId());
+		alarmSourceEntity.setTenantId(tenantId);
 		// alarmSourceEntity.setDetails(new SerialClob(ami.getDetails().toCharArray()));
 		// 设置日期
 		String date = ami.getEventData();
@@ -84,11 +84,11 @@ public class DataConvert {
 	 * @param ami
 	 * @return
 	 */
-	public static AlarmRecoveryEntity zabbixRecoveryConvert(AlarmMessageInput ami) {
+	public static AlarmRecoveryEntity zabbixRecoveryConvert(AlarmMessageInput ami, String tenantId) {
 
 		AlarmRecoveryEntity alarmRecoveryEntity = new AlarmRecoveryEntity();
 		alarmRecoveryEntity.setAlarmSourceEntity(alarmLifeDao.selectAlarmSourceByEventId(ami.getEventId(),
-				ami.getMonitorIp(), ami.getTenantId(), AgentType.Zabbix));
+				ami.getMonitorIp(), tenantId, AgentType.Zabbix));
 		alarmRecoveryEntity.setMonitorIp(ami.getMonitorIp());
 		alarmRecoveryEntity.setEventAge(ami.getEventAge());
 		alarmRecoveryEntity.setEventRecoveryId(ami.getEventRecoveryId());
@@ -182,7 +182,7 @@ public class DataConvert {
 	 * @param nmi
 	 * @return
 	 */
-	public static AlarmSourceEntity nagiosAlarmConvert(NagiosMessageInput nmi) {
+	public static AlarmSourceEntity nagiosAlarmConvert(NagiosMessageInput nmi, String tenantId) {
 		AlarmSourceEntity alarmSourceEntity = new AlarmSourceEntity();
 		alarmSourceEntity.setAgentType(AgentType.Nagios);
 		if (Integer.parseInt(nmi.getHostState()) != 0) {
@@ -201,7 +201,7 @@ public class DataConvert {
 			alarmSourceEntity.setItemKey(nmi.getServiceCheckCommand());
 		}
 
-		alarmSourceEntity.setTenantId(nmi.getTenantId());
+		alarmSourceEntity.setTenantId(tenantId);
 		alarmSourceEntity.setMonitorIp(nmi.getMonitorIp());
 		alarmSourceEntity.setHostIp(nmi.getHostIp());
 		alarmSourceEntity.setHostName(nmi.getHostName());
@@ -233,18 +233,18 @@ public class DataConvert {
 	 * @return
 	 * @throws ParseException
 	 */
-	public static AlarmRecoveryEntity nagiosRecoveryConvert(NagiosMessageInput nmi) throws ParseException {
+	public static AlarmRecoveryEntity nagiosRecoveryConvert(NagiosMessageInput nmi, String tenantId) throws ParseException {
 		AlarmRecoveryEntity alarmRecoveryEntity = new AlarmRecoveryEntity();
 		if (Integer.parseInt(nmi.getHostState()) != 0) {
 			// 主机故障
 			alarmRecoveryEntity.setAlarmSourceEntity(alarmLifeDao.selectAlarmSourceByEventId(nmi.getLastHostProblemId(),
-					nmi.getMonitorIp(), nmi.getTenantId(), AgentType.Nagios));
+					nmi.getMonitorIp(), tenantId, AgentType.Nagios));
 			// alarmRecoveryEntity.setEventAge(nmi.getHostDuration());
 			alarmRecoveryEntity.setEventRecoveryId(nmi.getHostEventId());
 		} else {
 			// 服务故障
 			alarmRecoveryEntity.setAlarmSourceEntity(alarmLifeDao.selectAlarmSourceByEventId(
-					nmi.getLastServiceProblemId(), nmi.getMonitorIp(), nmi.getTenantId(), AgentType.Nagios));
+					nmi.getLastServiceProblemId(), nmi.getMonitorIp(), tenantId, AgentType.Nagios));
 			// alarmRecoveryEntity.setEventAge(nmi.getServiceDuration());
 			alarmRecoveryEntity.setEventRecoveryId(nmi.getServiceEventId());
 		}

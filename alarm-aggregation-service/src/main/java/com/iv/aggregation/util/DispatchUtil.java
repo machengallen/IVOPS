@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import com.iv.common.util.spring.PropertiesUtil;
-
 
 /**
  * 告警分派工具类

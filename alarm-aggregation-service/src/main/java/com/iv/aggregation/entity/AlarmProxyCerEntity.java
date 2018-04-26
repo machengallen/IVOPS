@@ -1,5 +1,6 @@
 package com.iv.aggregation.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -22,6 +23,7 @@ public class AlarmProxyCerEntity {
 	public void setToken(String token) {
 		this.token = token;
 	}
+	@Column(unique = true, nullable = false)
 	public String getTenantId() {
 		return tenantId;
 	}

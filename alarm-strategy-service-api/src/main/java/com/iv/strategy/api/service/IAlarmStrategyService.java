@@ -21,6 +21,6 @@ public interface IAlarmStrategyService {
 	ResponseDto getStrategy(@RequestBody StrategyQueryDto queryDto);
 	
 	@RequestMapping(value = "/strategy/exist", method = RequestMethod.GET)
-	boolean strategyExist(@RequestParam short groupId);
+	boolean strategyExist(@RequestParam("groupId") short groupId);
 	
 }

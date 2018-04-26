@@ -14,7 +14,7 @@ public class NagiosMessageInput implements Serializable{
 	
 	private String monitorIp;// 监控服务器ip
 	private String notificationType;// 通知类型
-	private String tenantId;//租户id
+	private String token;//租户id
 	private String details;
 	/**
 	 * 主机相关
@@ -57,11 +57,11 @@ public class NagiosMessageInput implements Serializable{
 	public void setNotificationType(String notificationType) {
 		this.notificationType = notificationType;
 	}
-	public String getTenantId() {
-		return tenantId;
+	public String getToken() {
+		return token;
 	}
-	public void setTenantId(String tenantId) {
-		this.tenantId = tenantId;
+	public void setToken(String token) {
+		this.token = token;
 	}
 	public String getDetails() {
 		return details;
@@ -196,8 +196,8 @@ public class NagiosMessageInput implements Serializable{
 		builder.append(monitorIp);
 		builder.append(", notificationType=");
 		builder.append(notificationType);
-		builder.append(", tenantId=");
-		builder.append(tenantId);
+		builder.append(", token=");
+		builder.append(token);
 		builder.append(", details=");
 		builder.append(details);
 		builder.append(", hostName=");

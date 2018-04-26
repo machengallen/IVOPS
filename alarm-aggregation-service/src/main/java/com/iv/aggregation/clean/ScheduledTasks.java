@@ -1,6 +1,7 @@
 package com.iv.aggregation.clean;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.PostConstruct;
@@ -20,7 +21,6 @@ import com.iv.aggregation.dao.impl.AlarmCleanStrategyDaoImpl;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
 import com.iv.aggregation.entity.AlarmCleanStrategyEntity;
 import com.iv.aggregation.feign.clients.ITenantServiceClient;
-import com.iv.tenant.api.dto.EnterpriseInfoDto;
 import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
 
 @Component
@@ -32,41 +32,34 @@ public class ScheduledTasks {
 
 	@Autowired
 	private AlarmCleanStrategyDaoImpl strategyDao;
+	@Autowired
 	private ITenantServiceClient tenantServiceClient;
 	private static final IAlarmLifeDao ALARM_LIFE_DAO = AlarmLifeDaoImpl.getInstance();
 
 	public void work() throws SchedulerException {
 		LOGGER.info("*******************告警数据定时清理*******************");
 
-		// 获取所有租户,执行对应清理策略
-		for (EnterpriseInfoDto enterpriseInfoDto : tenantServiceClient.getEnterpriseAll()) {
-
-			String tenantId = enterpriseInfoDto.getTenantId();
-			LOGGER.info("租户：" + enterpriseInfoDto.getName());
-			Calendar calendar = Calendar.getInstance(Locale.CHINA);
-			AlarmCleanStrategyEntity strategyEntity = strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId);
-			if (null == strategyEntity) {
-				strategyEntity = initStrategy(tenantId);
+		try {
+			// 获取所有项目组，执行对应清理策略
+			List<SubEnterpriseInfoDto> subEnterpriseInfoDtos = tenantServiceClient.getSubEnterpriseAll();
+			if(null != subEnterpriseInfoDtos) {
+				for (SubEnterpriseInfoDto subEnterpriseInfoDto : subEnterpriseInfoDtos) {
+					
+					String tenantId = subEnterpriseInfoDto.getTenantId();
+					LOGGER.info(
+							"租户：" + subEnterpriseInfoDto.getEnterprise().getName() + " 项目组：" + subEnterpriseInfoDto.getName());
+					Calendar calendar = Calendar.getInstance(Locale.CHINA);
+					AlarmCleanStrategyEntity strategyEntity = strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId);
+					if (null == strategyEntity) {
+						strategyEntity = initStrategy(tenantId);
+					}
+					calendar.add(Calendar.MONTH, strategyEntity.getCycleType().getMonths());
+					// System.out.println(dao.selectById(IAlarmCleanStrategyDao.id).getCycleType().getMonths());
+					ALARM_LIFE_DAO.delBeforeTimestamp(calendar.getTimeInMillis(), tenantId);
+				}
 			}
-			calendar.add(Calendar.MONTH, strategyEntity.getCycleType().getMonths());
-			// System.out.println(dao.selectById(IAlarmCleanStrategyDao.id).getCycleType().getMonths());
-			ALARM_LIFE_DAO.delBeforeTimestamp(calendar.getTimeInMillis(), tenantId);
-		}
-
-		// 获取所有项目组，执行对应清理策略
-		for (SubEnterpriseInfoDto subEnterpriseInfoDto : tenantServiceClient.getSubEnterpriseAll()) {
-
-			String tenantId = subEnterpriseInfoDto.getSubTenantId();
-			LOGGER.info(
-					"租户：" + subEnterpriseInfoDto.getEnterprise().getName() + " 项目组：" + subEnterpriseInfoDto.getName());
-			Calendar calendar = Calendar.getInstance(Locale.CHINA);
-			AlarmCleanStrategyEntity strategyEntity = strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId);
-			if (null == strategyEntity) {
-				strategyEntity = initStrategy(tenantId);
-			}
-			calendar.add(Calendar.MONTH, strategyEntity.getCycleType().getMonths());
-			// System.out.println(dao.selectById(IAlarmCleanStrategyDao.id).getCycleType().getMonths());
-			ALARM_LIFE_DAO.delBeforeTimestamp(calendar.getTimeInMillis(), tenantId);
+		} catch (RuntimeException e) {
+			LOGGER.error("定时任务执行失败", e);
 		}
 	}
 
@@ -79,17 +72,24 @@ public class ScheduledTasks {
 	public void initConfig() {
 		// System.out.println("*****************初始化告警数据清理规则*****************");
 		// 对所有租户初始化告警数据清理策略
-		for (EnterpriseInfoDto enterpriseInfoDto : tenantServiceClient.getEnterpriseAll()) {
+		try {
+			List<SubEnterpriseInfoDto> subEnterpriseInfoDtos = tenantServiceClient.getSubEnterpriseAll();
+			if(null != subEnterpriseInfoDtos) {
+				for (SubEnterpriseInfoDto subEnterpriseInfoDto : subEnterpriseInfoDtos) {
 
-			String tenantId = enterpriseInfoDto.getTenantId();
-			// 初始化告警清理规则
-			if (null == strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId)) {
-				// 默认告警数据保留一年
-				AlarmCleanStrategyEntity cleanStrategyEntity = new AlarmCleanStrategyEntity();
-				cleanStrategyEntity.setCycleType(StrategyCycle.YEAR);
-				cleanStrategyEntity.setId(IAlarmCleanStrategyDao.id);
-				strategyDao.saveStrategy(cleanStrategyEntity, tenantId);
+					String tenantId = subEnterpriseInfoDto.getTenantId();
+					// 初始化告警清理规则
+					if (null == strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId)) {
+						// 默认告警数据保留一年
+						AlarmCleanStrategyEntity cleanStrategyEntity = new AlarmCleanStrategyEntity();
+						cleanStrategyEntity.setCycleType(StrategyCycle.YEAR);
+						cleanStrategyEntity.setId(IAlarmCleanStrategyDao.id);
+						strategyDao.saveStrategy(cleanStrategyEntity, tenantId);
+					}
+				}
 			}
+		} catch (RuntimeException e) {
+			LOGGER.error("定时任务初始化失败", e);
 		}
 	}
 

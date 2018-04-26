@@ -127,7 +127,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/strategy", method = RequestMethod.POST)
+	@RequestMapping(value = "/get/strategy/page", method = RequestMethod.POST)
 	@ApiOperation("查询分派策略(分页)")
 	public ResponseDto getStrategyPaging(@RequestBody StrategyQueryDto query) {
 

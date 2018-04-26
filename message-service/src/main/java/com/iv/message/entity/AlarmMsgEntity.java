@@ -1,4 +1,4 @@
-package com.iv.aggregation.entity;
+package com.iv.message.entity;
 
 import java.io.Serializable;
 
@@ -14,14 +14,14 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.iv.aggregation.api.constant.AlarmStatus;
+import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.NoticeType;
 
 /**
- * 消息中心-告警通知消息体
+ * 告警通知消息体
  * @author macheng
- * 2018年4月3日
- * alarm-aggregation-service-1.0.0-SNAPSHOT
+ * 2018年1月26日
+ * aggregation-1.3.0-SNAPSHOT
  * 
  */
 @Entity
@@ -61,7 +61,7 @@ public class AlarmMsgEntity implements Serializable{
 	public void setId(String id) {
 		this.id = id;
 	}
-	
+	@Column(name = "user_id")
 	public int getUserId() {
 		return userId;
 	}

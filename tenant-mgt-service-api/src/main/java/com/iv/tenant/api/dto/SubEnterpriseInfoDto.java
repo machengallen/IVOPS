@@ -7,7 +7,7 @@ public class SubEnterpriseInfoDto {
 	private int id;
 	private String name;
 	private String subIdentifier;// 项目组标识符
-	private String subTenantId;//　子租户id
+	private String tenantId;//　子租户id
 	private EnterpriseInfoDto enterprise;
 	private Set<Integer> userIds;
 	public int getId() {
@@ -28,11 +28,11 @@ public class SubEnterpriseInfoDto {
 	public void setSubIdentifier(String subIdentifier) {
 		this.subIdentifier = subIdentifier;
 	}
-	public String getSubTenantId() {
-		return subTenantId;
+	public String getTenantId() {
+		return tenantId;
 	}
-	public void setSubTenantId(String subTenantId) {
-		this.subTenantId = subTenantId;
+	public void setTenantId(String tenantId) {
+		this.tenantId = tenantId;
 	}
 	public Set<Integer> getUserIds() {
 		return userIds;

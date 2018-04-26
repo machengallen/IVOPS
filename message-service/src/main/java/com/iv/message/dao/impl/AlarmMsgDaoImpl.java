@@ -1,4 +1,4 @@
-package com.iv.aggregation.dao.impl;
+package com.iv.message.dao.impl;
 
 import java.util.List;
 
@@ -6,13 +6,14 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
-import com.iv.aggregation.dao.IAlarmMsgDao;
-import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.common.dto.ObjectPageDto;
 import com.iv.common.enumeration.NoticeType;
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
-import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
+import com.iv.message.dao.IAlarmMsgDao;
+import com.iv.message.entity.AlarmMsgEntity;
+
 
 @Repository
 public class AlarmMsgDaoImpl implements IAlarmMsgDao {
@@ -113,7 +114,7 @@ public class AlarmMsgDaoImpl implements IAlarmMsgDao {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.id in (:idList)")
+				int num = ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.id in (:idList)")
 						.setParameter(0, confirmed).setParameterList("idList", ids).executeUpdate();
 				return null;
 			}
@@ -127,7 +128,7 @@ public class AlarmMsgDaoImpl implements IAlarmMsgDao {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.userId=? and a.type=?")
+				int num = ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.userId=? and a.type=?")
 						.setParameter(0, confirmed).setParameter(1, userId).setParameter(2, type).executeUpdate();
 				return null;
 			}
@@ -141,7 +142,7 @@ public class AlarmMsgDaoImpl implements IAlarmMsgDao {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.userId=?")
+				int num = ses.createQuery("update AlarmMsgEntity a set a.confirmed=? where a.userId=?")
 						.setParameter(0, confirmed).setParameter(1, userId).executeUpdate();
 				return null;
 			}

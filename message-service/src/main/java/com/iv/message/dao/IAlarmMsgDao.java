@@ -1,10 +1,10 @@
-package com.iv.aggregation.dao;
+package com.iv.message.dao;
 
 import java.util.List;
 
-import com.iv.aggregation.entity.AlarmMsgEntity;
 import com.iv.common.dto.ObjectPageDto;
 import com.iv.common.enumeration.NoticeType;
+import com.iv.message.entity.AlarmMsgEntity;
 
 
 public interface IAlarmMsgDao {
