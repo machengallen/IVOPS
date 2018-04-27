@@ -1,7 +1,7 @@
 eureka:
   client:
     service-url:
-      defaultZone: http://ivops:123abcd@10.10.9.55:8110/eureka/
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
 spring:
   profiles:
     active:
@@ -9,7 +9,7 @@ spring:
   application:
     name: zuul-service
 zuul:
-  prefix: /v2
+  prefix: /v1
   routes:
     api-1:
       path: /user/**
@@ -35,6 +35,15 @@ zuul:
     api-8:
       path: /group/**
       serviceId: group-service
+    api-9:
+      path: /message/**
+      service-id: message-service
+    api-10:
+      path: /alarm/report/**
+      service-id: alarm-report-service
+    api-11:
+      path: /authentication/**
+      service-id: authentication-server
 
 ribbon:
   ReadTimeout: 5000
@@ -42,19 +51,7 @@ ribbon:
   MaxAutoRetries: 3
   MaxAutoRetriesNextServer: 1
 
----
-spring:
-  profiles: peer1
-server:
-  port: 8120
-
----
-spring:
-  profiles: peer2
-server:
-  port: 8121
----
-#jwt��oauth2�İ�ȫ��֤����
+#jwt oauth2
 security:
   basic:
     enabled: false
@@ -74,3 +71,15 @@ security:
           -----END PUBLIC KEY-----
       id: zuul
       service-id: ${PREFIX:}zuul
+
+---
+spring:
+  profiles: peer1
+server:
+  port: 8120
+
+---
+spring:
+  profiles: peer2
+server:
+  port: 8121
