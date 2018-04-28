@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.dto.IdListDto;
 import com.iv.common.response.ResponseDto;
-import com.iv.tenant.api.dto.EnterpriseInfoDto;
 import com.iv.tenant.api.dto.QueryEnterReq;
 import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
 import com.iv.tenant.api.dto.SubTenantInfoDto;
@@ -28,7 +27,7 @@ import com.iv.tenant.api.dto.TenantInfoDto;
 public interface ITenantFacadeService {
 
 	/**
-	 * 获取已注册租户的主体信息
+	 * 获取已注册的企业主体信息
 	 * 
 	 * @return
 	 */
@@ -36,29 +35,29 @@ public interface ITenantFacadeService {
 	ResponseDto getEnterNameList();
 
 	/**
-	 * 获取租户信息
+	 * 获取企业信息
 	 * 
 	 * @param req
 	 * @return
 	 */
-	@RequestMapping(value = "/get/targetEnter", method = RequestMethod.POST)
+	@RequestMapping(value = "/get/enterprise/conditions", method = RequestMethod.POST)
 	ResponseDto getTenant(@RequestBody QueryEnterReq req);
 
 	/**
-	 * 获取租户下所有项目组信息
+	 * 获取某企业所有项目组信息
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/subTenant/list", method = RequestMethod.GET)
-	ResponseDto getSubTenant(@RequestParam("request") HttpServletRequest request);
+	/*@RequestMapping(value = "/get/enterprise/tenant/list", method = RequestMethod.GET)
+	ResponseDto getSubTenant(@RequestParam("request") HttpServletRequest request);*/
 
 	/**
-	 * 获取指定项目组信息
+	 * 获取项目组信息
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/subTenant", method = RequestMethod.GET)
-	ResponseDto getSubTenant(@RequestParam("subTenantId") String subTenantId);
+	@RequestMapping(value = "/get/tenant", method = RequestMethod.GET)
+	ResponseDto getTenantByTenantId(@RequestParam("request") HttpServletRequest request);
 
 	/**
 	 * 申请创建租户
@@ -67,7 +66,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/apply/regis", method = RequestMethod.POST)
+	@RequestMapping(value = "/apply/regis", method = RequestMethod.POST)
 	ResponseDto newTenantApply(@RequestParam("request") HttpServletRequest request, @RequestBody TenantInfoDto dto);
 
 	/**
@@ -77,7 +76,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/approve", method = RequestMethod.POST)
+	@RequestMapping(value = "/approve", method = RequestMethod.POST)
 	ResponseDto taskApprove(@RequestParam("request") HttpServletRequest request, @RequestBody TenantApproveReq dto);
 
 	/**
@@ -88,7 +87,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/usertask/regis/{first}/{max}", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/pending/regis/{first}/{max}", method = RequestMethod.GET)
 	ResponseDto getUserTasksRegis(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "first", required = true) int first,
 			@PathVariable(value = "max", required = true) int max);
@@ -101,7 +100,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/hisFlow/regis/{first}/{max}", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/hisFlow/regis/{first}/{max}", method = RequestMethod.GET)
 	ResponseDto getHistoryProcessRegis(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "first", required = true) int first,
 			@PathVariable(value = "max", required = true) int max);
@@ -113,7 +112,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/apply/join/{tenantId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/apply/join/{tenantId}", method = RequestMethod.GET)
 	ResponseDto applyJoinTenant(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "tenantId", required = true) String tenantId);
 
@@ -125,7 +124,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/usertask/join/{first}/{max}", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/pending/join/{first}/{max}", method = RequestMethod.GET)
 	ResponseDto getUserTasksJoin(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "first", required = true) int first,
 			@PathVariable(value = "max", required = true) int max);
@@ -138,7 +137,7 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/hisFlow/join/{first}/{max}", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/hisFlow/join/{first}/{max}", method = RequestMethod.GET)
 	ResponseDto getHistoryProcessJoin(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "first", required = true) int first,
 			@PathVariable(value = "max", required = true) int max);
@@ -149,7 +148,7 @@ public interface ITenantFacadeService {
 	 * @param userIds
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/adduser/ten", method = RequestMethod.POST)
+	@RequestMapping(value = "/add/user", method = RequestMethod.POST)
 	ResponseDto manuallyAddUser(@RequestParam("request") HttpServletRequest request, @RequestBody IdListDto userIds);
 
 	/**
@@ -159,17 +158,17 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/switch/{tenantId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/switch/{tenantId}", method = RequestMethod.GET)
 	ResponseDto switchTenant(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "tenantId", required = true) String tenantId);
 
 	/**
-	 * 创建租户下项目组
+	 * 创建项目组
 	 * 
 	 * @param dto
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/create/sub", method = RequestMethod.POST)
+	@RequestMapping(value = "/create/tenant", method = RequestMethod.POST)
 	ResponseDto createSubTenant(@RequestParam("request") HttpServletRequest request, @RequestBody SubTenantInfoDto dto);
 
 	/**
@@ -178,10 +177,10 @@ public interface ITenantFacadeService {
 	 * @param userIds
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/adduser/sub", method = RequestMethod.POST)
+	/*@RequestMapping(value = "/mgt/adduser/sub", method = RequestMethod.POST)
 	ResponseDto manuallyAddUserToSubTenant(@RequestParam("request") HttpServletRequest request,
 			@RequestBody IdListDto userIds);
-
+*/
 	/**
 	 * 删除项目组(管理员)
 	 * 
@@ -189,24 +188,16 @@ public interface ITenantFacadeService {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/mgt/del/sub/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/del/tenant/{id}", method = RequestMethod.GET)
 	ResponseDto deleteSubTenant(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "id", required = true) int id);
-
-	/**
-	 * 获取所有租户信息
-	 * 
-	 * @return
-	 */
-	@RequestMapping(value = "/get/tenant/all", method = RequestMethod.GET)
-	List<EnterpriseInfoDto> getEnterpriseAll();
 
 	/**
 	 * 获取所有项目组信息
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/subTenant/all", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/tenant/all", method = RequestMethod.GET)
 	List<SubEnterpriseInfoDto> getSubEnterpriseAll();
 
 }

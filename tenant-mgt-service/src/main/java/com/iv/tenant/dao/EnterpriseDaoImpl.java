@@ -16,18 +16,6 @@ import com.iv.tenant.entity.EnterpriseEntity;
 public class EnterpriseDaoImpl implements IEnterpriseDao {
 
 	@Override
-	public EnterpriseEntity selectByTenantId(String tenantId) throws RuntimeException {
-		return (EnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
-
-			@Override
-			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("from EnterpriseEntity e where e.tenantId=?").setParameter(0, tenantId)
-						.uniqueResult();
-			}
-		});
-	}
-
-	@Override
 	public EnterpriseEntity save(EnterpriseEntity entity) throws RuntimeException {
 		return (EnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
@@ -103,18 +91,6 @@ public class EnterpriseDaoImpl implements IEnterpriseDao {
 			public Object doInHibernate(Session ses) throws HibernateException {
 				return ses.createQuery("from EnterpriseEntity e where e.orgCode=?").setParameter(0, orgCode)
 						.uniqueResult();
-			}
-		});
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> selectAllTenantId() throws RuntimeException {
-		return (List<String>) HibernateTemplate.execute(new HibernateCallBack() {
-
-			@Override
-			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("select e.tenantId from EnterpriseEntity e").list();
 			}
 		});
 	}

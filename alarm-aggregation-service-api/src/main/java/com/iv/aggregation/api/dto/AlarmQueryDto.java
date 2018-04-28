@@ -18,7 +18,7 @@ public class AlarmQueryDto {
 	private byte upgrade;
 	private String itemType;
 	private AlarmQueryType alarmQueryType;
-	private short groupId;
+	//private short groupId;
 	public int getCurPage() {
 		return curPage;
 	}
@@ -78,12 +78,6 @@ public class AlarmQueryDto {
 	}
 	public void setAlarmQueryType(AlarmQueryType alarmQueryType) {
 		this.alarmQueryType = alarmQueryType;
-	}
-	public short getGroupId() {
-		return groupId;
-	}
-	public void setGroupId(short groupId) {
-		this.groupId = groupId;
 	}
 	public int getHandlerCurrent() {
 		return handlerCurrent;

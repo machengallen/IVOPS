@@ -54,12 +54,12 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 	}
 
 	@Override
-	public SubEnterpriseEntity selectBySubTenantId(String subTenant) throws RuntimeException {
+	public SubEnterpriseEntity selectByTenantId(String subTenant) throws RuntimeException {
 		return (SubEnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("from SubEnterpriseEntity s where s.subTenantId=?").setParameter(0, subTenant)
+				return ses.createQuery("from SubEnterpriseEntity s where s.tenantId=?").setParameter(0, subTenant)
 						.uniqueResult();
 			}
 		});
@@ -78,18 +78,18 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> selectAllSubTenantId() throws RuntimeException {
+	public List<String> selectAllTenantId() throws RuntimeException {
 		return (List<String>) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("select s.subTenantId from SubEnterpriseEntity s").list();
+				return ses.createQuery("select s.tenantId from SubEnterpriseEntity s").list();
 			}
 		});
 	}
 
 	@Override
-	public void delSubTenantById(int id) throws RuntimeException {
+	public void delById(int id) throws RuntimeException {
 		HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override

@@ -34,6 +34,7 @@ import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.ConstantContainer;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.enter.dto.AccountDto;
+import com.iv.enter.dto.UsersQueryDto;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.tenant.api.constant.ErrorMsg;
 import com.iv.tenant.api.dto.EnterpriseInfoDto;
@@ -134,10 +135,10 @@ public class TenantService {
 	 * users.add(userDto); } } return users; } else { return null; } }
 	 */
 
-	public EnterpriseInfoResp getSubTenant(String tenantId) {
+	public EnterpriseInfoResp getEnterpriseByTenantId(String tenantId) {
 		EnterpriseInfoResp infoResp = new EnterpriseInfoResp();
 		EnterpriseEntity enterpriseEntity = null;
-		enterpriseEntity = subEnterpriseDao.selectBySubTenantId(tenantId).getEnterprise();
+		enterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId).getEnterprise();
 
 		EnterpriseInfoDto enterpriseInfoDto = new EnterpriseInfoDto();
 		BeanUtils.copyProperties(enterpriseEntity, enterpriseInfoDto);
@@ -151,10 +152,10 @@ public class TenantService {
 		infoResp.setSubEnterprises(dtos);
 		return infoResp;
 	}
-	
-	public SubEnterpriseInfoDto getSubTenantBySubId(String subTenant) {
-		
-		SubEnterpriseEntity entity = subEnterpriseDao.selectBySubTenantId(subTenant);
+
+	public SubEnterpriseInfoDto getTenantByTenantId(String tenantId) {
+
+		SubEnterpriseEntity entity = subEnterpriseDao.selectByTenantId(tenantId);
 		SubEnterpriseInfoDto dto = new SubEnterpriseInfoDto();
 		BeanUtils.copyProperties(entity, dto, "enterprise");
 		return dto;
@@ -290,7 +291,8 @@ public class TenantService {
 		LocalAuthDto applicant = userServiceClient.selectLocalAuthById(userId);
 		// 调用通知管理服务
 		messageServiceClient.produceApproveMsg(applicant.getRealName() + "(" + applicant.getUserName() + ")",
-				admin.getId(), tenantInfoDto.getName(), WorkflowType.APPLY_REGIS_TENANT);
+				admin.getId(), tenantInfoDto.getSubEnterpriseName(), tenantInfoDto.getName(),
+				WorkflowType.APPLY_REGIS_TENANT);
 		return Arrays.asList(String.valueOf(admin.getId()));
 	}
 
@@ -315,17 +317,19 @@ public class TenantService {
 			// 注册企业信息
 			EnterpriseEntity enterpriseEntity = registEnterprise(dto, user);
 			// 初始化项目组空间
-			SubEnterpriseEntity subEnterpriseEntity = initSubEnterprise(enterpriseEntity, user, enterpriseEntity.getIdentifier());
+			SubEnterpriseEntity subEnterpriseEntity = initSubEnterprise(enterpriseEntity, user,
+					enterpriseEntity.getIdentifier());
 			// 初始化租户管理
 			initTenMgt(enterpriseEntity.getId(), subEnterpriseEntity.getId(), userId);
 		}
 		// 制造消息通知
-		messageServiceClient.produceApplyMsg(userId, isCreate, dto.getName(), remark, WorkflowType.APPLY_REGIS_TENANT);
+		messageServiceClient.produceApplyMsg(userId, isCreate, dto.getSubEnterpriseName(), dto.getName(), remark, WorkflowType.APPLY_REGIS_TENANT);
 
 	}
 
 	/**
 	 * 注册企业
+	 * 
 	 * @param dto
 	 * @param user
 	 * @return
@@ -349,19 +353,22 @@ public class TenantService {
 		entity = enterpriseDao.save(entity);
 
 		// TODO 初始化租户内角色/人员信息
-		//RequestContextHolder.getRequestAttributes().removeAttribute("tenantMgt", 0);
-		//RequestContextHolder.getRequestAttributes().setAttribute("tenantMgt", ConstantContainer.TENANT_SHARED_ID, 0);
+		// RequestContextHolder.getRequestAttributes().removeAttribute("tenantMgt", 0);
+		// RequestContextHolder.getRequestAttributes().setAttribute("tenantMgt",
+		// ConstantContainer.TENANT_SHARED_ID, 0);
 
 		return entity;
 	}
 
 	/**
 	 * 初始化项目组空间
+	 * 
 	 * @param entity
 	 * @param user
 	 * @param subEnterpriseName
 	 */
-	private SubEnterpriseEntity initSubEnterprise(EnterpriseEntity enterpriseEntity, LocalAuthDto user, String subEnterpriseName) {
+	private SubEnterpriseEntity initSubEnterprise(EnterpriseEntity enterpriseEntity, LocalAuthDto user,
+			String subEnterpriseName) {
 		// 创建项目组
 		SubEnterpriseEntity subEnterpriseEntity = new SubEnterpriseEntity();
 		subEnterpriseEntity.setName(subEnterpriseName);
@@ -377,13 +384,13 @@ public class TenantService {
 		}
 		subEnterpriseEntity.setSubIdentifier(identifier);
 		subEnterpriseEntity.setTenantId("t" + identifier);
-		
+
 		// 添加用户至项目组
 		Set<Integer> userIds = new HashSet<Integer>(1);
 		userIds.add(user.getId());
 		subEnterpriseEntity.setUserIds(userIds);
 		subEnterpriseDao.save(subEnterpriseEntity);
-		
+
 		// 更新用户信息
 		AccountDto userModify = new AccountDto();
 		userModify.setUserId(user.getId());
@@ -391,11 +398,11 @@ public class TenantService {
 			userModify.setCurTenantId(subEnterpriseEntity.getTenantId());
 		}
 		userServiceClient.saveOrUpdateUserAuth(userModify);
-		
+
 		return subEnterpriseEntity;
-		
+
 	}
-	
+
 	private void initTenMgt(int enterpriseId, int subEnterpriseId, int userId) {
 		// TODO 初始化管理员角色
 		/*
@@ -409,13 +416,13 @@ public class TenantService {
 	}
 
 	/**
-	 * 申请加入租户
+	 * 申请加入项目组
 	 * 
 	 */
 	public ResponseDto applyJoinTenant(int userId, String tenantId) {
 
 		LocalAuthDto user = userServiceClient.selectLocalAuthById(userId);
-		if (enterpriseDao.selectByTenantId(tenantId).getUserIds().contains(userId)) {
+		if (subEnterpriseDao.selectByTenantId(tenantId).getUserIds().contains(userId)) {
 			// 已加入该租户
 			return ResponseDto.builder(ErrorMsg.ALREADY_IN_TENANT);
 		}
@@ -434,7 +441,7 @@ public class TenantService {
 	}
 
 	/**
-	 * 获取待审批的加入租户申请
+	 * 获取待审批的加入项目组申请
 	 * 
 	 * @param userId
 	 * @param first
@@ -456,7 +463,8 @@ public class TenantService {
 			tenantApplyResp.setType(WorkflowType.APPLY_JOIN_TENANT);
 			TenantInfoDto tenantInfo = new TenantInfoDto();
 			String tenantId = (String) taskService.getVariable(task.getId(), "tenantId");
-			EnterpriseEntity enterpriseEntity = enterpriseDao.selectByTenantId(tenantId);
+			SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId);
+			EnterpriseEntity enterpriseEntity = subEnterpriseEntity.getEnterprise();
 			tenantInfo.setName(enterpriseEntity.getName());
 			tenantInfo.setOrgCode(enterpriseEntity.getOrgCode());
 			tenantApplyResp.setTenantInfo(tenantInfo);
@@ -506,8 +514,9 @@ public class TenantService {
 				} else if ("remark".equals(historicVariableInstance.getVariableName())) {
 					hisProTenantApplyDto.setRemark((String) historicVariableInstance.getValue());
 				} else if ("tenantId".equals(historicVariableInstance.getVariableName())) {
-					EnterpriseEntity enterpriseEntity = enterpriseDao
+					SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao
 							.selectByTenantId((String) historicVariableInstance.getValue());
+					EnterpriseEntity enterpriseEntity = subEnterpriseEntity.getEnterprise();
 					if (null == enterpriseEntity) {
 						continue;
 					}
@@ -535,33 +544,38 @@ public class TenantService {
 	 * @return
 	 */
 	public Set<String> findCandidateUsersJoin(DelegateExecution execution) {
-		//TODO 获取租户创建人
-		//List<LocalAuth> admins = USER_DAO.selectUserByRole("ROLE_admin", (String) execution.getVariable("tenantId"));
+		// TODO 获取租户创建人
+		// List<LocalAuth> admins = USER_DAO.selectUserByRole("ROLE_admin", (String)
+		// execution.getVariable("tenantId"));
 		Set<String> list = new HashSet<String>();
-		//admins.forEach(n -> list.add(String.valueOf(n.getId())));
-		
-		//TODO 获取租户管理员
-		RequestContextHolder.getRequestAttributes().removeAttribute("tenantMgt", 0);
-		/*List<Integer> creators = HIRE_USER_DAO.selectByRole("ROLE_creator",
-				(String) execution.getVariable("tenantId"));
-		RequestContextHolder.getRequestAttributes().setAttribute("tenantMgt", ConstantContainer.TENANT_SHARED_ID, 0);
-		creators.forEach(n -> list.add(String.valueOf(n.getUserId())));*/
+		// admins.forEach(n -> list.add(String.valueOf(n.getId())));
+
+		// TODO 获取租户管理员
+		// RequestContextHolder.getRequestAttributes().removeAttribute("tenantMgt", 0);
+		/*
+		 * List<Integer> creators = HIRE_USER_DAO.selectByRole("ROLE_creator", (String)
+		 * execution.getVariable("tenantId"));
+		 * RequestContextHolder.getRequestAttributes().setAttribute("tenantMgt",
+		 * ConstantContainer.TENANT_SHARED_ID, 0); creators.forEach(n ->
+		 * list.add(String.valueOf(n.getUserId())));
+		 */
 
 		// 制造用户消息
 		String tenantId = (String) execution.getVariable("tenantId");
-		EnterpriseEntity enterpriseEntity = enterpriseDao.selectByTenantId(tenantId);
+		SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId);
 		int userId = (int) execution.getVariable("userId");
 		LocalAuthDto applicant = userServiceClient.selectLocalAuthById(userId);
 		for (String approverId : list) {
 			messageServiceClient.produceApproveMsg(applicant.getRealName() + "(" + applicant.getUserName() + ")",
-					Integer.parseInt(approverId), enterpriseEntity.getName(), WorkflowType.APPLY_JOIN_TENANT);
+					Integer.parseInt(approverId), subEnterpriseEntity.getName(),
+					subEnterpriseEntity.getEnterprise().getName(), WorkflowType.APPLY_JOIN_TENANT);
 		}
 
 		return list;
 	}
 
 	/**
-	 * 添加用户至租户
+	 * 添加用户至项目组
 	 * 
 	 * @param userId
 	 */
@@ -570,24 +584,24 @@ public class TenantService {
 		int userId = (int) execution.getVariable("userId");
 		String remark = (String) execution.getVariable("remark");
 		String tenantId = (String) execution.getVariable("tenantId");
-		EnterpriseEntity enterprise = enterpriseDao.selectByTenantId(tenantId);
+		SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId);
 		if (isApproved) {
 			// 用户添加至租户
-			LocalAuthDto user = userServiceClient.selectLocalAuthById(userId);
-			if (enterprise.getUserIds().contains(user.getId())) {
+			if (subEnterpriseEntity.getUserIds().contains(userId)) {
 				return; // 已加入该租户
 			}
-			enterprise.getUserIds().add(userId);
-			enterprise = enterpriseDao.save(enterprise);
+			subEnterpriseEntity.getUserIds().add(userId);
+			subEnterpriseDao.save(subEnterpriseEntity);
 			// 用户关联租户
+			LocalAuthDto user = userServiceClient.selectLocalAuthById(userId);
 			if (ConstantContainer.TOURIST.equals(user.getCurTenantId())) {
 				user.setCurTenantId(tenantId);
 			}
 		}
 
 		// 制造消息通知
-		messageServiceClient.produceApplyMsg(userId, isApproved, enterprise.getName(), remark,
-				WorkflowType.APPLY_JOIN_TENANT);
+		messageServiceClient.produceApplyMsg(userId, isApproved, subEnterpriseEntity.getName(),
+				subEnterpriseEntity.getEnterprise().getName(), remark, WorkflowType.APPLY_JOIN_TENANT);
 	}
 
 	/**
@@ -595,23 +609,21 @@ public class TenantService {
 	 * 
 	 * @param userId
 	 */
-	public void manuallyAddUser(String tenantId, List<String> userIds) {
+	public ResponseDto manuallyAddUser(String tenantId, List<String> userIds) {
 
-		for (String userId : userIds) {
+		List<Integer> idList = new ArrayList<Integer>();
+		userIds.forEach(id -> idList.add(Integer.parseInt(id)));
+		SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId);
+		subEnterpriseEntity.getUserIds().addAll(idList);
+		subEnterpriseDao.save(subEnterpriseEntity);
+		UsersQueryDto queryDto = new UsersQueryDto();
+		queryDto.setUserIds(idList);
+		List<LocalAuthDto> authDtos = userServiceClient.selectUserInfos(queryDto);
+		if(null == authDtos) {
+			return ResponseDto.builder(ErrorMsg.TENANT_USERADD_FAILED);
+		}
+		for (LocalAuthDto user : authDtos) {
 
-			LocalAuthDto user = userServiceClient.selectLocalAuthById(Integer.parseInt(userId));
-			if (tenantId.startsWith("t")) {
-				// 当前租户id为企业
-				EnterpriseEntity enterprise = enterpriseDao.selectByTenantId(tenantId);
-				enterprise.getUserIds().add(Integer.parseInt(userId));
-				enterprise = enterpriseDao.save(enterprise);
-				
-			} else if (tenantId.startsWith("s")) {
-				// 当前租户id为项目组
-				SubEnterpriseEntity subEnterpriseEntity = subEnterpriseDao.selectBySubTenantId(tenantId);
-				subEnterpriseEntity.getUserIds().add(Integer.parseInt(userId));
-				subEnterpriseDao.save(subEnterpriseEntity);
-			}
 			AccountDto userModify = new AccountDto();
 			userModify.setUserId(user.getId());
 			if (ConstantContainer.TOURIST.equals(user.getCurTenantId())) {
@@ -620,12 +632,12 @@ public class TenantService {
 			// 保存用户
 			userServiceClient.saveOrUpdateUserAuth(userModify);
 		}
+		return ResponseDto.builder(ErrorMsg.OK);
 
 	}
 
 	public ResponseDto switchTenant(String tenantId, HttpServletRequest request) {
-		if (null == enterpriseDao.selectByTenantId(tenantId)
-				&& null == subEnterpriseDao.selectBySubTenantId(tenantId)) {
+		if (null == subEnterpriseDao.selectByTenantId(tenantId)) {
 			return ResponseDto.builder(ErrorMsg.TENANT_NOT_EXIST);
 		}
 		int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
@@ -636,60 +648,50 @@ public class TenantService {
 		userModify.setCurTenantId(tenantId);
 		userServiceClient.saveOrUpdateUserAuth(userModify);
 		// TODO 刷新内存中的认证信息
-		/*SecurityContextImpl contextImpl = (SecurityContextImpl) request.getSession()
-				.getAttribute("SPRING_SECURITY_CONTEXT");
-		LocalAuthDetails authDetails = (LocalAuthDetails) contextImpl.getAuthentication().getPrincipal();
-		authDetails.setCurTenantId(tenantId);
-		authDetails.getRoles().clear();
-		Object passWord = contextImpl.getAuthentication().getCredentials();
-
-		// 更新角色
-		ArrayList<GrantedAuthority> temp = new ArrayList<GrantedAuthority>();
-		Set<RoleEntity> roles = user.getRoles();
-		authDetails.getRoles().addAll(roles);// 封装session中角色信息
-		if (!CollectionUtils.isEmpty(roles)) {
-			// 基本角色
-			for (RoleEntity roleEntity : roles) {
-				if (roleEntity.getTenantId().equals(authDetails.getCurTenantId())) {
-					SimpleGrantedAuthority authority = new SimpleGrantedAuthority(roleEntity.getName());
-					temp.add(authority);
-				}
-			}
-		}
-		HireUser hireUser = HIRE_USER_DAO.selectUserBytenantId(user.getId(), user.getCurTenantId());
-		if (null != hireUser) {
-			// 租户下角色
-			int roleId = 100;
-			for (HireRoleEntity hireRole : hireUser.getHireRoleEntities()) {
-				SimpleGrantedAuthority authority = new SimpleGrantedAuthority(hireRole.getName());
-				temp.add(authority);
-				// 封装session中角色信息
-				RoleEntity roleEntity = new RoleEntity();
-				roleEntity.setId(roleId);
-				roleId++;
-				roleEntity.setName(hireRole.getName());
-				roleEntity.setTenantId(user.getCurTenantId());
-				authDetails.getRoles().add(roleEntity);
-			}
-		}
-		UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(authDetails,
-				passWord, Collections.unmodifiableList(temp));
-		authenticationToken.setDetails(contextImpl.getAuthentication().getDetails());
-		contextImpl.setAuthentication(authenticationToken);
-
-		// 更新内存中的session
-		request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", contextImpl);*/
+		/*
+		 * SecurityContextImpl contextImpl = (SecurityContextImpl) request.getSession()
+		 * .getAttribute("SPRING_SECURITY_CONTEXT"); LocalAuthDetails authDetails =
+		 * (LocalAuthDetails) contextImpl.getAuthentication().getPrincipal();
+		 * authDetails.setCurTenantId(tenantId); authDetails.getRoles().clear(); Object
+		 * passWord = contextImpl.getAuthentication().getCredentials();
+		 * 
+		 * // 更新角色 ArrayList<GrantedAuthority> temp = new ArrayList<GrantedAuthority>();
+		 * Set<RoleEntity> roles = user.getRoles();
+		 * authDetails.getRoles().addAll(roles);// 封装session中角色信息 if
+		 * (!CollectionUtils.isEmpty(roles)) { // 基本角色 for (RoleEntity roleEntity :
+		 * roles) { if (roleEntity.getTenantId().equals(authDetails.getCurTenantId())) {
+		 * SimpleGrantedAuthority authority = new
+		 * SimpleGrantedAuthority(roleEntity.getName()); temp.add(authority); } } }
+		 * HireUser hireUser = HIRE_USER_DAO.selectUserBytenantId(user.getId(),
+		 * user.getCurTenantId()); if (null != hireUser) { // 租户下角色 int roleId = 100;
+		 * for (HireRoleEntity hireRole : hireUser.getHireRoleEntities()) {
+		 * SimpleGrantedAuthority authority = new
+		 * SimpleGrantedAuthority(hireRole.getName()); temp.add(authority); //
+		 * 封装session中角色信息 RoleEntity roleEntity = new RoleEntity();
+		 * roleEntity.setId(roleId); roleId++; roleEntity.setName(hireRole.getName());
+		 * roleEntity.setTenantId(user.getCurTenantId());
+		 * authDetails.getRoles().add(roleEntity); } }
+		 * UsernamePasswordAuthenticationToken authenticationToken = new
+		 * UsernamePasswordAuthenticationToken(authDetails, passWord,
+		 * Collections.unmodifiableList(temp));
+		 * authenticationToken.setDetails(contextImpl.getAuthentication().getDetails());
+		 * contextImpl.setAuthentication(authenticationToken);
+		 * 
+		 * // 更新内存中的session request.getSession().setAttribute("SPRING_SECURITY_CONTEXT",
+		 * contextImpl);
+		 */
 		return ResponseDto.builder(ErrorMsg.OK);
 	}
 
 	public ResponseDto createSubTenant(int creator, String name, List<Integer> userIds) {
-		
-		/*if (null != subEnterpriseDao.selectByName(name)) {
-			return ResponseDto.builder(ErrorMsg.SUB_ENTERPRISE_EXIST);
-		}*/
+
+		/*
+		 * if (null != subEnterpriseDao.selectByName(name)) { return
+		 * ResponseDto.builder(ErrorMsg.SUB_ENTERPRISE_EXIST); }
+		 */
 		LocalAuthDto authDetails = userServiceClient.selectLocalAuthById(creator);
 		String tenantId = authDetails.getCurTenantId();
-		EnterpriseEntity enterpriseEntity = enterpriseDao.selectByTenantId(tenantId);
+		EnterpriseEntity enterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId).getEnterprise();
 		SubEnterpriseEntity subEnterpriseEntity = new SubEnterpriseEntity();
 		subEnterpriseEntity.setName(name);
 		subEnterpriseEntity.setEnterprise(enterpriseEntity);
@@ -709,87 +711,74 @@ public class TenantService {
 		subEnterpriseDao.save(subEnterpriseEntity);
 
 		// TODO 初始化项目组管理员角色
-		/*RoleEntity admin = new RoleEntity();
-		admin.setName("ROLE_admin");
-		admin.setTenantId(subEnterpriseEntity.getSubTenantId());
-		roleRepository.save(admin);
-		LocalAuth user = USER_DAO.selectUserAuthById(authDetails.getId());
-		if (null != user.getRoles()) {
-			user.getRoles().add(admin);
-		} else {
-			Set<RoleEntity> roles = new HashSet<>();
-			roles.add(admin);
-			user.setRoles(roles);
-		}
-		USER_DAO.saveUserAuth(user);
-		List<LocalAuth> tenantAdmins = USER_DAO.selectUserByRole("ROLE_admin", tenantId);
-		for (LocalAuth localAuth : tenantAdmins) {
-			localAuth.getRoles().add(admin);
-			USER_DAO.saveUserAuth(localAuth);
-		}*/
+		/*
+		 * RoleEntity admin = new RoleEntity(); admin.setName("ROLE_admin");
+		 * admin.setTenantId(subEnterpriseEntity.getSubTenantId());
+		 * roleRepository.save(admin); LocalAuth user =
+		 * USER_DAO.selectUserAuthById(authDetails.getId()); if (null !=
+		 * user.getRoles()) { user.getRoles().add(admin); } else { Set<RoleEntity> roles
+		 * = new HashSet<>(); roles.add(admin); user.setRoles(roles); }
+		 * USER_DAO.saveUserAuth(user); List<LocalAuth> tenantAdmins =
+		 * USER_DAO.selectUserByRole("ROLE_admin", tenantId); for (LocalAuth localAuth :
+		 * tenantAdmins) { localAuth.getRoles().add(admin);
+		 * USER_DAO.saveUserAuth(localAuth); }
+		 */
 
-		
-		
-		
-		
 		// TODO 初始化项目组内角色信息
-		/*HireRoleEntity manager = new HireRoleEntity();
-		manager.setName("ROLE_manager");
-		hireRoleDaoImpl.save(manager, subEnterpriseEntity.getSubTenantId());
-		HireRoleEntity creator = new HireRoleEntity();
-		creator.setName("ROLE_creator");
-		hireRoleDaoImpl.save(creator, subEnterpriseEntity.getSubTenantId());
-		HireRoleEntity adminHire = new HireRoleEntity();
-		adminHire.setName("ROLE_admin");
-		hireRoleDaoImpl.save(adminHire, subEnterpriseEntity.getSubTenantId());
-
-		// 创建项目组管理员
-		HireUser hireUser = new HireUser();
-		hireUser.setUserId(user.getId());
-		Set<HireRoleEntity> roles = new HashSet<HireRoleEntity>();
-		roles.add(creator);
-		roles.add(adminHire);
-		hireUser.setHireRoleEntities(roles);
-		HIRE_USER_DAO.save(hireUser, subEnterpriseEntity.getSubTenantId());*/
+		/*
+		 * HireRoleEntity manager = new HireRoleEntity();
+		 * manager.setName("ROLE_manager"); hireRoleDaoImpl.save(manager,
+		 * subEnterpriseEntity.getSubTenantId()); HireRoleEntity creator = new
+		 * HireRoleEntity(); creator.setName("ROLE_creator");
+		 * hireRoleDaoImpl.save(creator, subEnterpriseEntity.getSubTenantId());
+		 * HireRoleEntity adminHire = new HireRoleEntity();
+		 * adminHire.setName("ROLE_admin"); hireRoleDaoImpl.save(adminHire,
+		 * subEnterpriseEntity.getSubTenantId());
+		 * 
+		 * // 创建项目组管理员 HireUser hireUser = new HireUser();
+		 * hireUser.setUserId(user.getId()); Set<HireRoleEntity> roles = new
+		 * HashSet<HireRoleEntity>(); roles.add(creator); roles.add(adminHire);
+		 * hireUser.setHireRoleEntities(roles); HIRE_USER_DAO.save(hireUser,
+		 * subEnterpriseEntity.getSubTenantId());
+		 */
 
 		return ResponseDto.builder(ErrorMsg.OK);
 	}
 
-	public void manuallyAddUserToSubTenant(String subTenantId, List<String> userIds) {
+	/*public void manuallyAddUserToSubTenant(String subTenantId, List<String> userIds) {
 		List<Integer> idList = new ArrayList<Integer>();
 		userIds.forEach(id -> idList.add(Integer.parseInt(id)));
 		addUserToSubEnter(subEnterpriseDao.selectBySubTenantId(subTenantId), idList);
-	}
+	}*/
 
 	private void addUserToSubEnter(SubEnterpriseEntity subEnterpriseEntity, List<Integer> userIds) {
-		
+
 		if (!CollectionUtils.isEmpty(subEnterpriseEntity.getUserIds())) {
 			subEnterpriseEntity.getUserIds().addAll(userIds);
 		} else {
 			subEnterpriseEntity.setUserIds(new HashSet<Integer>(userIds));
 		}
-		
+
 	}
 
 	public void deleteSubTenant(int id, HttpServletRequest request) {
 
 		SubEnterpriseEntity entity = subEnterpriseDao.selectById(id);
-		//RoleEntity roleEntity = roleRepository.findByTenantId(entity.getSubTenantId());
+		// RoleEntity roleEntity =
+		// roleRepository.findByTenantId(entity.getSubTenantId());
 		for (Integer userId : entity.getUserIds()) {
 			LocalAuthDto user = userServiceClient.selectLocalAuthById(userId);
-			//TODO 删除对应用户角色
-			//user.getRoles().remove(roleEntity);
-			
-			
-			
+			// TODO 删除对应用户角色
+			// user.getRoles().remove(roleEntity);
+
 			if (entity.getTenantId().equals(user.getCurTenantId())) {
 				user.setCurTenantId(ConstantContainer.TOURIST);// 切换至游客
 			}
 		}
 		// TODO 删除项目组相关角色信息表
-		//roleRepository.delById(roleEntity.getId());
+		// roleRepository.delById(roleEntity.getId());
 		// 删除项目组
-		subEnterpriseDao.delSubTenantById(id);
+		subEnterpriseDao.delById(id);
 		// 切换当前操作用户至租户下
 		switchTenant(entity.getTenantId(), request);
 	}

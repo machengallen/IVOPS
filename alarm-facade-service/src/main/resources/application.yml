@@ -7,6 +7,9 @@ eureka:
 feign:
   hystrix:
     enabled: true
+security:
+  basic:
+    enabled: false
 spring:
   profiles:
     active:

@@ -45,6 +45,7 @@ public class ApproveFlowMsgEntity implements Serializable{
 	private long applyTime;// 申请时间
 	private String applicant;// 申请人
 	private String enterprise;// 企业名称
+	private String subEnterprise;// 项目组名称
 	@Id
 	@GenericGenerator(name="idGenerator", strategy="uuid")
 	@GeneratedValue(generator="idGenerator")
@@ -72,6 +73,12 @@ public class ApproveFlowMsgEntity implements Serializable{
 	}
 	public void setMsgDate(long msgDate) {
 		this.msgDate = msgDate;
+	}
+	public String getSubEnterprise() {
+		return subEnterprise;
+	}
+	public void setSubEnterprise(String subEnterprise) {
+		this.subEnterprise = subEnterprise;
 	}
 	public WorkflowType getType() {
 		return type;

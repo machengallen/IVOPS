@@ -17,7 +17,7 @@ import com.iv.strategy.api.dto.StrategyQueryDto;
  */
 public interface IAlarmStrategyService {
 
-	@RequestMapping(value = "/get/strategy", method = RequestMethod.POST)
+	@RequestMapping(value = "/get/strategy/conditions", method = RequestMethod.POST)
 	ResponseDto getStrategy(@RequestBody StrategyQueryDto queryDto);
 	
 	@RequestMapping(value = "/strategy/exist", method = RequestMethod.GET)

@@ -31,17 +31,6 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 		return null;
 	}
 
-	@Override
-	public ResponseDto getSubTenant(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto getSubTenant(String subTenantId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ResponseDto newTenantApply(HttpServletRequest request, TenantInfoDto dto) {
@@ -103,11 +92,6 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 		return null;
 	}
 
-	@Override
-	public ResponseDto manuallyAddUserToSubTenant(HttpServletRequest request, IdListDto userIds) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ResponseDto deleteSubTenant(HttpServletRequest request, int id) {
@@ -115,14 +99,15 @@ public class TenantServiceClientFallBack implements ITenantServiceClient {
 		return null;
 	}
 
+
 	@Override
-	public List<EnterpriseInfoDto> getEnterpriseAll() {
+	public List<SubEnterpriseInfoDto> getSubEnterpriseAll() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<SubEnterpriseInfoDto> getSubEnterpriseAll() {
+	public ResponseDto getTenantByTenantId(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}

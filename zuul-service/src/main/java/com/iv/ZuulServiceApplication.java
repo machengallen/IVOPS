@@ -12,23 +12,17 @@ import org.springframework.cloud.client.loadbalancer.LoadBalancerInterceptor;
 import org.springframework.cloud.netflix.zuul.EnableZuulProxy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.security.oauth2.client.token.AccessTokenProviderChain;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.implicit.ImplicitAccessTokenProvider;
-import org.springframework.security.oauth2.client.token.grant.password.ResourceOwnerPasswordAccessTokenProvider;
-import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
 @SpringCloudApplication
 @EnableZuulProxy
-@EnableResourceServer
+//@EnableResourceServer
 public class ZuulServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ZuulServiceApplication.class, args);
 	}
 	
-	@Bean
+	/*@Bean
 	UserInfoRestTemplateCustomizer userInfoRestTemplateCustomizer(LoadBalancerInterceptor loadBalancerInterceptor) {
 	
 	return template -> {
@@ -51,5 +45,5 @@ public class ZuulServiceApplication {
 
 	};
 
-	}
+	}*/
 }

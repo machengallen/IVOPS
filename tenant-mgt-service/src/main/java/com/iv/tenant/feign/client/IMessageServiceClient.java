@@ -15,14 +15,14 @@ public interface IMessageServiceClient extends IMessageService {
 class MessageServiceClientFallBack implements IMessageServiceClient{
 
 	@Override
-	public ResponseDto produceApproveMsg(String applicant, int approverId, String enterpriseName,
-			WorkflowType workflowType) {
+	public ResponseDto produceApproveMsg(String applicant, int approverId, String subEnterpriseName,
+			String enterpriseName, WorkflowType workflowType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public ResponseDto produceApplyMsg(int userId, boolean approved, String enterpriseName,
+	public ResponseDto produceApplyMsg(int userId, boolean approved, String subEnterpriseName, String enterpriseName,
 			String remark, WorkflowType workflowType) {
 		// TODO Auto-generated method stub
 		return null;
@@ -33,5 +33,5 @@ class MessageServiceClientFallBack implements IMessageServiceClient{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

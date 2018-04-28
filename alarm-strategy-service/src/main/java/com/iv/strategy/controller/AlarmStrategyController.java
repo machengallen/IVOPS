@@ -148,7 +148,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/allStrategy", method = RequestMethod.GET)
+	@RequestMapping(value = "/get/strategy/all", method = RequestMethod.GET)
 	@ApiOperation("查询分派策略(全部)")
 	public ResponseDto getAllStrategy(HttpServletRequest request) {
 
@@ -194,8 +194,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(value = "/get/Onestrategy", method = RequestMethod.POST)
-	@ApiOperation("查询指定升级策略")
+	@RequestMapping(value = "/get/strategy/ids", method = RequestMethod.POST)
+	@ApiOperation("查询指定id的分派策略")
 	public ResponseDto getTargetStrategy(@RequestBody IdListDto ids) {
 
 		try {
@@ -272,7 +272,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * @return
 	 */
 	@RequestMapping(value = "/del/strategy", method = RequestMethod.POST)
-	@ApiOperation("《管理员》删除升级策略")
+	@ApiOperation("《管理员》删除分派策略")
 	public ResponseDto delStrategies(@RequestBody IdListDto list) {
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -287,7 +287,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 
 	}
 
-	@RequestMapping(value = "/config/clean/quartz", method = RequestMethod.GET)
+	@RequestMapping(value = "/config/clean", method = RequestMethod.GET)
 	@ApiOperation("《管理员》配置告警数据清理频率")
 	public ResponseDto setAlarmCleanQuartz(@RequestParam String exp) {
 		ResponseDto responseDto = new ResponseDto();
@@ -302,7 +302,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 		}
 	}
 
-	@RequestMapping(value = "/config/clean", method = RequestMethod.GET)
+	@RequestMapping(value = "/config/store", method = RequestMethod.GET)
 	@ApiOperation("《管理员》配置告警数据保留周期")
 	public ResponseDto setAlarmCleanCycle(@RequestParam StrategyCycle cycle) {
 		ResponseDto responseDto = new ResponseDto();
@@ -318,6 +318,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	}
 
 	@Override
+	@ApiOperation("校验是否存在组相关策略")
 	public boolean strategyExist(short groupId) {
 		int count = ALARM_STRATEGY_DAO.countByGroupId(groupId);
 		if(count > 0) {

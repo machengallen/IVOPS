@@ -107,12 +107,12 @@ public class MsgCenterController implements IMessageService {
 		return dto;
 	}
 
-	@ApiOperation("生产待审批的企业注册申请消息")
+	@ApiOperation("生产待审批的申请消息")
 	@Override
-	public ResponseDto produceApproveMsg(String applicant, int approverId, String enterpriseName,
+	public ResponseDto produceApproveMsg(String applicant, int approverId, String subEnterprise, String enterpriseName,
 			WorkflowType workflowType) {
 		try {
-			service.produceApproveFlowMsg(applicant, approverId, enterpriseName, workflowType);
+			service.produceApproveFlowMsg(applicant, approverId, subEnterprise, enterpriseName, workflowType);
 			return ResponseDto.builder(ErrorMsg.OK);
 		} catch (Exception e) {
 			LOGGER.error("消息生成失败", e);
@@ -122,10 +122,10 @@ public class MsgCenterController implements IMessageService {
 
 	@ApiOperation("生产审批结果消息")
 	@Override
-	public ResponseDto produceApplyMsg(int userId, boolean approved, String enterpriseName,
-			String remark, WorkflowType workflowType) {
+	public ResponseDto produceApplyMsg(int userId, boolean approved, String subEnterpriseName, String enterpriseName, String remark,
+			WorkflowType workflowType) {
 		try {
-			service.produceApplyFlowMsg(userId, approved, enterpriseName, remark, workflowType);
+			service.produceApplyFlowMsg(userId, approved, subEnterpriseName, enterpriseName, remark, workflowType);
 			return ResponseDto.builder(ErrorMsg.OK);
 		} catch (Exception e) {
 			LOGGER.error("消息生成失败", e);
@@ -134,8 +134,9 @@ public class MsgCenterController implements IMessageService {
 	}
 
 	@Override
+	@ApiOperation("生产告警消息")
 	public ResponseDto produceAlarmMsg(@RequestBody AlarmMsgDto alarmMsgDto) {
-		
+
 		try {
 			service.produceAlarmMsg(alarmMsgDto);
 			return ResponseDto.builder(ErrorMsg.OK);

@@ -170,7 +170,7 @@ public class MsgCenterService {
 	 * @param enterprise
 	 * @param workflowType
 	 */
-	public void produceApproveFlowMsg(String applicant, int approverId, String enterprise, WorkflowType workflowType) {
+	public void produceApproveFlowMsg(String applicant, int approverId, String subEnterprise, String enterprise, WorkflowType workflowType) {
 
 		try {
 			long time = System.currentTimeMillis();
@@ -179,13 +179,14 @@ public class MsgCenterService {
 			msgEntity.setApplyTime(time);
 			msgEntity.setConfirmed(false);
 			msgEntity.setEnterprise(enterprise);
+			msgEntity.setSubEnterprise(subEnterprise);
 			msgEntity.setMsgDate(time);
 			msgEntity.setType(workflowType);
 			msgEntity.setUserId(approverId);
 			approveFlowMsgDaoImpl.save(msgEntity);
 
 		} catch (Exception e) {
-			LOGGER.error("用户消息生产-审批租户提示-失败", e);
+			LOGGER.error("用户消息生产-审批提示-失败", e);
 		}
 	}
 
@@ -198,7 +199,7 @@ public class MsgCenterService {
 	 * @param remark
 	 * @param workflowType
 	 */
-	public void produceApplyFlowMsg(int userId, boolean approved, String enterprise, String remark,
+	public void produceApplyFlowMsg(int userId, boolean approved, String subEnterpriseName, String enterprise, String remark,
 			WorkflowType workflowType) {
 
 		try {
@@ -208,6 +209,7 @@ public class MsgCenterService {
 			msgEntity.setApproveTime(time);
 			msgEntity.setConfirmed(false);
 			msgEntity.setEnterprise(enterprise);
+			msgEntity.setSubEnterprise(subEnterpriseName);
 			msgEntity.setMsgDate(time);
 			msgEntity.setRemark(remark);
 			msgEntity.setType(workflowType);

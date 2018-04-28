@@ -26,9 +26,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	TENANT_EXIST(42309,"租户已存在"),
 	
-	TENANT_APPLY_EXIST(42310,"该租户的申请已在审批中"),
+	TENANT_APPLY_EXIST(42310,"该申请已在审批中"),
 	
-	ALREADY_IN_TENANT(42311,"您已加入该租户，请勿重复申请"),
+	ALREADY_IN_TENANT(42311,"您已加入该项目组，请勿重复申请"),
 	
 	TENANT_INFO_GET_FAILED(42312,"查询企业信息失败"),
 	

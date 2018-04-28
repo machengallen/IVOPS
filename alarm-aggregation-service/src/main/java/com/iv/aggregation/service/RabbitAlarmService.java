@@ -127,7 +127,7 @@ public class RabbitAlarmService {
 		}
 	}
 	
-	private String getTenantId(String token) {
+	public String getTenantId(String token) {
 		if (StringUtils.isEmpty(token)) {
 			LOGGER.warn("【警告】告警未携带有效的token，已过滤");
 			return null;

@@ -21,7 +21,8 @@ public interface IMessageService {
 	 */
 	@RequestMapping(value = "/produce/approve", method = RequestMethod.GET)
 	ResponseDto produceApproveMsg(@RequestParam("applicant")String applicant, 
-			@RequestParam("approverId")int approverId, @RequestParam("enterpriseName")String enterpriseName,
+			@RequestParam("approverId")int approverId, @RequestParam("subEnterpriseName")String subEnterpriseName,
+			@RequestParam("enterpriseName")String enterpriseName,
 			@RequestParam("workflowType")WorkflowType workflowType);
 	
 	/**
@@ -36,6 +37,7 @@ public interface IMessageService {
 	 */
 	@RequestMapping(value = "/produce/apply", method = RequestMethod.GET)
 	ResponseDto produceApplyMsg(@RequestParam("userId")int userId, @RequestParam("approved")boolean approved,
+			@RequestParam("subEnterpriseName")String subEnterpriseName,
 			@RequestParam("enterpriseName")String enterpriseName, @RequestParam("remark")String remark,
 			@RequestParam("workflowType")WorkflowType workflowType);
 	

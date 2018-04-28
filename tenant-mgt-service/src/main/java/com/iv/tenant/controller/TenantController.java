@@ -16,7 +16,6 @@ import com.iv.common.dto.IdListDto;
 import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.tenant.api.constant.ErrorMsg;
-import com.iv.tenant.api.dto.EnterpriseInfoDto;
 import com.iv.tenant.api.dto.ProcessDataDto;
 import com.iv.tenant.api.dto.QueryEnterReq;
 import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
@@ -44,7 +43,7 @@ public class TenantController implements ITenantFacadeService{
 	private TenantService service;
 	private static final Logger LOGGER = LoggerFactory.getLogger(TenantController.class);
 
-	@ApiOperation("获取已注册租户的主体信息")
+	@ApiOperation("获取已注册的企业主体信息")
 	@Override
 	public ResponseDto getEnterNameList() {
 		ResponseDto response = null;
@@ -59,7 +58,7 @@ public class TenantController implements ITenantFacadeService{
 		}
 	}
 
-	@ApiOperation("获取租户信息")
+	@ApiOperation("获取企业信息")
 	@Override
 	public ResponseDto getTenant(@RequestBody QueryEnterReq req) {
 		ResponseDto response = null;
@@ -93,12 +92,12 @@ public class TenantController implements ITenantFacadeService{
 	@ApiOperation("获取项目组信息")
 	//@PreAuthorize("hasAnyRole('administrator','admin','creator')")
 	@Override
-	public ResponseDto getSubTenant(HttpServletRequest request) {
+	public ResponseDto getTenantByTenantId(HttpServletRequest request) {
 		ResponseDto response = null;
 		try {
 			response = new ResponseDto();
 			String tenantId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("curTenantId");
-			response.setData(service.getSubTenant(tenantId));
+			response.setData(service.getTenantByTenantId(tenantId));
 			response.setErrorMsg(ErrorMsg.OK);
 			return response;
 		} catch (Exception e) {
@@ -193,7 +192,7 @@ public class TenantController implements ITenantFacadeService{
 		}
 	}
 
-	@ApiOperation("申请加入租户")
+	@ApiOperation("申请加入项目组")
 	@Override
 	public ResponseDto applyJoinTenant(@RequestParam("request") HttpServletRequest request,
 			@PathVariable(value = "tenantId", required = true) String tenantId) {
@@ -256,14 +255,13 @@ public class TenantController implements ITenantFacadeService{
 		}
 	}
 
-	@ApiOperation("《管理员》租户创建者手动添加用户至租户")
+	@ApiOperation("《管理员》项目组管理员手动添加用户")
 	//@PreAuthorize("hasRole('admin')")
 	public ResponseDto manuallyAddUser(HttpServletRequest request, @RequestBody IdListDto userIds) {
 
 		try {
 			String tenantId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("curTenantId");
-			service.manuallyAddUser(tenantId, userIds.getIds());
-			return ResponseDto.builder(ErrorMsg.OK);
+			return service.manuallyAddUser(tenantId, userIds.getIds());
 		} catch (Exception e) {
 			LOGGER.error("添加用户失败", e);
 			return ResponseDto.builder(ErrorMsg.TENANT_USERADD_FAILED);
@@ -298,7 +296,7 @@ public class TenantController implements ITenantFacadeService{
 		}
 	}
 
-	@ApiOperation("《管理员》管理员手动添加用户至项目组")
+	/*@ApiOperation("《管理员》管理员手动添加用户至项目组")
 	//@PreAuthorize("hasAnyRole('admin','creator')")
 	public ResponseDto manuallyAddUserToSubTenant(HttpServletRequest request, @RequestBody IdListDto userIds) {
 
@@ -310,7 +308,7 @@ public class TenantController implements ITenantFacadeService{
 			LOGGER.error("添加用户失败", e);
 			return ResponseDto.builder(ErrorMsg.TENANT_USERADD_FAILED);
 		}
-	}
+	}*/
 
 	@ApiOperation("《管理员》删除项目组")
 	//@PreAuthorize("hasAnyRole('admin')")
@@ -325,16 +323,7 @@ public class TenantController implements ITenantFacadeService{
 		}
 	}
 
-	@Override
-	public List<EnterpriseInfoDto> getEnterpriseAll() {
-		try {
-			return service.getEnterpriseAll();
-		} catch (Exception e) {
-			LOGGER.error("获取租户列表失败", e);
-			return null;
-		}
-	}
-
+	@ApiOperation("获取所有项目组信息")
 	@Override
 	public List<SubEnterpriseInfoDto> getSubEnterpriseAll() {
 		try {
@@ -342,20 +331,6 @@ public class TenantController implements ITenantFacadeService{
 		} catch (Exception e) {
 			LOGGER.error("获取项目组列表失败", e);
 			return null;
-		}
-	}
-
-	@Override
-	public ResponseDto getSubTenant(String subTenantId) {
-		ResponseDto response = null;
-		try {
-			response = new ResponseDto();
-			response.setData(service.getSubTenantBySubId(subTenantId));
-			response.setErrorMsg(ErrorMsg.OK);
-			return response;
-		} catch (Exception e) {
-			LOGGER.error("获取项目组信息失败", e);
-			return ResponseDto.builder(ErrorMsg.GET_SUBTENANT_INFO_FAILED);
 		}
 	}
 

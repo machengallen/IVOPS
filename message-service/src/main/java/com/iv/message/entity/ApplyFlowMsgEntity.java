@@ -46,6 +46,7 @@ public class ApplyFlowMsgEntity implements Serializable{
 	private boolean approved;// 审批结果
 	private String remark;// 审批人备注
 	private String enterprise;// 企业名称
+	private String subEnterprise;// 项目组名称
 	
 	@Id
 	@GenericGenerator(name="idGenerator", strategy="uuid")
@@ -65,6 +66,12 @@ public class ApplyFlowMsgEntity implements Serializable{
 	}
 	public boolean isConfirmed() {
 		return confirmed;
+	}
+	public String getSubEnterprise() {
+		return subEnterprise;
+	}
+	public void setSubEnterprise(String subEnterprise) {
+		this.subEnterprise = subEnterprise;
 	}
 	public void setConfirmed(boolean confirmed) {
 		this.confirmed = confirmed;
