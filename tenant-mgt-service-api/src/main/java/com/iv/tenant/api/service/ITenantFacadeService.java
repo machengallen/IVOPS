@@ -58,6 +58,14 @@ public interface ITenantFacadeService {
 	 */
 	@RequestMapping(value = "/get/tenant", method = RequestMethod.GET)
 	ResponseDto getTenantByTenantId(@RequestParam("request") HttpServletRequest request);
+	
+	/**
+	 * 获取项目组信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/get/tenant/backend", method = RequestMethod.GET)
+	SubEnterpriseInfoDto getSubEnterprise(@RequestParam("request") HttpServletRequest request);
 
 	/**
 	 * 申请创建租户
