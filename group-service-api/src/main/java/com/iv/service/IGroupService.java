@@ -1,11 +1,18 @@
 package com.iv.service;
 
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupQuery;
+import com.iv.enter.dto.GroupIdsDto;
 import com.iv.outer.dto.GroupEntityDto;
 
 /**
@@ -19,9 +26,9 @@ public interface IGroupService {
 	/**
 	 * 测试
 	 * @return
-	 */
+	 *//*
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	GroupUserInfosDto test();
+	GroupUserInfosDto test();*/
 	
 	/**
 	 * 根据组id、租户id/或根据组id查询组信息
@@ -37,7 +44,7 @@ public interface IGroupService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/groupUsersInfo", method = RequestMethod.POST)
-	ResponseDto groupUsersInfo(@RequestBody GroupQuery groupQuery);
+	ResponseDto groupUsersInfo(@RequestParam("request") HttpServletRequest requests);
 	
 	/**
 	 * 查询当前用户所在组信息（人员分页）
@@ -45,7 +52,7 @@ public interface IGroupService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/groupUsersPageInfo", method = RequestMethod.POST)
-	ResponseDto groupUsersPageInfo(@RequestBody GroupQuery groupQuery);
+	ResponseDto groupUsersPageInfo(@RequestParam("request") HttpServletRequest request,@RequestBody GroupQuery groupQuery);
 	
 	/**
 	 * 组操作
@@ -60,6 +67,21 @@ public interface IGroupService {
 	 * @param groupQuery
 	 * @return
 	 */
-	@RequestMapping(value = "/tenant/userInfos", method = RequestMethod.POST)
-	ResponseDto selectUsersInfoByTenantId(@RequestBody GroupQuery groupQuery);
-}
+	@RequestMapping(value = "/tenant/userInfos", method = RequestMethod.GET)
+	ResponseDto selectUsersInfoByTenantId(@RequestParam("request") HttpServletRequest request);
+	
+	/**
+	 * 查询所有组信息（人员非分页）
+	 * @param groupUserQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/select/groupsUsersInfo", method = RequestMethod.GET)
+	ResponseDto groupsUsersInfo();
+	
+	/**
+	 * 根据组Ids获取组信息（组名称、组id）
+	 * @return
+	 */
+	@RequestMapping(value = "/select/groupsInfo", method = RequestMethod.POST)
+	List<GroupEntityDto> groupsInfo(@RequestBody GroupIdsDto groupIds);
+}	
