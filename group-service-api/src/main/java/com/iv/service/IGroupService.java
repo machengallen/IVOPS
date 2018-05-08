@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.response.ResponseDto;
-import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupQuery;
+import com.iv.enter.dto.OpsGroupDto;
 import com.iv.enter.dto.GroupIdsDto;
 import com.iv.outer.dto.GroupEntityDto;
 
@@ -24,27 +24,21 @@ import com.iv.outer.dto.GroupEntityDto;
 public interface IGroupService {
 	
 	/**
-	 * 测试
-	 * @return
-	 *//*
-	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	GroupUserInfosDto test();*/
-	
-	/**
-	 * 根据组id、租户id/或根据组id查询组信息
+	 * 根据组id、租户id(告警轮询推送使用)
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/select/groupInfoById", method = RequestMethod.POST)
-	GroupEntityDto selectGroupInfo(@RequestBody GroupQuery groupQuery);
+	@RequestMapping(value = "/select/groupInfoById", method = RequestMethod.GET)
+	GroupEntityDto selectGroupInfo(@RequestParam("subTenantId") String subTenantId
+			, @RequestParam("groupId") short groupId);
 		
 	/**
 	 * 查询当前用户所在组信息（人员非分页）
 	 * @param groupUserQuery
 	 * @return
 	 */
-	@RequestMapping(value = "/select/groupUsersInfo", method = RequestMethod.POST)
-	ResponseDto groupUsersInfo(@RequestParam("request") HttpServletRequest requests);
+	@RequestMapping(value = "/select/groupUsersInfo", method = RequestMethod.GET)
+	ResponseDto groupUsersInfo(@RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 查询当前用户所在组信息（人员分页）
@@ -55,12 +49,45 @@ public interface IGroupService {
 	ResponseDto groupUsersPageInfo(@RequestParam("request") HttpServletRequest request,@RequestBody GroupQuery groupQuery);
 	
 	/**
-	 * 组操作
-	 * @param groupDto
+	 * 创建组
+	 * @param groupQuery
 	 * @return
 	 */
-	@RequestMapping(value = "/group/ops", method = RequestMethod.POST)
-	ResponseDto groupOps(@RequestBody GroupQuery groupQuery);
+	@RequestMapping(value = "/group/create", method = RequestMethod.POST)
+	ResponseDto createGroup(@RequestBody OpsGroupDto opsGroupDto);
+	
+	/**
+	 * 删除组
+	 * @param groupQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/group/delete", method = RequestMethod.GET)
+	ResponseDto deleteGroup(@RequestParam("groupId") short groupId);
+	
+	
+	/**
+	 * 增加成员
+	 * @param groupQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/group/memberIn", method = RequestMethod.POST)
+	ResponseDto memberInGroup(@RequestBody OpsGroupDto opsGroupDto);
+	
+	/**
+	 * 删除成员
+	 * @param groupQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/group/memberOut", method = RequestMethod.POST)
+	ResponseDto memberOutGroup(@RequestBody OpsGroupDto opsGroupDto);
+	
+	/**
+	 * 修改组名称
+	 * @param groupQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/group/nameMod", method = RequestMethod.GET)
+	ResponseDto groupNameMod(@RequestParam("groupId") short groupId, @RequestParam("groupName") String groupName);
 	
 	/**
 	 * 根据租户id，提供人员信息列表
