@@ -15,6 +15,7 @@ public class LocalAuthDto {
 	private String tel;	
 	private String curTenantId;
 	private String headimgurl;
+	private String passWord;	
 	public int getId() {
 		return id;
 	}
@@ -62,6 +63,13 @@ public class LocalAuthDto {
 	}
 	public void setHeadimgurl(String headimgurl) {
 		this.headimgurl = headimgurl;
+	}
+		
+	public String getPassWord() {
+		return passWord;
+	}
+	public void setPassWord(String passWord) {
+		this.passWord = passWord;
 	}
 	@Override
 	public int hashCode() {

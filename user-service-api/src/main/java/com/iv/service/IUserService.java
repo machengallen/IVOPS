@@ -3,7 +3,6 @@ package com.iv.service;
 
 import java.util.List;
 import java.util.Set;
-
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -23,6 +22,7 @@ import com.iv.outer.dto.UserOauthDto;
  * 2018年4月4日
  * aggregation-1.4.0-SNAPSHOT
  */
+
 public interface IUserService {
 	
 	/**
@@ -32,7 +32,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/user/info", method = RequestMethod.GET)
-	LocalAuthDto getUserInfo();
+	ResponseDto getUserInfo();
 	
 	/**
 	 * 查看用户是否已绑定三方登录
@@ -65,7 +65,7 @@ public interface IUserService {
 	 * @throws RuntimeException
 	 */
 	@RequestMapping(value = "/permit/select/localAuthById",method = RequestMethod.GET)
-	LocalAuthDto selectLocalAuthById(@RequestParam("userId") int userId) throws RuntimeException;
+	LocalAuthDto selectLocalAuthById(@RequestParam("userId") int userId);
 	
 	/**
 	 * 根据用户id  登录方式  查询unionid
@@ -75,7 +75,7 @@ public interface IUserService {
 	 * @throws RuntimeException
 	 */
 	@RequestMapping(value = "/select/UserWechat",method = RequestMethod.GET)
-	String selectUserWechatUnionid(@RequestParam("userId") int userId, @RequestParam("loginType") String loginType);
+	UserOauthDto selectUserWechatUnionid(@RequestParam("userId") int userId, @RequestParam("loginType") LoginType loginType);
 	
 	/**
 	 * 根据用户id集合，查询用户信息
