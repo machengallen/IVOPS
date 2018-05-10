@@ -10,6 +10,7 @@ spring:
     name: zuul-service
 zuul:
   prefix: /v1
+  sensitive-headers: Cookie,Set-Cookie
   routes:
     api-1:
       path: /user/**
@@ -52,26 +53,31 @@ ribbon:
   MaxAutoRetriesNextServer: 1
 
 #jwt oauth2
-#security:
+security:
 #  basic:
 #    enabled: false
-#  oauth2:
+  oauth2:
+#    authorization:
+#      realm: Authorization
 #    sso:
 #      login-path: /login
-#    client:
-#      access-token-uri: http://oauth2/uaa/oauth/token
-#      user-authorization-uri: /uaa/oauth/authorize
-#      client-id: client
-#      client-secret: secret
-#    resource:
-#      jwt:
-#        key-value: |
-#          -----BEGIN PUBLIC KEY-----
-#          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAurW7iiT3kzvj159Ji9kHuOAgYrlSbCjfsICwKmQYCu6Zqp13c3nn8ZQvvMRrVouXoiRAvSxkO6X1rT4PaLSDTxlIcLG2tYL5Q7yRG8fBlweNS1YbYKzglTEdw9SkTR7UlJW1i/Sp6hIrGv+DH4YEQs1eXFPCRDrLXN+Tze6zwmUv0u/kfIp1yZoYQuB/ZNy/K9w4+f/gHCiJ7gCmU6PibkTxDsdJRC4X7V5lKmZ9LfzOaXB7trsFRHXov459dIwAypE4Zyf3O79/dDHkm84HKehMAPD8GjCyByzD1BZQ5g4H2PdZPvGwTqOjylyZa1HsqE9UeKoGOKOxMkAGXcG/hQIDAQAB
-#          -----END PUBLIC KEY-----
-#      id: zuul
-#      service-id: ${PREFIX:}zuul
-
+    client:
+      access-token-uri: http://authentication-server/uaa/oauth/token
+      user-authorization-uri: http://authentication-server/uaa/oauth/authorize
+      client-id: client
+      client-secret: secret
+      grant-type: password
+    resource:
+      jwt:
+        key-value: |
+          -----BEGIN PUBLIC KEY-----
+          MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAurW7iiT3kzvj159Ji9kHuOAgYrlSbCjfsICwKmQYCu6Zqp13c3nn8ZQvvMRrVouXoiRAvSxkO6X1rT4PaLSDTxlIcLG2tYL5Q7yRG8fBlweNS1YbYKzglTEdw9SkTR7UlJW1i/Sp6hIrGv+DH4YEQs1eXFPCRDrLXN+Tze6zwmUv0u/kfIp1yZoYQuB/ZNy/K9w4+f/gHCiJ7gCmU6PibkTxDsdJRC4X7V5lKmZ9LfzOaXB7trsFRHXov459dIwAypE4Zyf3O79/dDHkm84HKehMAPD8GjCyByzD1BZQ5g4H2PdZPvGwTqOjylyZa1HsqE9UeKoGOKOxMkAGXcG/hQIDAQAB
+          -----END PUBLIC KEY-----
+      id: zuul
+      service-id: ${PREFIX:}zuul
+logging:
+  level:
+    org.springframework : DEBUG
 ---
 spring:
   profiles: peer1
