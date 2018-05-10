@@ -1,5 +1,7 @@
 package com.iv.facade.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
@@ -10,12 +12,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.iv.aggregation.api.constant.AlarmQueryType;
+import com.iv.aggregation.api.dto.AlarmPagingDto;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.common.response.ErrorMsg;
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.ConstantContainer;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.facade.feign.client.IAlarmAggregationClient;
 
@@ -45,7 +52,7 @@ public class AlarmFacadeController {
 	 * @param userName
 	 * @return
 	 */
-	@RequestMapping(value = "/modify/claim", method = RequestMethod.GET)
+	@RequestMapping(value = "/claim", method = RequestMethod.GET)
 	@ApiOperation("告警认领")
 	public ResponseDto claimAlarm(HttpServletRequest request, @RequestParam String lifeId) {
 		
@@ -92,11 +99,13 @@ public class AlarmFacadeController {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
 			query.setHandlerCurrent(userId);
 			query.setAlarmQueryType(AlarmQueryType.MY);
-			return alarmAggregationClient.getMyAlarmPaging(query);
-		
+			AlarmPagingDto alarmPagingDto = alarmAggregationClient.getMyAlarmPaging(query);
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(alarmPagingDto);
+			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("系统内部错误：", e);
-			return ResponseDto.builder(ErrorMsg.UNKNOWN);
+			return ResponseDto.builder(ErrorMsg.GET_DATA_FAILED);
 		}
 	}
 
@@ -111,11 +120,39 @@ public class AlarmFacadeController {
 
 		try {
 			query.setAlarmQueryType(AlarmQueryType.ALL);
-			return alarmAggregationClient.getAlarmPaging(query);
-
+			AlarmPagingDto alarmPagingDto = alarmAggregationClient.getAlarmPaging(query);
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(alarmPagingDto);
+			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("系统内部错误：", e);
-			return ResponseDto.builder(ErrorMsg.UNKNOWN);
+			return ResponseDto.builder(ErrorMsg.GET_DATA_FAILED);
+		}
+	}
+	
+	/**
+	 * 微信客户端刷新告警详情页
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/refresh/alarmDetail", method = RequestMethod.GET)
+	@ApiOperation("微信客户端刷新告警详情页")
+	public ResponseDto refreshAlarmDetail(@RequestParam String lifeId) {
+
+		ResponseDto responseDto = new ResponseDto();
+		try {
+			ResponseDto dto = alarmAggregationClient.getAlarmDetails(lifeId);
+			if(null != dto) {
+				return dto;
+			}else {
+				return ResponseDto.builder(ErrorMsg.GET_DATA_FAILED);
+			}
+            
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOGGER.error("微信错误：刷新微信端告警详情页错误", e);
+			responseDto.setErrorMsg(ErrorMsg.GET_DATA_FAILED);
+			return responseDto;	
 		}
 	}
 

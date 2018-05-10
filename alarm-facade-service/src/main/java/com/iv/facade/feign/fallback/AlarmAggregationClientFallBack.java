@@ -3,6 +3,7 @@ package com.iv.facade.feign.fallback;
 import org.springframework.stereotype.Component;
 
 import com.iv.aggregation.api.constant.StrategyCycle;
+import com.iv.aggregation.api.dto.AlarmPagingDto;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.common.response.ResponseDto;
@@ -23,17 +24,6 @@ public class AlarmAggregationClientFallBack implements IAlarmAggregationClient {
 		return null;
 	}
 
-	@Override
-	public ResponseDto getMyAlarmPaging(AlarmQueryDto query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto getAlarmPaging(AlarmQueryDto query) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ResponseDto updateAlarmCleanQuartz(String exp) {
@@ -43,6 +33,24 @@ public class AlarmAggregationClientFallBack implements IAlarmAggregationClient {
 
 	@Override
 	public ResponseDto updateAlarmCleanCycle(StrategyCycle cycle) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AlarmPagingDto getMyAlarmPaging(AlarmQueryDto query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public AlarmPagingDto getAlarmPaging(AlarmQueryDto query) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto getAlarmDetails(String lifeId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
