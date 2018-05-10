@@ -1,4 +1,4 @@
-package com.iv.springcloud.oauth2.config;
+package com.iv.authentication.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -9,7 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
-import com.iv.springcloud.oauth2.service.MyUserDetailsService;
+import com.iv.authentication.service.MyUserDetailsService;
 @Order(10)
 @Configuration
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {

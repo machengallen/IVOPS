@@ -1,4 +1,4 @@
-package com.iv.filter;
+package com.iv.zuul.filter;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

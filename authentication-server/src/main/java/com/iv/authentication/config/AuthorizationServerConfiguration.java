@@ -1,4 +1,4 @@
-package com.iv.springcloud.oauth2.config;
+package com.iv.authentication.config;
 
 import java.security.KeyPair;
 import java.util.HashMap;
@@ -20,7 +20,9 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
-import com.iv.springcloud.oauth2.service.MyUserDetailsService;
+import com.iv.authentication.pojo.LocalUser;
+import com.iv.authentication.service.MyUserDetailsService;
+import com.iv.common.util.spring.Constants;
 
 @Configuration
 @EnableAuthorizationServer
@@ -47,10 +49,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
 		// TODO Auto-generated method stub
 		clients.inMemory() // 使用in-memory存储 
-		.withClient("client") // client_id 
-		.secret("secret") // client_secret 
-		.authorizedGrantTypes("authorization_code") // 该client允许的授权类型
-		.scopes("app")//允许的授权范围xin
+		.withClient(Constants.OAUTH2_CLIENT_ID) // client_id 
+		.secret(Constants.OAUTH2_CLIENT_SECRET) // client_secret 
+		.authorizedGrantTypes("password", "refresh_token") // 该client允许的授权类型
+		.accessTokenValiditySeconds(3600)
+		.refreshTokenValiditySeconds(3600)
+		.scopes("read", "write")//允许的授权范围xin
 		.autoApprove(true); 
 		/*clients.inMemory()  
         .withClient("client")//客户端ID  
@@ -74,9 +78,17 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 		JwtAccessTokenConverter converter = new JwtAccessTokenConverter() {
 			@Override
 			public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-				String userName = authentication.getUserAuthentication().getName();
+				//String userName = authentication.getUserAuthentication().getName();
+				LocalUser user = (LocalUser) authentication.getPrincipal();
 				final Map<String, Object> additionalInformation = new HashMap<String, Object>();
-				additionalInformation.put("user_name", userName);
+				//additionalInformation.put("user_name", userName);
+				additionalInformation.put("userId", user.getUserId());
+				additionalInformation.put("userName", user.getUsername());
+				additionalInformation.put("curTenantId", user.getCurTenantId());
+				additionalInformation.put("realName", user.getRealName());
+				additionalInformation.put("email", user.getEmail());
+				additionalInformation.put("tel", user.getTel());
+				
 				((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInformation);
 				OAuth2AccessToken token = super.enhance(accessToken, authentication);
 				return token;

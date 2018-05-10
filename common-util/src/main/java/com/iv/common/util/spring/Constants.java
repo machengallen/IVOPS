@@ -27,4 +27,17 @@ public class Constants {
 	 * redis 微信token超时 key
 	 */
 	public static String ACCESS_TIMEOUT_KEY = "timeout";
+	
+	/**
+	 * oauth默认内部客户端id
+	 */
+	public static String OAUTH2_CLIENT_ID = "client";
+	/**
+	 * oauth默认内部客户端密码
+	 */
+	public static String OAUTH2_CLIENT_SECRET = "secret";
+	/**
+	 * oauth默认内部客户端加密凭证
+	 */
+	public static String OAUTH2_CLIENT_BASIC = "Basic Y2xpZW50OnNlY3JldA==";
 }

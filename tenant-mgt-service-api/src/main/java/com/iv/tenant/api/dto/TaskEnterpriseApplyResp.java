@@ -2,7 +2,7 @@ package com.iv.tenant.api.dto;
 
 import com.iv.common.enumeration.WorkflowType;
 
-public class TaskTenantApplyResp {
+public class TaskEnterpriseApplyResp {
 
 	private String taskId;
 	private WorkflowType type;
@@ -10,11 +10,11 @@ public class TaskTenantApplyResp {
 	private TenantInfoDto tenantInfo;
 	private String createTime;
 	
-	public TaskTenantApplyResp() {
+	public TaskEnterpriseApplyResp() {
 		super();
 	}
 
-	public TaskTenantApplyResp(String taskId, WorkflowType type, int applicantId, TenantInfoDto tenantInfo,
+	public TaskEnterpriseApplyResp(String taskId, WorkflowType type, int applicantId, TenantInfoDto tenantInfo,
 			String createTime) {
 		super();
 		this.taskId = taskId;
