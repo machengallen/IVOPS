@@ -120,4 +120,15 @@ public class EnterpriseDaoImpl implements IEnterpriseDao {
 		});
 	}
 
+	@Override
+	public EnterpriseEntity selectById(int id) throws RuntimeException {
+		return (EnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				return ses.get(EnterpriseEntity.class, id);
+			}
+		});
+	}
+
 }

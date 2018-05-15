@@ -1,6 +1,7 @@
 package com.iv.tenant.feign.client;
 
 import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.stereotype.Component;
 
 import com.iv.common.enumeration.WorkflowType;
 import com.iv.common.response.ResponseDto;
@@ -12,6 +13,7 @@ public interface IMessageServiceClient extends IMessageService {
 
 }
 
+@Component
 class MessageServiceClientFallBack implements IMessageServiceClient{
 
 	@Override

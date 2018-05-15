@@ -9,6 +9,8 @@ public interface IEnterpriseDao {
 
 	EnterpriseEntity save(EnterpriseEntity entity) throws RuntimeException;
 	
+	EnterpriseEntity selectById(int id) throws RuntimeException;
+	
 	List<EnterpriseEntity> selectByCondition(QueryEnterReq req) throws RuntimeException;
 	
 	EnterpriseEntity selectByOrgCode(String orgCode) throws RuntimeException;
