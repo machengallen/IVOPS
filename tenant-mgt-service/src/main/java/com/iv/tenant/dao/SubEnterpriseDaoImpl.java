@@ -101,14 +101,15 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public SubEnterpriseEntity selectByName(String name) throws RuntimeException {
-		return (SubEnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
+	public List<SubEnterpriseEntity> selectByName(String name) throws RuntimeException {
+		return (List<SubEnterpriseEntity>) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("from SubEnterpriseEntity s where s.name=?")
-						.setParameter(0, name).uniqueResult();
+				return ses.createQuery("from SubEnterpriseEntity s where s.name like ?")
+						.setParameter(0, "%" + name + "%").list();
 			}
 		});
 	}
@@ -132,7 +133,7 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery("from SubEnterpriseEntity s where ? in s.userIds").setParameter(0, userId)
+				return ses.createQuery("from SubEnterpriseEntity s join s.userIds u where u=?").setParameter(0, userId)
 						.list();
 			}
 		});

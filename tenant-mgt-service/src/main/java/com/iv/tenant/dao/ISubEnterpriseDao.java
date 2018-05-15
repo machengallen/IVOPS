@@ -17,7 +17,7 @@ public interface ISubEnterpriseDao {
 	
 	SubEnterpriseEntity selectById(int id) throws RuntimeException;
 	
-	SubEnterpriseEntity selectByName(String name) throws RuntimeException;
+	List<SubEnterpriseEntity> selectByName(String name) throws RuntimeException;
 	
 	List<String> selectAllTenantId() throws RuntimeException;
 	

@@ -1,12 +1,9 @@
 package com.iv.tenant.entity;
 
 import java.io.Serializable;
-import java.util.Set;
 
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -37,8 +34,8 @@ public class EnterpriseEntity implements Serializable{
 	private String industry;
 	private String businessInvolves;
 	private String staffSize;
-	@JsonIgnore
-	private Set<Integer> userIds;
+	/*@JsonIgnore
+	private Set<Integer> userIds;*/
 	
 	@Id
 	@GeneratedValue
@@ -48,7 +45,7 @@ public class EnterpriseEntity implements Serializable{
 	public void setId(int id) {
 		this.id = id;
 	}
-	@Column(nullable = false)
+	@Column(unique = true, nullable = false)
 	public String getName() {
 		return name;
 	}
@@ -100,13 +97,13 @@ public class EnterpriseEntity implements Serializable{
 	public void setStaffSize(String staffSize) {
 		this.staffSize = staffSize;
 	}
-	@ElementCollection(fetch = FetchType.EAGER)
+	/*@ElementCollection(fetch = FetchType.EAGER)
 	public Set<Integer> getUserIds() {
 		return userIds;
 	}
 	public void setUserIds(Set<Integer> userIds) {
 		this.userIds = userIds;
-	}
+	}*/
 	@Override
 	public int hashCode() {
 		final int prime = 31;
