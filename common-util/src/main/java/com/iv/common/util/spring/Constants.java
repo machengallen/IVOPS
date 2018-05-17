@@ -40,4 +40,9 @@ public class Constants {
 	 * oauth默认内部客户端加密凭证
 	 */
 	public static String OAUTH2_CLIENT_BASIC = "Basic Y2xpZW50OnNlY3JldA==";
+	
+	/**
+	 * 三方登录标记
+	 */
+	public static String THREE_PARTY_LOGIN = "_auto";
 }
