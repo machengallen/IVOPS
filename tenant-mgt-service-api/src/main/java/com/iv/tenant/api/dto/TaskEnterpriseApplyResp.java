@@ -6,7 +6,9 @@ public class TaskEnterpriseApplyResp {
 
 	private String taskId;
 	private WorkflowType type;
-	private int applicantId;
+	private String applicant;
+	private String email;
+	private String tel;
 	private TenantInfoDto tenantInfo;
 	private String createTime;
 	
@@ -14,12 +16,14 @@ public class TaskEnterpriseApplyResp {
 		super();
 	}
 
-	public TaskEnterpriseApplyResp(String taskId, WorkflowType type, int applicantId, TenantInfoDto tenantInfo,
-			String createTime) {
+	public TaskEnterpriseApplyResp(String taskId, WorkflowType type, String applicant, String email, String tel,
+			TenantInfoDto tenantInfo, String createTime) {
 		super();
 		this.taskId = taskId;
 		this.type = type;
-		this.applicantId = applicantId;
+		this.applicant = applicant;
+		this.email = email;
+		this.tel = tel;
 		this.tenantInfo = tenantInfo;
 		this.createTime = createTime;
 	}
@@ -29,12 +33,6 @@ public class TaskEnterpriseApplyResp {
 	}
 	public void setType(WorkflowType type) {
 		this.type = type;
-	}
-	public int getApplicant() {
-		return applicantId;
-	}
-	public void setApplicant(int applicant) {
-		this.applicantId = applicantId;
 	}
 	public TenantInfoDto getTenantInfo() {
 		return tenantInfo;
@@ -53,6 +51,30 @@ public class TaskEnterpriseApplyResp {
 	}
 	public void setTaskId(String taskId) {
 		this.taskId = taskId;
+	}
+
+	public String getApplicant() {
+		return applicant;
+	}
+
+	public void setApplicant(String applicant) {
+		this.applicant = applicant;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getTel() {
+		return tel;
+	}
+
+	public void setTel(String tel) {
+		this.tel = tel;
 	}
 	
 }

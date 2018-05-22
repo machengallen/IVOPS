@@ -8,7 +8,10 @@ public class HisProTenantApplyReq {
 	private String endTime;
 	private String duration;
 	private String type;
-	private int startUser;
+	private String applicant;
+	private String email;
+	private String tel;
+	private String approver;
 	private TenantInfoDto tenantInfo;
 	private boolean approved;
 	private String remark;
@@ -42,11 +45,23 @@ public class HisProTenantApplyReq {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public int getStartUser() {
-		return startUser;
+	public String getApplicant() {
+		return applicant;
 	}
-	public void setStartUser(int startUser) {
-		this.startUser = startUser;
+	public void setApplicant(String applicant) {
+		this.applicant = applicant;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
 	}
 	public TenantInfoDto getTenantInfo() {
 		return tenantInfo;
@@ -65,6 +80,12 @@ public class HisProTenantApplyReq {
 	}
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+	public String getApprover() {
+		return approver;
+	}
+	public void setApprover(String approver) {
+		this.approver = approver;
 	}
 	
 }
