@@ -31,8 +31,8 @@ public interface IWechatService {
 	 * 扫描微信二维码后回调地址
 	 * @return
 	 */
-	@RequestMapping(value = "/wechat/wxLoginCallBack", method = RequestMethod.GET)
-	public ResponseDto wxLoginCallBack(@RequestParam("request") HttpServletRequest request);
+	@RequestMapping(value = "/wxLoginCallBack", method = RequestMethod.GET)
+	public ResponseDto wxLoginCallBack(@RequestParam("code") String code,@RequestParam("request") HttpServletRequest request);
 	
 	
 	/**

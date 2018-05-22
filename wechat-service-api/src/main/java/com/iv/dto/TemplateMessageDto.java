@@ -1,7 +1,6 @@
 package com.iv.dto;
 
 import java.util.List;
-import java.util.Set;
 
 import com.iv.common.enumeration.SendType;
 
@@ -13,28 +12,26 @@ import com.iv.common.enumeration.SendType;
 public class TemplateMessageDto {
 
 	//userId
-	private List<Integer> UserIds;
+	private List<Integer> userIds;
 	//详情页面路径
 	private String redirect_uri;
 	//发送主题
 	private SendType sendType;
 	//告警数据
-	private ContentData data;
+	private AlarmContent data;
 	
 	public TemplateMessageDto() {
 		
 	}	
-
+	
 	public List<Integer> getUserIds() {
-		return UserIds;
+		return userIds;
 	}
 	
 	public void setUserIds(List<Integer> userIds) {
-		UserIds = userIds;
+		this.userIds = userIds;
 	}
-
-
-
+	
 	public String getRedirect_uri() {
 		return redirect_uri;
 	}
@@ -43,11 +40,11 @@ public class TemplateMessageDto {
 		this.redirect_uri = redirect_uri;
 	}
 
-	public ContentData getData() {
+	public AlarmContent getData() {
 		return data;
 	}
 
-	public void setData(ContentData data) {
+	public void setData(AlarmContent data) {
 		this.data = data;
 	}
 

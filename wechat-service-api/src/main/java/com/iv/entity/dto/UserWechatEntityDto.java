@@ -6,6 +6,7 @@ import java.util.Set;
 public class UserWechatEntityDto {
 	// 开放平台唯一id
 		private String unionid;	
+		private String openid;
 		// 用户昵称
 		private String nickname;
 		// 电话
@@ -123,8 +124,14 @@ public class UserWechatEntityDto {
 		}
 		public void setPlatformSigns(Set<PlatformSignDto> platformSigns) {
 			this.platformSigns = platformSigns;
+		}		
+				
+		public String getOpenid() {
+			return openid;
 		}
-		
+		public void setOpenid(String openid) {
+			this.openid = openid;
+		}
 		public void filterEmoji() {
 			setNickname(this.nickname.replaceAll("[\ud83c\udc00-\ud83c\udfff]|[\ud83d\udc00-\ud83d\udfff]|[\u2600-\u27ff]",
 					""));

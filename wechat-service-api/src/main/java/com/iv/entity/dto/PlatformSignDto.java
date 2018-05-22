@@ -1,11 +1,5 @@
 package com.iv.entity.dto;
 
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
 public class PlatformSignDto {
 
 	private String id;

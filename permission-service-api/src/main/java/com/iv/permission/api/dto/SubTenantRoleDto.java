@@ -2,7 +2,8 @@ package com.iv.permission.api.dto;
 
 import java.util.Set;
 
-public class CreateRoleDto {
+public class SubTenantRoleDto {
+	private int id;
 	private String name;
 	private String des;
 	private Set<String> permissionIds;
@@ -30,6 +31,12 @@ public class CreateRoleDto {
 	}
 	public void setGroupIds(Set<Short> groupIds) {
 		this.groupIds = groupIds;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 }
