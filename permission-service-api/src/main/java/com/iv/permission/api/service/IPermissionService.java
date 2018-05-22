@@ -110,7 +110,7 @@ public interface IPermissionService {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete/globalRole", method = RequestMethod.GET)
-	ResponseDto deleteGlobalRole(@RequestParam int roleId);	
+	ResponseDto deleteGlobalRole(@RequestParam("roleId") int roleId);	
 	
 	/**
 	 * 角色编辑（基础库）
