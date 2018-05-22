@@ -7,5 +7,5 @@ package com.iv.permission.api.dto;
  * alarm-aggregation-service-1.0.0-SNAPSHOT
  */
 public enum ServiceType {
-	ALARM, GROUP, USER, TENANT,ALARMREPORT,WECHAT,EMAIL;
+	ALARM, ALARMANALYSIS, STRATEGY, MESSAGE, SCRIPT, SUBTENANT, USER, GROUP, WECHAT, EMAIL, OPERATE;
 }
