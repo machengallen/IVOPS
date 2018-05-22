@@ -4,19 +4,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.iv.common.dto.IdListDto;
 import com.iv.common.response.ResponseDto;
 import com.iv.tenant.api.dto.QueryEnterReq;
 import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
-import com.iv.tenant.api.dto.SubTenantInfoDto;
-import com.iv.tenant.api.dto.TenantApproveReq;
-import com.iv.tenant.api.dto.TenantInfoDto;
+import com.iv.tenant.api.dto.UserListDto;
 
 /**
  * 租户管理
@@ -68,7 +64,7 @@ public interface ITenantFacadeService {
 	 * @return
 	 */
 	@RequestMapping(value = "/get/tenant/users", method = RequestMethod.GET)
-	List<Integer> getCurrentSubEnterpriseUserList(@RequestParam("request") HttpServletRequest request,
+	UserListDto getCurrentSubEnterpriseUserList(@RequestParam("request") HttpServletRequest request,
 			@RequestParam("page") int page, @RequestParam("items") int items);
 
 	/**
