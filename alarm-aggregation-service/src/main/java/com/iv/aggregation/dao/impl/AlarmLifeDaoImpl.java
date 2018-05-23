@@ -80,7 +80,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 		}, sourceEntity.getTenantId());
 	}
 
-	@Override
+	/*@Override
 	public void updateAlarmStatus(final String alarmId, final Integer hireHandlerCurrent, final Integer hireHandlerLast,
 			final AlarmRecoveryEntity recovery, final AlarmStatus alarmStatus, final Byte upgrade)
 			throws RuntimeException {
@@ -107,7 +107,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 				return null;
 			}
 		});
-	}
+	}*/
 
 	@Override
 	public AlarmLifeEntity selectAlarmLifeById(final String id, final String tenantId) throws RuntimeException {

@@ -34,11 +34,6 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 		return null;
 	}
 
-	@Override
-	public String selectUserWechatUnionid(int userId, String loginType) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
@@ -64,11 +59,6 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 		return null;
 	}
 
-	@Override
-	public LocalAuthDto getUserInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
@@ -78,6 +68,18 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 
 	@Override
 	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto getUserInfo() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
 		// TODO Auto-generated method stub
 		return null;
 	}

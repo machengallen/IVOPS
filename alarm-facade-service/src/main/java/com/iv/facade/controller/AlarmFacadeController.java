@@ -1,6 +1,5 @@
 package com.iv.facade.controller;
 
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -12,9 +11,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.iv.aggregation.api.constant.AlarmQueryType;
 import com.iv.aggregation.api.dto.AlarmPagingDto;
@@ -22,7 +18,6 @@ import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.common.response.ErrorMsg;
 import com.iv.common.response.ResponseDto;
-import com.iv.common.util.spring.ConstantContainer;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.facade.feign.client.IAlarmAggregationClient;
 
@@ -52,8 +47,8 @@ public class AlarmFacadeController {
 	 * @param userName
 	 * @return
 	 */
+	@ApiOperation(value = "告警认领", notes = "84200")
 	@RequestMapping(value = "/claim", method = RequestMethod.GET)
-	@ApiOperation("告警认领")
 	public ResponseDto claimAlarm(HttpServletRequest request, @RequestParam String lifeId) {
 		
 		try {
@@ -72,8 +67,8 @@ public class AlarmFacadeController {
 	 * @param userName
 	 * @return
 	 */
+	@ApiOperation(value = "告警转让", notes = "84201")
 	@RequestMapping(value = "/transfer", method = RequestMethod.POST)
-	@ApiOperation("告警转让")
 	public ResponseDto transferAlarm(HttpServletRequest request, @RequestBody AlarmTransferDto dto) {
 
 		try {
@@ -91,8 +86,8 @@ public class AlarmFacadeController {
 	 * 
 	 * @return
 	 */	
+	@ApiOperation(value = "告警查询（我的告警）", notes = "84202")
 	@RequestMapping(value = "/get/myAlarm", method = RequestMethod.POST)
-	@ApiOperation("查询我的告警")
 	public ResponseDto getMyAlarmPaging(HttpServletRequest request, @RequestBody AlarmQueryDto query) {
 
 		try {
@@ -114,8 +109,8 @@ public class AlarmFacadeController {
 	 * 
 	 * @return
 	 */	
+	@ApiOperation(value = "告警查询（所有告警）", notes = "84203")
 	@RequestMapping(value = "/get/alarm", method = RequestMethod.POST)
-	@ApiOperation("查询所有告警")
 	public ResponseDto getAlarmPaging(@RequestBody AlarmQueryDto query) {
 
 		try {
@@ -135,8 +130,8 @@ public class AlarmFacadeController {
 	 * 
 	 * @return
 	 */
+	@ApiOperation(value = "告警详情查询", notes = "84204")
 	@RequestMapping(value = "/refresh/alarmDetail", method = RequestMethod.GET)
-	@ApiOperation("微信客户端刷新告警详情页")
 	public ResponseDto refreshAlarmDetail(@RequestParam String lifeId) {
 
 		ResponseDto responseDto = new ResponseDto();

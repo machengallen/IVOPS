@@ -80,9 +80,9 @@ public class ScheduledTasks {
 					String tenantId = subEnterpriseInfoDto.getTenantId();
 					// 初始化告警清理规则
 					if (null == strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId)) {
-						// 默认告警数据保留一年
+						// 默认告警数据保留三个月
 						AlarmCleanStrategyEntity cleanStrategyEntity = new AlarmCleanStrategyEntity();
-						cleanStrategyEntity.setCycleType(StrategyCycle.YEAR);
+						cleanStrategyEntity.setCycleType(StrategyCycle.THREE_MONTHS);
 						cleanStrategyEntity.setId(IAlarmCleanStrategyDao.id);
 						strategyDao.saveStrategy(cleanStrategyEntity, tenantId);
 					}

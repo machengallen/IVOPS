@@ -30,7 +30,6 @@ import com.iv.common.response.ResponseDto;
 import com.iv.dto.AlarmInfoTemplate;
 import com.iv.dto.AlarmLifeEntityDto;
 import com.iv.dto.TemplateMessageDto;
-import com.iv.enter.dto.GroupQuery;
 import com.iv.enter.dto.UsersQueryDto;
 import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.outer.dto.GroupEntityDto;
@@ -81,8 +80,8 @@ public class WechatProxyClient {
 		// 设置基本信息
 		// 判断通知类型，选择模板id
 		// atm.setTemplate_id(templateAlarm);
-		templateMessageDto.setRedirect_uri(urlAlarmDetails + alarmLifeEntity.getId() + "$" +
-		alarmLifeEntity.getAlarm().getTenantId());
+		templateMessageDto.setRedirect_uri(
+				urlAlarmDetails + alarmLifeEntity.getId() + "$" + alarmLifeEntity.getAlarm().getTenantId());
 		Map<String, Object> infoMap = new HashMap<String, Object>();
 		// 记录告警派送人/组
 		String dispatcher = null;
@@ -113,9 +112,12 @@ public class WechatProxyClient {
 			alarmLifeEntityDto.setSeverity(alarmLifeEntity.getAlarm().getSeverity());
 			alarmLifeEntityDto.setTime(new Date(alarmLifeEntity.getTriDate()).toLocaleString());
 			alarmLifeEntityDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
-			alarmLifeEntityDto.setUpgrade(alarmLifeEntityDto.getUpgrade());
+			alarmLifeEntityDto.setUpgrade(alarmLifeEntity.getUpgrade());
 			alarmInfoTemplate.setAlarmLifeEntity(alarmLifeEntityDto);
-			emailServiceClient.alarmToMail(alarmInfoTemplate);
+			ResponseDto responseDto = emailServiceClient.alarmToMail(alarmInfoTemplate);
+			if (null != responseDto && 0 != responseDto.getErrcode()) {
+				LOGGER.error("告警邮件通知失败：" + responseDto.getErrmsg());
+			}
 		}
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("dispatcher", dispatcher);
@@ -132,36 +134,32 @@ public class WechatProxyClient {
 	 * @param toEmails
 	 * @throws Exception
 	 */
-	private Map<String,Object> strategyNotice(AlarmLifeEntity alarmLifeEntity, TemplateMessageDto atm, Integer index,
+	private Map<String, Object> strategyNotice(AlarmLifeEntity alarmLifeEntity, TemplateMessageDto atm, Integer index,
 			NoticeModel model, ArrayList<String> toEmails) throws Exception {
 		ArrayList<Integer> toUserIds = new ArrayList<Integer>(1);
-		Map<String,Object> infoMap = new HashMap<String,Object>();
+		Map<String, Object> infoMap = new HashMap<String, Object>();
 		// 调用告警策略服务
 		StrategyQueryDto strategyQuery = new StrategyQueryDto();
 		strategyQuery.setSeverity(Severity.valueOf(alarmLifeEntity.getAlarm().getSeverity().name()));
 		strategyQuery.setItemType(alarmLifeEntity.getItemType());
 		strategyQuery.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
-		ResponseDto responseDto = alarmStrategyClient.getStrategy(strategyQuery);
-		AlarmStrategyDto dispatchStrategy = null;
-		if(null != responseDto) {
-			dispatchStrategy = (AlarmStrategyDto)responseDto.getData();
-		} else {
+		AlarmStrategyDto dispatchStrategy = alarmStrategyClient.getStrategy(strategyQuery);
+		if (null == dispatchStrategy) {
 			return infoMap;
 		}
-		//AlarmStrategyDto dispatchStrategy = (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
+		// AlarmStrategyDto dispatchStrategy =
+		// (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
 		short groupId = dispatchStrategy.getGroupIds().get(index);
 		// 调用组服务获取组信息
-		GroupQuery groupQuery = new GroupQuery();
-		groupQuery.setGroupId(groupId);
-		groupQuery.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
-		GroupEntityDto groupDto = groupServiceClient.selectGroupInfo(groupQuery);
-		if(null == groupDto) {
+		GroupEntityDto groupDto = groupServiceClient.selectGroupInfo(alarmLifeEntity.getAlarm().getTenantId(), groupId);
+		if (null == groupDto) {
 			return infoMap;
 		}
-		
+
 		switch (model) {
 		case ROUND_ROBIN:// 轮询通知方式
-			Integer targetUserId = TeamRoundRobin.getToUser(alarmLifeEntity.getAlarm().getTenantId(), groupId, groupDto.getUserId());
+			Integer targetUserId = TeamRoundRobin.getToUser(alarmLifeEntity.getAlarm().getTenantId(), groupId,
+					groupDto.getUserId());
 			// HireUser targetUser1 = hireUserDao.selectHireUserByUserId(hirer.getUserId());
 			if (null == targetUserId) {
 				break;
@@ -171,18 +169,21 @@ public class WechatProxyClient {
 				// 首次通知，则写入当前处理人
 				alarmLifeEntity.setHandlerCurrent(targetUserId);
 			}
-			
-			//LOGGER.info("推送人员：" + localAuth.toString());
+
 			// 记录告警生命周期-推送人
 			alarmLifeEntity.getToHireUserIds().add(targetUserId);
 			// 调用微信管理服务，发送模板消息
 			atm.setUserIds(Arrays.asList(targetUserId));
-			wechatServiceClient.SendWeChatInfo(atm);
-				
+			ResponseDto responseDto = wechatServiceClient.SendWeChatInfo(atm);
+			if(null != responseDto && 0 != responseDto.getErrcode()) {
+				LOGGER.error("微信告警失败：" + responseDto.getErrmsg());
+			}
+
 			// 记录邮件发送人
 			LocalAuthDto localAuth = userServiceClient.selectLocalAuthById(targetUserId);
-			if(null != localAuth) {
-				toEmails.add(localAuth.getUserName());
+			LOGGER.info("推送人员：" + localAuth.toString());
+			if (null != localAuth) {
+				toEmails.add(localAuth.getEmail());
 				// 返回告警派送人
 				String dispatcher = null;
 				if (null == localAuth.getRealName()) {
@@ -192,7 +193,7 @@ public class WechatProxyClient {
 				}
 				infoMap.put("dispatcher", dispatcher);
 			}
-			
+
 			toUserIds.add(targetUserId);
 			infoMap.put("toUserIds", toUserIds);
 			return infoMap;
@@ -202,9 +203,9 @@ public class WechatProxyClient {
 			UsersQueryDto usersQuery = new UsersQueryDto();
 			usersQuery.setUserIds(groupDto.getUserId());
 			List<LocalAuthDto> authDtos = userServiceClient.selectUserInfos(usersQuery);
-			if(null != authDtos) {
+			if (null != authDtos) {
 				for (LocalAuthDto user : authDtos) {
-					
+
 					LOGGER.info("推送人员：" + user.toString());
 					// 写入当前处理人
 					// alarmLifeEntity.setHandlerCurrent(user);
@@ -212,14 +213,17 @@ public class WechatProxyClient {
 					alarmLifeEntity.getToHireUserIds().add(user.getId());
 					userIds.add(user.getId());
 					// 记录邮件发送人
-					toEmails.add(user.getUserName());
+					toEmails.add(user.getEmail());
 					toUserIds.add(user.getId());
 				}
 			}
 			// 调用微信管理服务，发送模板消息
 			atm.setUserIds(userIds);
-			if(!userIds.isEmpty()) {
-				wechatServiceClient.SendWeChatInfo(atm);
+			if (!userIds.isEmpty()) {
+				responseDto = wechatServiceClient.SendWeChatInfo(atm);
+				if(null != responseDto && 0 != responseDto.getErrcode()) {
+					LOGGER.error("微信告警失败：" + responseDto.getErrmsg());
+				}
 			}
 			infoMap.put("dispatcher", groupDto.getGroupName());
 			infoMap.put("toUserIds", toUserIds);
@@ -240,15 +244,19 @@ public class WechatProxyClient {
 	 * @param toEmails
 	 * @throws Exception
 	 */
-	private void transferNotice(AlarmLifeEntity alarmLifeEntity, TemplateMessageDto atm, ArrayList<String> toEmails) throws Exception {
+	private void transferNotice(AlarmLifeEntity alarmLifeEntity, TemplateMessageDto atm, ArrayList<String> toEmails)
+			throws Exception {
 		// 调用微信管理服务，发送模板消息
-		wechatServiceClient.SendWeChatInfo(atm);
+		ResponseDto responseDto = wechatServiceClient.SendWeChatInfo(atm);
+		if(null != responseDto && 0 != responseDto.getErrcode()) {
+			LOGGER.error("微信告警失败：" + responseDto.getErrmsg());
+		}
 		LocalAuthDto user = userServiceClient.selectLocalAuthById(atm.getUserIds().get(0));
 		// 记录邮件发送人
-		if(null != user) {
-			toEmails.add(user.getUserName());
+		if (null != user) {
+			toEmails.add(user.getEmail());
 		}
-		//LOGGER.info("转让人员：" + user.toString());
+		// LOGGER.info("转让人员：" + user.toString());
 		// 记录被通知人
 		alarmLifeEntity.getToHireUserIds().add(atm.getUserIds().get(0));
 	}
@@ -269,16 +277,16 @@ public class WechatProxyClient {
 		// 转换为微信模板消息体
 		TemplateMessageDto templateMessageDto = DataConvert.AlarmTempConvert(alarmLifeEntity.getAlarm());
 		templateMessageDto.setSendType(SendType.ALARMRECOVERY);
-		templateMessageDto.setRedirect_uri(urlAlarmDetails + alarmLifeEntity.getId() + "$" +
-				alarmLifeEntity.getAlarm().getTenantId());
+		templateMessageDto.setRedirect_uri(
+				urlAlarmDetails + alarmLifeEntity.getId() + "$" + alarmLifeEntity.getAlarm().getTenantId());
 
 		UsersQueryDto usersQuery = new UsersQueryDto();
 		usersQuery.setUserIds(new ArrayList<>(alarmLifeEntity.getToHireUserIds()));
 		List<LocalAuthDto> authDtos = userServiceClient.selectUserInfos(usersQuery);
-		if(null != authDtos) {
+		if (null != authDtos) {
 			for (LocalAuthDto user : authDtos) {
 				// 记录邮箱发送人
-				toEmails.add(user.getUserName());
+				toEmails.add(user.getEmail());
 			}
 		}
 		// 发送消息至微信服务器

@@ -3,9 +3,11 @@ package com.iv.aggregation.service;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.quartz.CronScheduleBuilder;
 import org.quartz.CronTrigger;
@@ -20,10 +22,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.iv.aggregation.api.constant.OpsType;
 import com.iv.aggregation.api.constant.StrategyCycle;
+import com.iv.aggregation.api.dto.AlarmLifeDto;
+import com.iv.aggregation.api.dto.AlarmLogDto;
+import com.iv.aggregation.api.dto.AlarmPagingDto;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
+import com.iv.aggregation.api.dto.AlarmRecoveryDto;
+import com.iv.aggregation.api.dto.AlarmSourceDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.aggregation.api.service.IAlarmAggregationService;
 import com.iv.aggregation.dao.AlarmPaging;
@@ -37,7 +47,6 @@ import com.iv.aggregation.entity.AlarmLogEntity;
 import com.iv.aggregation.feign.clients.IEmailServiceClient;
 import com.iv.aggregation.feign.clients.IMessageServiceClient;
 import com.iv.aggregation.feign.clients.IUserServiceClient;
-import com.iv.aggregation.feign.clients.IWechatServiceClient;
 import com.iv.aggregation.util.WechatProxyClient;
 import com.iv.common.enumeration.AlarmStatus;
 import com.iv.common.enumeration.NoticeType;
@@ -48,11 +57,6 @@ import com.iv.common.util.spring.JWTUtil;
 import com.iv.common.util.spring.SpringContextUtil;
 import com.iv.dto.AlarmInfoTemplate;
 import com.iv.dto.AlarmLifeEntityDto;
-import com.iv.facade.dto.AlarmLifeDto;
-import com.iv.facade.dto.AlarmLogDto;
-import com.iv.facade.dto.AlarmPagingDto;
-import com.iv.facade.dto.AlarmRecoveryDto;
-import com.iv.facade.dto.AlarmSourceDto;
 import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.outer.dto.LocalAuthDto;
 
@@ -118,7 +122,7 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 		if(null != toUser) {
 			// 被转让人
 			transferee = toUser.getRealName() == null ? toUser.getUserName() : toUser.getRealName();
-			toEmails.add(toUser.getUserName());
+			toEmails.add(toUser.getEmail());
 		}
 		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(dto.getLifeId());
 		if (null != alarmLifeEntity) {
@@ -207,24 +211,45 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 	}
 
 	@Override
-	public ResponseDto getMyAlarmPaging(@RequestBody AlarmQueryDto query) {
+	public AlarmPagingDto getMyAlarmPaging(@RequestBody AlarmQueryDto query) {
 		// 查询我的告警
 		AlarmPagingDto alarmPagingDto = getAlarmLifeDto(
 				ALARM_LIFE_DAO.selectPaging((query.getCurPage() - 1) * query.getItems(), query.getItems(), query, query.getHandlerCurrent()));
-		ResponseDto response = ResponseDto.builder(ErrorMsg.OK);
-		response.setData(alarmPagingDto);
-		return response;
+		return alarmPagingDto;
 	}
 
 	@Override
-	public ResponseDto getAlarmPaging(@RequestBody AlarmQueryDto query) {
+	public AlarmPagingDto getAlarmPaging(@RequestBody AlarmQueryDto query) {
 
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 		AlarmPagingDto alarmPagingDto = getAlarmLifeDto(
 				ALARM_LIFE_DAO.selectPaging((query.getCurPage() - 1) * query.getItems(), query.getItems(), query, null));
-		ResponseDto response = ResponseDto.builder(ErrorMsg.OK);
-		response.setData(alarmPagingDto);
-		return response;
+		return alarmPagingDto;
 
+	}
+	
+	/**
+	 * 获取告警数据详情
+	 * 
+	 * @param alarmId
+	 */
+	@Override
+	public ResponseDto getAlarmDetails(String lifeId) {
+
+		try {
+			String[] strs = lifeId.split("\\$");
+			lifeId = strs[0];
+			String tenantId = strs[1];
+			AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(lifeId, tenantId);
+			AlarmLifeDto lifeDto = alarmLifeDtoConvert(alarmLifeEntity);
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(lifeDto);
+			return responseDto;
+		} catch (RuntimeException e) {
+			LOGGER.error("获取告警数据失败", e);
+			return ResponseDto.builder(ErrorMsg.GET_DATA_FAILED);
+		}
 	}
 
 	/**
@@ -239,42 +264,58 @@ public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 			alarmPagingDto.setTotalCount(alarmPaging.getTotalCount());
 			List<AlarmLifeDto> AlarmLifeDtos = new ArrayList<AlarmLifeDto>();
 			for (AlarmLifeEntity alarmLifeEntity : alarmPaging.getEntries()) {
-				AlarmLifeDto alarmLifeDto = new AlarmLifeDto();
-				// copy entity
-				AlarmSourceDto alarmSourceDto = new AlarmSourceDto();
-				alarmLifeDto.setAlarm(alarmSourceDto);
-				BeanUtils.copyProperties(alarmLifeEntity.getAlarm(), alarmSourceDto);
-				AlarmRecoveryDto alarmRecoveryDto = new AlarmRecoveryDto();
-				if(null != alarmLifeEntity.getRecovery()) {
-					BeanUtils.copyProperties(alarmLifeEntity.getRecovery(), alarmRecoveryDto);
-					alarmLifeDto.setRecovery(alarmRecoveryDto);
-				}
-				Set<AlarmLogDto> alarmLogDtos = new HashSet<AlarmLogDto>();
-				for (AlarmLogEntity entity : alarmLifeEntity.getLogs()) {
-					AlarmLogDto dto = new AlarmLogDto();
-					BeanUtils.copyProperties(entity, dto);
-					alarmLogDtos.add(dto);
-				}
-
-				alarmLifeDto.setLogs(alarmLogDtos);
-				alarmLifeDto.setAlarmStatus(
-						com.iv.facade.constant.AlarmStatus.valueOf(alarmLifeEntity.getAlarmStatus().name()));
-				alarmLifeDto.setHandlerCurrent(alarmLifeEntity.getHandlerCurrent());
-				alarmLifeDto.setHandlerLast(alarmLifeEntity.getHandlerLast());
-				alarmLifeDto.setHostAlarmNum(alarmLifeEntity.getHostAlarmNum());
-				alarmLifeDto.setId(alarmLifeEntity.getId());
-				alarmLifeDto.setItemType(alarmLifeEntity.getItemType());
-
-				alarmLifeDto.setRecDate(alarmLifeEntity.getRecDate());
-				alarmLifeDto.setTriDate(alarmLifeEntity.getTriDate());
-				alarmLifeDto.setUpgrade(alarmLifeEntity.getUpgrade());
-				AlarmLifeDtos.add(alarmLifeDto);
+				AlarmLifeDtos.add(alarmLifeDtoConvert(alarmLifeEntity));
 			}
 			alarmPagingDto.setEntries(AlarmLifeDtos);
 		}else {
 			alarmPagingDto.setEntries(new ArrayList<AlarmLifeDto>());
 		}
 		return alarmPagingDto;
+	}
+	
+	/**
+	 * 实体类转换
+	 * @param alarmLifeEntity
+	 * @return
+	 */
+	public AlarmLifeDto alarmLifeDtoConvert(AlarmLifeEntity alarmLifeEntity) {
+		AlarmLifeDto alarmLifeDto = new AlarmLifeDto();
+		// copy entity
+		AlarmSourceDto alarmSourceDto = new AlarmSourceDto();
+		alarmLifeDto.setAlarm(alarmSourceDto);
+		BeanUtils.copyProperties(alarmLifeEntity.getAlarm(), alarmSourceDto);
+		AlarmRecoveryDto alarmRecoveryDto = new AlarmRecoveryDto();
+		if(null != alarmLifeEntity.getRecovery()) {
+			BeanUtils.copyProperties(alarmLifeEntity.getRecovery(), alarmRecoveryDto);
+			alarmLifeDto.setRecovery(alarmRecoveryDto);
+		}
+		TreeSet<AlarmLogDto> alarmLogDtos = new TreeSet<AlarmLogDto>();
+		for (AlarmLogEntity entity : alarmLifeEntity.getLogs()) {
+			AlarmLogDto dto = new AlarmLogDto();
+			BeanUtils.copyProperties(entity, dto);
+			alarmLogDtos.add(dto);
+		}
+
+		alarmLifeDto.setLogs(alarmLogDtos);
+		alarmLifeDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
+		if(alarmLifeEntity.getHandlerCurrent() != 0) {
+			LocalAuthDto handlerCurrentDto = userServiceClient.selectLocalAuthById(alarmLifeEntity.getHandlerCurrent());
+			String handlerCurrent = handlerCurrentDto == null ? null : handlerCurrentDto.getRealName();
+			alarmLifeDto.setHandlerCurrent(handlerCurrent);
+		}
+		if(alarmLifeEntity.getHandlerCurrent() != 0) {
+			LocalAuthDto handlerLastDto = userServiceClient.selectLocalAuthById(alarmLifeEntity.getHandlerCurrent());
+			String handlerLast = handlerLastDto == null ? null : handlerLastDto.getRealName();
+			alarmLifeDto.setHandlerLast(handlerLast);
+		}
+		alarmLifeDto.setHostAlarmNum(alarmLifeEntity.getHostAlarmNum());
+		alarmLifeDto.setId(alarmLifeEntity.getId());
+		alarmLifeDto.setItemType(alarmLifeEntity.getItemType());
+
+		alarmLifeDto.setRecDate(alarmLifeEntity.getRecDate());
+		alarmLifeDto.setTriDate(alarmLifeEntity.getTriDate());
+		alarmLifeDto.setUpgrade(alarmLifeEntity.getUpgrade());
+		return alarmLifeDto;
 	}
 
 	@Override

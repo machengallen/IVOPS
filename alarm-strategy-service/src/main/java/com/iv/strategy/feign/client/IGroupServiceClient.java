@@ -1,4 +1,4 @@
-package com.iv.aggregation.feign.clients;
+package com.iv.strategy.feign.client;
 
 import java.util.List;
 
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import com.iv.common.requestInterceptor.FeignClientsConfigurationCustom;
 import com.iv.common.response.ResponseDto;
-import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupIdsDto;
 import com.iv.enter.dto.GroupQuery;
 import com.iv.enter.dto.OpsGroupDto;
@@ -22,7 +21,7 @@ public interface IGroupServiceClient extends IGroupService {
 }
 
 @Component
-class GroupServiceClientFallBack implements IGroupServiceClient {
+class GroupServiceClientFallBack implements IGroupServiceClient{
 
 
 	@Override
@@ -91,6 +90,5 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
 }

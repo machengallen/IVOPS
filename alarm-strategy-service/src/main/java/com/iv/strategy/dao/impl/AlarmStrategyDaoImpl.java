@@ -157,7 +157,7 @@ public class AlarmStrategyDaoImpl implements IAlarmStrategyDao {
 				if (!StringUtils.isEmpty(query.getItemType())) {
 					hql.append(" and a.itemType = ").append("'").append(query.getItemType()).append("'");
 				}
-				strategypaging.setCount(ses.createQuery(hql.toString()).list().size());
+				strategypaging.setCount((long)ses.createQuery("select count(*) " + hql.toString()).uniqueResult());
 				strategypaging.setStrategies(ses.createQuery(hql.append("order by a.severity").toString())
 						.setFirstResult(curItems).setMaxResults(item).list());
 				return strategypaging;

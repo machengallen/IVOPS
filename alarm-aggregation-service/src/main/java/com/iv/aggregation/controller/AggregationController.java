@@ -52,7 +52,7 @@ public class AggregationController {
 	 * @param request
 	 * @return
 	 */
-	@ApiOperation("获取三方告警接入令牌")
+	@ApiOperation(value = "获取第三方告警接入令牌", notes = "84100")
 	@GetMapping("/proxy/access")
 	public ResponseDto alarmProxyAccess(HttpServletRequest request) {
 
@@ -80,7 +80,7 @@ public class AggregationController {
 	 * @throws IOException 
 	 * @throws Exception
 	 */
-	@ApiOperation("开放告警接收入口")
+	@ApiOperation(value = "REST告警接收", notes = "84101")
 	@PostMapping("/openalarm")
 	public String alarmProcessing(@RequestBody AlarmMessageInput ami) {
 		//日志记录

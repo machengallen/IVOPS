@@ -30,8 +30,8 @@ public interface IAlarmLifeDao {
 	
 	AlarmLifeEntity selectAlarmLifeById(String id, String tenantId) throws RuntimeException;
 
-	void updateAlarmStatus(String alarmId, Integer hireHandlerCurrent, Integer hireHandlerLast,
-			AlarmRecoveryEntity recovery, AlarmStatus alarmStatus, Byte upgrade) throws RuntimeException;
+	/*void updateAlarmStatus(String alarmId, Integer hireHandlerCurrent, Integer hireHandlerLast,
+			AlarmRecoveryEntity recovery, AlarmStatus alarmStatus, Byte upgrade) throws RuntimeException;*/
 
 	void updateAlarmLife(AlarmLifeEntity alarmLifeEntity)throws RuntimeException;
 	

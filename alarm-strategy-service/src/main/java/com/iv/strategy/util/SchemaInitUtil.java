@@ -1,4 +1,4 @@
-package com.iv.aggregation.util;
+package com.iv.strategy.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,11 +42,6 @@ public class SchemaInitUtil {
 			// 初始化租户的业务库表
 			String schemataSql = "SELECT sc.SCHEMA_NAME FROM information_schema.SCHEMATA sc where sc.SCHEMA_NAME like 's80%' or sc.SCHEMA_NAME like 't80%'";
 			sqlStatement(connection, schemataSql, ConstantContainer.BUS_SQL_SCRIPT_NAME);
-
-			// 初始化基础知识库表
-			/*schemataSql = "SELECT sc.SCHEMA_NAME FROM information_schema.SCHEMATA sc where sc.SCHEMA_NAME='"
-					+ ConstantContainer.KNOWLEDGE_DB_ID + "'";
-			sqlStatement(connection, schemataSql, ConstantContainer.KNOWLEDGE_SQL_SCRIPT_NAME);*/
 
 		} catch (SQLException e) {
 			LOGGER.error("**********table update failed**********", e);

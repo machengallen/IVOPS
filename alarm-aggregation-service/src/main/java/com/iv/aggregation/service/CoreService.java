@@ -102,11 +102,7 @@ public class CoreService {
 		strategyQuery.setSeverity(alarmSourceEntity.getSeverity());
 		strategyQuery.setItemType(alarmLifeEntity.getItemType());
 		strategyQuery.setTenantId(alarmSourceEntity.getTenantId());
-		ResponseDto responseDto = alarmStrategyClient.getStrategy(strategyQuery);
-		AlarmStrategyDto dispatchStrategy = null;
-		if(null != responseDto) {
-			dispatchStrategy = (AlarmStrategyDto)responseDto.getData();
-		}
+		AlarmStrategyDto dispatchStrategy = alarmStrategyClient.getStrategy(strategyQuery);
 		
 		int delayTime;// 单位秒
 		if (null != dispatchStrategy) {

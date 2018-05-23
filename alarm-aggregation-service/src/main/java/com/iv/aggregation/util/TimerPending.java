@@ -71,7 +71,7 @@ public class TimerPending implements Runnable {
 		strategyQuery.setSeverity(alarmSourceEntity.getSeverity());
 		strategyQuery.setItemType(alarmLifeEntity.getItemType());
 		strategyQuery.setTenantId(alarmSourceEntity.getTenantId());
-		AlarmStrategyDto dispatchStrategy = (AlarmStrategyDto)alarmStrategyClient.getStrategy(strategyQuery).getData();
+		AlarmStrategyDto dispatchStrategy = alarmStrategyClient.getStrategy(strategyQuery);
 		
 		Map<String, AlarmSourceEntity> map = (Map<String, AlarmSourceEntity>) redisTemplate.opsForValue()
 				.get(this.alarmSourceEntity.getTenantId());

@@ -9,6 +9,7 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
@@ -40,6 +41,7 @@ public class SwaggerConfig {
                 .forCodeGeneration(true)
                 .pathMapping("/")// base，最终调用接口后会和paths拼接在一起
                 .select()
+                .apis(RequestHandlerSelectors.basePackage("com.iv"))
                 .build()
                 .globalOperationParameters(pars)
                 .apiInfo(devApiInfo());

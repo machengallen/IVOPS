@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.aggregation.api.constant.StrategyCycle;
+import com.iv.aggregation.api.dto.AlarmPagingDto;
 import com.iv.aggregation.api.dto.AlarmQueryDto;
 import com.iv.aggregation.api.dto.AlarmTransferDto;
 import com.iv.common.response.ResponseDto;
@@ -36,7 +37,7 @@ public interface IAlarmAggregationService {
 	 * @return
 	 */
 	@RequestMapping(value = "/get/myAlarm", method = RequestMethod.POST)
-	ResponseDto getMyAlarmPaging(@RequestBody AlarmQueryDto query);
+	AlarmPagingDto getMyAlarmPaging(@RequestBody AlarmQueryDto query);
 	
 	/**
 	 * 查询所有告警
@@ -44,7 +45,7 @@ public interface IAlarmAggregationService {
 	 * @return
 	 */
 	@RequestMapping(value = "/get/alarm", method = RequestMethod.POST)
-	ResponseDto getAlarmPaging(@RequestBody AlarmQueryDto query);
+	AlarmPagingDto getAlarmPaging(@RequestBody AlarmQueryDto query);
 	
 	/**
 	 * 修改告警数据清理频率
@@ -61,5 +62,13 @@ public interface IAlarmAggregationService {
 	 */
 	@RequestMapping(value = "/update/store", method = RequestMethod.GET)
 	ResponseDto updateAlarmCleanCycle(@RequestParam("cycle") StrategyCycle cycle);
+	
+	/**
+	 * 获取告警详情
+	 * @param lifeId
+	 * @return
+	 */
+	@RequestMapping(value = "/get/alarm/details", method = RequestMethod.GET)
+	ResponseDto getAlarmDetails(@RequestParam("lifeId")String lifeId);
 	
 }

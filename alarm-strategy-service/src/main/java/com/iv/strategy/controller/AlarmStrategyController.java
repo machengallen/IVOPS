@@ -28,6 +28,8 @@ import com.iv.common.enumeration.ItemType;
 import com.iv.common.enumeration.Severity;
 import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.JWTUtil;
+import com.iv.enter.dto.GroupIdsDto;
+import com.iv.outer.dto.GroupEntityDto;
 import com.iv.strategy.api.constant.ErrorMsg;
 import com.iv.strategy.api.constant.OpsStrategy;
 import com.iv.strategy.api.constant.StrategyCycle;
@@ -42,9 +44,13 @@ import com.iv.strategy.dao.impl.AlarmStrategyDaoImpl;
 import com.iv.strategy.entity.AlarmStrategyEntity;
 import com.iv.strategy.entity.StrategyLogEntity;
 import com.iv.strategy.feign.client.IAlarmAggregationClient;
+import com.iv.strategy.feign.client.IGroupServiceClient;
+import com.iv.strategy.front.dto.AlarmStrategyFrontDto;
+import com.iv.strategy.front.dto.StrategyPagingDto;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @Api(description = "告警策略管理系列接口")
@@ -54,22 +60,28 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	private static final IAlarmStrategyDao ALARM_STRATEGY_DAO = AlarmStrategyDaoImpl.getInstance();
 
 	@Autowired
+	private IGroupServiceClient groupServiceClient;
+	@Autowired
 	private IAlarmAggregationClient alarmAggregationClient;
+
+	@ApiIgnore
 	@ApiOperation("查询指定分派策略")
 	@Override
-	public ResponseDto getStrategy(StrategyQueryDto queryDto) {
+	public AlarmStrategyDto getStrategy(@RequestBody StrategyQueryDto queryDto) {
 		try {
-			AlarmStrategyEntity entity = ALARM_STRATEGY_DAO.selectStrategy(queryDto.getSeverity(), queryDto.getItemType(), queryDto.getTenantId());
+			AlarmStrategyEntity entity = ALARM_STRATEGY_DAO.selectStrategy(queryDto.getSeverity(),
+					queryDto.getItemType(), queryDto.getTenantId());
+			if(null == entity) {
+				return null;
+			}
 			AlarmStrategyDto dto = new AlarmStrategyDto();
 			BeanUtils.copyProperties(entity, dto, "logs");
-			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(dto);
-			return responseDto;
+			return dto;
 		} catch (RuntimeException e) {
 			LOGGER.error("系统内部错误：", e);
-			return ResponseDto.builder(ErrorMsg.CONFIG_STRATEGY_FAILED);
+			return null;
 		}
-		
+
 	}
 
 	/**
@@ -80,8 +92,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * @param prosessingUpgrade
 	 * @return
 	 */
+	@ApiOperation(value = "分派策略新增", notes = "84400")
 	@RequestMapping(value = "/config/strategy", method = RequestMethod.POST)
-	@ApiOperation("《管理员》分派策略配置")
 	public ResponseDto configStrategy(HttpServletRequest request, @RequestBody UpgadeStrategyDto upgadeStrategy) {
 		try {
 			if (!upgadeStrategy.no0check()) {
@@ -106,11 +118,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			lifeStrategyEntity.setUpgradeTime(upgadeStrategy.getUpgradeTime());
 			lifeStrategyEntity.setSeverity(upgadeStrategy.getSeverities().get(0));
 			lifeStrategyEntity.setItemType(upgadeStrategy.getItemTypes().get(0));
-			List<Short> groupIds = new ArrayList<Short>();
-			for (Short groupId : upgadeStrategy.getGroupIds()) {
-				groupIds.add(groupId);
-			}
-			lifeStrategyEntity.setGroupIds(groupIds);
+			lifeStrategyEntity.setGroupIds(upgadeStrategy.getGroupIds());
 			lifeStrategyEntity.setNoticeModel(upgadeStrategy.getNoticeModel());
 			lifeStrategyEntity.setLogs(strategyLogs);
 			ALARM_STRATEGY_DAO.saveStrategy(lifeStrategyEntity);
@@ -127,15 +135,27 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
+	@ApiOperation(value = "分派策略查询", notes = "84401")
 	@RequestMapping(value = "/get/strategy/page", method = RequestMethod.POST)
-	@ApiOperation("查询分派策略(分页)")
 	public ResponseDto getStrategyPaging(@RequestBody StrategyQueryDto query) {
 
 		try {
-			StrategyPaging strategyPaging = ALARM_STRATEGY_DAO
+			StrategyPaging pagingEntity = ALARM_STRATEGY_DAO
 					.selectByCurPage((query.getCurPage() - 1) * query.getItems(), query.getItems(), query);
+			StrategyPagingDto pagingDto = new StrategyPagingDto();
+			pagingDto.setCount(pagingEntity.getCount());
+			List<AlarmStrategyFrontDto> strategies = new ArrayList<AlarmStrategyFrontDto>(1); 
+			for (AlarmStrategyEntity strategyEntity : pagingEntity.getStrategies()) {
+				AlarmStrategyFrontDto strategyFrontDto = new AlarmStrategyFrontDto();
+				BeanUtils.copyProperties(strategyEntity, strategyFrontDto, "groupIds");
+				List<GroupEntityDto> groupEntityDtos = groupServiceClient
+						.groupsInfo(new GroupIdsDto(strategyEntity.getGroupIds()));
+				strategyFrontDto.setGroups(groupEntityDtos);
+				strategies.add(strategyFrontDto);
+			}
+			pagingDto.setStrategies(strategies);
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(strategyPaging);
+			responseDto.setData(pagingDto);
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("系统内部错误：", e);
@@ -148,8 +168,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
+	@ApiOperation(value = "策略配置完整度查询", notes = "84402")
 	@RequestMapping(value = "/get/strategy/all", method = RequestMethod.GET)
-	@ApiOperation("查询分派策略(全部)")
 	public ResponseDto getAllStrategy(HttpServletRequest request) {
 
 		try {
@@ -163,7 +183,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			int itempTypes = ItemType.values().length;
 			int totlalCount = severities * itempTypes;
 			Map<String, Object> map = new HashMap<>();
-			Set roles = ((Map)JWTUtil.getJWtJson(request.getHeader("Authorization")).get("permissions")).keySet();
+			Set roles = ((Map) JWTUtil.getJWtJson(request.getHeader("Authorization")).get("permissions")).keySet();
 			map.put("curHireRoles", roles);
 			map.put("netPercentage", getPercentage(netCount, severities));
 			map.put("systemPercentage", getPercentage(systemCount, severities));
@@ -171,7 +191,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			map.put("virtualPercentage", getPercentage(virtualCount, severities));
 			map.put("softwarePercentage", getPercentage(softwareCount, severities));
 			map.put("undefinedPercentage", getPercentage(undefinedCount, severities));
-			map.put("totalPercentage", getPercentage(ALARM_STRATEGY_DAO.selectAll().getCount(), totlalCount));
+			map.put("totalPercentage", getPercentage((int) ALARM_STRATEGY_DAO.selectAll().getCount(), totlalCount));
 			map.put("strategies", ALARM_STRATEGY_DAO.selectAll().getStrategies());
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
 			responseDto.setData(map);
@@ -181,7 +201,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			return ResponseDto.builder(ErrorMsg.GET_STRATEGY_FAILED);
 		}
 	}
-	
+
 	private String getPercentage(int itemTypeCount, int severities) {
 		NumberFormat numberFormat = NumberFormat.getInstance();
 		numberFormat.setMaximumFractionDigits(2);
@@ -194,8 +214,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * 
 	 * @return
 	 */
+	@ApiOperation(value = "分派策略查询（id批量）", notes = "84403")
 	@RequestMapping(value = "/get/strategy/ids", method = RequestMethod.POST)
-	@ApiOperation("查询指定id的分派策略")
 	public ResponseDto getTargetStrategy(@RequestBody IdListDto ids) {
 
 		try {
@@ -229,7 +249,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			strategy.setIdList(idList);
 			strategy.setSeverities(severities);
 			strategy.setItemTypes(itemTypes);
-			
+
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
 			responseDto.setData(strategy);
 			return responseDto;
@@ -238,7 +258,7 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			return ResponseDto.builder(ErrorMsg.GET_STRATEGY_FAILED);
 		}
 	}
-	
+
 	/**
 	 * 将告警类型转换为中文描述
 	 * 
@@ -271,8 +291,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	 * @param id
 	 * @return
 	 */
+	@ApiOperation(value = "分派策略删除", notes = "84404")
 	@RequestMapping(value = "/del/strategy", method = RequestMethod.POST)
-	@ApiOperation("《管理员》删除分派策略")
 	public ResponseDto delStrategies(@RequestBody IdListDto list) {
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -287,8 +307,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 
 	}
 
+	@ApiOperation(value = "告警数据清理频率配置", notes = "84405")
 	@RequestMapping(value = "/config/clean", method = RequestMethod.GET)
-	@ApiOperation("《管理员》配置告警数据清理频率")
 	public ResponseDto setAlarmCleanQuartz(@RequestParam String exp) {
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -302,12 +322,13 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 		}
 	}
 
+	@ApiOperation(value = "告警数据保留周期配置", notes = "84406")
 	@RequestMapping(value = "/config/store", method = RequestMethod.GET)
-	@ApiOperation("《管理员》配置告警数据保留周期")
 	public ResponseDto setAlarmCleanCycle(@RequestParam StrategyCycle cycle) {
 		ResponseDto responseDto = new ResponseDto();
 		try {
-			alarmAggregationClient.updateAlarmCleanCycle(com.iv.aggregation.api.constant.StrategyCycle.valueOf(cycle.name()));
+			alarmAggregationClient
+					.updateAlarmCleanCycle(com.iv.aggregation.api.constant.StrategyCycle.valueOf(cycle.name()));
 			responseDto.setErrorMsg(ErrorMsg.OK);
 			return responseDto;
 		} catch (Exception e) {
@@ -318,10 +339,11 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	}
 
 	@Override
+	@ApiIgnore
 	@ApiOperation("校验是否存在组相关策略")
 	public boolean strategyExist(short groupId) {
 		int count = ALARM_STRATEGY_DAO.countByGroupId(groupId);
-		if(count > 0) {
+		if (count > 0) {
 			return true;
 		}
 		return false;
