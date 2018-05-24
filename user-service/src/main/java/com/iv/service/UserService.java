@@ -7,6 +7,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.JWTUtil;
 import com.iv.dao.impl.LocalAuthDaoImpl;
 import com.iv.dao.impl.UserOauthDaoImpl;
 import com.iv.dto.ErrorMsg;
@@ -45,14 +48,22 @@ public class UserService {
 	private WechatServiceClient wechatService;
 	@Autowired
 	private StringRedisTemplate stringtemplate;
-	@Autowired
-	private Md5PasswordEncoder md5PasswordEncoder;
+	/*@Autowired
+	private Md5PasswordEncoder md5PasswordEncoder;*/
+	private Md5PasswordEncoder md5PasswordEncoder = new Md5PasswordEncoder(); 
+	
+	/**
+	 * 获取用户信息
+	 * @param request
+	 * @return
+	 */
+	public LocalAuthDto getUserInfo(HttpServletRequest request) {
+		int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
+		return selectLocalAuthById(userId);
+	}
 	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
-		UserOauth userOauth = userOauthDao.selectUserOauthByUnionid(unionid, loginType);
-		UserOauthDto userOauthDto = new UserOauthDto();
-		BeanCopier copy=BeanCopier.create(UserOauth.class, UserOauthDto.class, false);
-		copy.copy(userOauth, userOauthDto, null);
-		return userOauthDto;
+		UserOauth userOauth = userOauthDao.selectUserOauthByUnionid(unionid, loginType);		
+		return convertUserOauthDto(userOauth);
 	}
 	
 	public LocalAuthDto selectLocalAuthById(int userId) {
@@ -74,14 +85,14 @@ public class UserService {
 			dto.setErrorMsg(ErrorMsg.USER_NOT_EXIST);
 			return dto;
 		}
-		if(ifLoginTypeExist(localAuth,LoginType.WECHAT.toString())) {
+		if(ifLoginTypeExist(localAuth.getId(),LoginType.WECHAT)) {
 			//该账号已绑定其他微信
 			dto.setErrorMsg(ErrorMsg.ACCOUNT_HAS_WECHAT_BOUNDED);
 			return dto;
 		}
-		Md5PasswordEncoder encoder = new Md5PasswordEncoder();
-		if(StringUtils.isEmpty(accountDto.getPassWord()) || !encoder.encodePassword(accountDto.getPassWord(), 
-				null).equals(accountDto.getPassWord())) {				
+		//Md5PasswordEncoder encoder = new Md5PasswordEncoder();
+		if(StringUtils.isEmpty(accountDto.getPassWord()) || !md5PasswordEncoder.encodePassword(accountDto.getPassWord(), 
+				null).equals(localAuth.getPassWord())) {				
 			//用户名或密码不正确
 			dto.setErrorMsg(ErrorMsg.AUTH_ILLEGAL);
 			return dto;
@@ -91,8 +102,7 @@ public class UserService {
 		userOauth.setUserId(localAuth.getId());
 		userOauth.setLoginType(LoginType.WECHAT);
 		userOauth.setUnionid(accountDto.getUnionid());
-		localAuth.getUserOauthes().add(userOauth);
-		localAuthDao.saveOrUpdateLocalAuth(localAuth);
+		userOauthDao.saveOrUpdateUserOauth(userOauth);
 		dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
 		return dto;
 	}
@@ -124,13 +134,17 @@ public class UserService {
 				localAuth.setUserName(userName);
 				localAuth.setPassWord(passWord);
 				localAuth.setTel(accountDto.getTel());
+				localAuth.setEmail(accountDto.getEmail());
+				localAuth.setNickName(accountDto.getNickName());
+				localAuth.setRealName(accountDto.getRealName());
 				localAuth = localAuthDao.saveOrUpdateLocalAuth(localAuth);
-				UserOauth userOauth = new UserOauth();
-				userOauth.setUserId(localAuth.getId());
-				userOauth.setLoginType(LoginType.WECHAT);
-				userOauth.setUnionid(accountDto.getUnionid());
-				localAuth.getUserOauthes().add(userOauth);
-				localAuthDao.saveOrUpdateLocalAuth(localAuth);
+				if(!StringUtils.isEmpty(accountDto.getUnionid())) {
+					UserOauth userOauth = new UserOauth();
+					userOauth.setUserId(localAuth.getId());
+					userOauth.setLoginType(LoginType.WECHAT);
+					userOauth.setUnionid(accountDto.getUnionid());
+					userOauthDao.saveOrUpdateUserOauth(userOauth);
+				}				
 				dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
 				return dto;
 			} else {
@@ -175,16 +189,10 @@ public class UserService {
 	 * @return
 	 */
 	@SuppressWarnings("unlikely-arg-type")
-	public boolean ifLoginTypeExist(LocalAuth localAuth, String loginType) {
-		Set<UserOauth> userOauths = new HashSet<UserOauth>();
-		userOauths = localAuth.getUserOauthes();
-		if(userOauths.size() > 0) {
-			for (UserOauth userOauth : userOauths) {
-				if(userOauth.getLoginType().equals(loginType)) {
-					return true;
-				}
-			}
-			return false;
+	public boolean ifLoginTypeExist(int userId, LoginType loginType) {
+		UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
+		if(null != userOauth) {
+			return true;
 		}else {
 			return false;
 		}
@@ -196,8 +204,9 @@ public class UserService {
 	 * @param loginType
 	 * @return
 	 */
-	public String selectUserWechatUnionid(int userId, String loginType) {
-		return userOauthDao.selectUserWechatUnionid(userId, loginType);
+	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
+		UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
+		return convertUserOauthDto(userOauth);
 	}
 	
 	/**
@@ -206,7 +215,7 @@ public class UserService {
 	 * @return
 	 */
 	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery){
-		String loginType = usersWechatsQuery.getLoginType();
+		LoginType loginType = usersWechatsQuery.getLoginType();
 		List<Integer> userIds = usersWechatsQuery.getUserIds();
 		LocalAuthDto localAuthDto = new LocalAuthDto();
 		List<LocalAuthDto> UserInfos = new ArrayList<LocalAuthDto>();
@@ -214,9 +223,11 @@ public class UserService {
 			LocalAuth localAuth = localAuthDao.selectLocalAuthById(userId);
 			localAuthDto = convertLocalAuthDto(localAuth);
 			if(!StringUtils.isEmpty(usersWechatsQuery.getLoginType())) {
-				String unionid = userOauthDao.selectUserWechatUnionid(userId, loginType);
-				UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(unionid);
-				localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
+				UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
+				if(null != userOauth) {
+					UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());					
+					localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
+				}				
 			}							
 			UserInfos.add(localAuthDto);
 		}
@@ -241,19 +252,19 @@ public class UserService {
 		LocalAuth localAuth = localAuthDao.selectLocalAuthById(accountDto.getUserId());
 		//更改真实姓名
 		if(!StringUtils.isEmpty(accountDto.getRealName())) {
-			localAuth.setUserName(accountDto.getRealName());
+			localAuth.setRealName(accountDto.getRealName());
 		}
 		//更改昵称
 		if(!StringUtils.isEmpty(accountDto.getNickName())) {
-			localAuth.setUserName(accountDto.getNickName());
+			localAuth.setNickName(accountDto.getNickName());
 		}		
 		//更改电话
 		if(!StringUtils.isEmpty(accountDto.getTel())) {
-			localAuth.setUserName(accountDto.getTel());
+			localAuth.setTel(accountDto.getTel());
 		}
 		//更改租户id
 		if(!StringUtils.isEmpty(accountDto.getCurTenantId())) {
-			localAuth.setUserName(accountDto.getCurTenantId());
+			localAuth.setCurTenantId(accountDto.getCurTenantId());
 		}
 		//更改密码
 		String passWord = accountDto.getPassWord();
@@ -261,7 +272,7 @@ public class UserService {
 		String passWord2 = accountDto.getPassWord2();
 		if (!StringUtils.isEmpty(passWord) && !StringUtils.isEmpty(passWord1) && !StringUtils.isEmpty(passWord2)) {
 			// 检验原密码
-			/*if (!md5PasswordEncoder.encodePassword(passWord, null).equals(localAuth.getPassWord())) {
+			if (!md5PasswordEncoder.encodePassword(passWord, null).equals(localAuth.getPassWord())) {
 				dto.setErrorMsg(ErrorMsg.AUTH_ILLEGAL);
 				return dto;
 			}
@@ -271,7 +282,7 @@ public class UserService {
 			} else {
 				dto.setErrorMsg(ErrorMsg.PASSWORD_DIFF);
 				return dto;
-			}*/
+			}
 		}
 		localAuth = localAuthDao.saveOrUpdateLocalAuth(localAuth);
 		dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
@@ -284,10 +295,28 @@ public class UserService {
 	 * @return
 	 */
 	public LocalAuthDto convertLocalAuthDto(LocalAuth localAuth) {
-		LocalAuthDto localAuthDto = new LocalAuthDto();		
-		BeanCopier copy=BeanCopier.create(LocalAuth.class, LocalAuthDto.class, false);
-		copy.copy(localAuth, localAuthDto, null);
+		LocalAuthDto localAuthDto = null;	
+		if(null !=localAuth) {
+			localAuthDto = new LocalAuthDto();
+			BeanCopier copy=BeanCopier.create(LocalAuth.class, LocalAuthDto.class, false);
+			copy.copy(localAuth, localAuthDto, null);
+		}		
 		return localAuthDto;
+	}
+	
+	/**
+	 * 将UserOauth转为UserOauthDto
+	 * @param localAuth
+	 * @return
+	 */
+	public UserOauthDto convertUserOauthDto(UserOauth userOAuth) {
+		UserOauthDto userOAuthDto = null;	
+		if(null != userOAuth) {		
+			userOAuthDto = new UserOauthDto();
+			BeanCopier copy=BeanCopier.create(UserOauth.class, UserOauthDto.class, false);
+			copy.copy(userOAuth, userOAuthDto, null);
+		}		
+		return userOAuthDto;
 	}
 	
 	/**

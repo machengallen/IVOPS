@@ -17,13 +17,6 @@ public class WechatServiceClientFallBack implements WechatServiceClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-	@Override
-	public ResponseDto wxLoginCallBack(HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public String xxtInterface(WeChat wc) {
 		// TODO Auto-generated method stub
@@ -58,6 +51,12 @@ public class WechatServiceClientFallBack implements WechatServiceClient {
 	public boolean ifFocusWechat(int userId) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public ResponseDto wxLoginCallBack(String code, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
@@ -30,13 +31,14 @@ public class SwaggerConfig {
                 .forCodeGeneration(true)
                 .pathMapping("/")// base，最终调用接口后会和paths拼接在一起
                 .select()
+                .apis(RequestHandlerSelectors.basePackage("com.iv"))
                 .build()
                 .apiInfo(devApiInfo());
 	}
 	
 	 private ApiInfo devApiInfo() {
 	        return new ApiInfoBuilder()
-	            .title("运维机器人-智能监控(mas) API")//大标题
+	            .title("用户服务(/v1/user) API")//大标题
 	            .description("MAS Platform REST API, all the applications could access the Object model data via JSON.")//详细描述
 	            .version("1.0.0")//版本
 	            .termsOfServiceUrl("NO terms of service")

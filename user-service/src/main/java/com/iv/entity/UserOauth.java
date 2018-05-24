@@ -5,8 +5,11 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
 
 import com.iv.enumeration.LoginType;
 
@@ -22,7 +25,7 @@ public class UserOauth implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6863210001150090725L;
 	private String id;
 	/**用户Id*/
 	private int userId;
@@ -41,6 +44,8 @@ public class UserOauth implements Serializable {
 		this.unionid = unionid;
 	}
 	@Id
+	@GenericGenerator(name = "idGen", strategy = "uuid")
+	@GeneratedValue(generator = "idGen")
 	public String getId() {
 		return id;
 	}
