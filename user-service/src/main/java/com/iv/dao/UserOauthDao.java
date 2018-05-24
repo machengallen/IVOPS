@@ -15,7 +15,9 @@ public interface UserOauthDao {
 
 	UserOauth selectUserOauthByUnionid(String unionid, LoginType loginType) throws RuntimeException;
 	
-	String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException;
+	UserOauth selectUserWechatUnionid(int userId, LoginType loginType) throws RuntimeException;
 	
-	List<UserOauth> selectUsersWechatUnionid(List<Integer> userIds, String loginType);
+	List<UserOauth> selectUsersWechatUnionid(List<Integer> userIds, LoginType loginType) throws RuntimeException;
+	
+	UserOauth saveOrUpdateUserOauth(UserOauth userOauth) throws RuntimeException;
 }

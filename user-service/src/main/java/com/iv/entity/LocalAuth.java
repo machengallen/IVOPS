@@ -36,11 +36,10 @@ public class LocalAuth implements Serializable {
 	private String nickName;
 	private String email;
 	private String tel;
-	private String curTenantId;
-	private Set<UserOauth> UserOauthes;		
+	private String curTenantId;	
 
 	public LocalAuth(int id, String userName, String passWord, String realName, String nickName, String email,
-			String tel, String curTenantId, Set<UserOauth> userOauthes) {
+			String tel, String curTenantId) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -50,7 +49,6 @@ public class LocalAuth implements Serializable {
 		this.email = email;
 		this.tel = tel;
 		this.curTenantId = curTenantId;
-		UserOauthes = userOauthes;
 	}
 
 	public LocalAuth() {
@@ -110,15 +108,6 @@ public class LocalAuth implements Serializable {
 		this.curTenantId = curTenantId;
 	}
 	
-	@OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
-	public Set<UserOauth> getUserOauthes() {
-		return UserOauthes;
-	}
-
-	public void setUserOauthes(Set<UserOauth> userOauthes) {
-		UserOauthes = userOauthes;
-	}
-
 	public String getNickName() {
 		return nickName;
 	}

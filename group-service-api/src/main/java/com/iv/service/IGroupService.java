@@ -54,7 +54,7 @@ public interface IGroupService {
 	 * @return
 	 */
 	@RequestMapping(value = "/group/create", method = RequestMethod.POST)
-	ResponseDto createGroup(@RequestBody OpsGroupDto opsGroupDto);
+	ResponseDto createGroup(@RequestBody OpsGroupDto opsGroupDto, @RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 删除组
@@ -111,4 +111,12 @@ public interface IGroupService {
 	 */
 	@RequestMapping(value = "/select/groupsInfo", method = RequestMethod.POST)
 	List<GroupEntityDto> groupsInfo(@RequestBody GroupIdsDto groupIds);
+	
+	/**
+	 * 项目组下人员信息分页
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/select/tenantUserPageInfo", method = RequestMethod.POST)
+	ResponseDto selectTenantUserPageInfo(@RequestParam("request") HttpServletRequest request, @RequestBody GroupQuery groupQuery);
 }	

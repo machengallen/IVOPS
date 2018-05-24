@@ -7,11 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.jwt.Jwt;
-import org.springframework.security.jwt.JwtHelper;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
@@ -26,9 +23,10 @@ import com.iv.service.UserService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@Api(description = "用户与团队管理接口")
+@Api(description = "用户管理接口")
 public class UserController implements IUserService {
 
 	@Autowired
@@ -39,40 +37,27 @@ public class UserController implements IUserService {
 	 * 例子
 	 */
 	@Override
-	public LocalAuthDto getUserInfo() {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-				.getRequest();
-		String token = request.getHeader("cook");
+	@ApiOperation(value = "获取用户信息", notes = "82204")
+	public ResponseDto getUserInfo(HttpServletRequest request) {
 		ResponseDto dto = new ResponseDto();
 		try {
-			//Thread.sleep(3000);
-			//String token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw";
-//			Jwt jwt = JwtHelper.decode(token);			
-//			String jwt1 = jwt.getClaims();	
-//			JSONObject jsonObject = JSONObject.fromObject(jwt1);
-//			String username = jsonObject.get("user_name").toString();
-			LocalAuth user = new LocalAuth();
-			user.setUserName("mac@inno-view.cn");
-			user.setRealName("马成");
-			user.setId(1);
-			/*dto.setData(user);
-			dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);*/
-			return userService.convertLocalAuthDto(user);
+			LocalAuthDto localAuthDto = userService.getUserInfo(request);
+			dto.setData(localAuthDto);
+			dto.setErrorMsg(ErrorMsg.OK);
+			return dto;
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			
+			// TODO Auto-generated catch block			
 			LOGGER.error("系统内部错误", e);
 			dto.setErrorMsg(com.iv.common.response.ErrorMsg.UNKNOWN);
-			//return dto;
-		}
-		return null;
+			return dto;
+		}		
 	}
 	
 	@Override
 	@ApiOperation("查看用户是否已绑定三方登录")
+	@ApiIgnore
 	public UserOauthDto bindInfo(String unionid,LoginType loginType) {
 		// TODO Auto-generated method stub
-		Jwt jwt = JwtHelper.decode("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTAxNzQ2MDYsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiYWRtaW4iXSwianRpIjoiNTJhOGM5MTUtMTE2OS00YzU5LWI0MmEtZGY4ZDM0Y2QwZWU0IiwiY2xpZW50X2lkIjoiY2xpZW50Iiwic2NvcGUiOlsiYXBwIl19.GecJM-FHApwznyYl-D3IjB0TpjhdhUXfYv782kfS9vdT0VZsu2HN-MGb-N-6Hf0efZ_mmz54IahJaq3KTw251v4L2O5A1r_iMuUP7GXs_qPHAGn3K1b4l-mNnpJdH5hhS5zYIRqOX2a8DXyI4zD7g8BQL-9PiR3kj9k_z9nW8vY9l2_x5Kyoc-sehxxQ5uQHM3xu6DzOwBpbbER7U_NnUwmcz5nS9YyAexSDnBbZAVpQavL2s1yYQVMJ5Dreq2asXHFbeQHXu5UqVbbTFuOgAylbFJ9K-3nsGAKT9NbzqBPRovI3s_X9HgjrzJHAuojBMeK0QMbvYSbUg2HB7MNNJw");
 		try {
 			return userService.bindInfo(unionid, loginType);			
 		}catch(Exception e){			
@@ -96,8 +81,8 @@ public class UserController implements IUserService {
 	}
 
 	@Override
-	@ApiOperation("绑定平台账号")
-	public ResponseDto bindWechatInfo(AccountDto accountDto) {
+	@ApiOperation(value = "微信、QQ等绑定平台账号", notes = "82200")
+	public ResponseDto bindWechatInfo(@RequestBody AccountDto accountDto) {
 		// TODO Auto-generated method stub
 		ResponseDto dto = new ResponseDto();
 		try {
@@ -111,10 +96,10 @@ public class UserController implements IUserService {
 	}
 
 	@Override
-	@ApiOperation("注册平台账号")
-	public ResponseDto registerAccount(AccountDto accountDto) {
+	@ApiOperation(value = "注册平台账号", notes = "82201")
+	public ResponseDto registerAccount(@RequestBody AccountDto accountDto) {
 		// TODO Auto-generated method stub
-		ResponseDto dto = new ResponseDto();
+		ResponseDto dto = new ResponseDto(); 
 		try {
 			return userService.registerAccount(accountDto);			
 		} catch (Exception e) {
@@ -127,7 +112,8 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("获取用户unionid")
-	public String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException {
+	@ApiIgnore
+	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectUserWechatUnionid(userId, loginType);			
@@ -140,7 +126,8 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("根据用户id集合，查询用户信息")
-	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
+	@ApiIgnore
+	public List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectUserInfos(usersWechatsQuery);
@@ -153,6 +140,7 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("根据用户名称查询用户信息")
+	@ApiIgnore
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
 		// TODO Auto-generated method stub
 		try {
@@ -165,8 +153,8 @@ public class UserController implements IUserService {
 	}
 
 	@Override
-	@ApiOperation("更改用户信息")
-	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto){
+	@ApiOperation(value = "编辑个人信息", notes = "82202")
+	public ResponseDto saveOrUpdateUserAuth(@RequestBody AccountDto accountDto){
 		// TODO Auto-generated method stub		
 		try {			
 			return userService.saveOrUpdateLocalAuth(accountDto);
@@ -180,8 +168,8 @@ public class UserController implements IUserService {
 	}	
 
 	@Override
-	@ApiOperation("找回用户密码")
-	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
+	@ApiOperation(value = "找回密码", notes = "82203")
+	public ResponseDto findLocalAuthPassWord(@RequestBody AccountDto accountDto) {
 		// TODO Auto-generated method stub
 		ResponseDto dto = null;
 		try {
@@ -196,7 +184,8 @@ public class UserController implements IUserService {
 
 	@Override
 	@ApiOperation("根据用户列表id、登录方式查找联合主键")
-	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto) {
+	@ApiIgnore
+	public Set<String> selectUsersWechatUnionid(@RequestBody UsersQueryDto UsersQueryDto) {
 		// TODO Auto-generated method stub
 		try {
 			return userService.selectUsersWechatUnionid(UsersQueryDto);
@@ -207,144 +196,4 @@ public class UserController implements IUserService {
 		return null;
 	}
 	
-
-	/*@Override
-	public ResponseDto userOps(HttpSession session, UserSafeDto modifyInfo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto groupInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto groupDetailInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto groupUserPageInfo(GroupUserQuery groupUserQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto groupsInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto groupOps(GroupDto groupDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto qrcodeCreate(HttpSession session) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	
-
-	@Override
-	public ResponseDto getUsersInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto getUsersPageInfo(UserQuery userQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto getUsersPageFromParent(UserQuery userQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto getUsersWechat() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto resetPassword(UserSafeDto userInfo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void saveUsersInfo(UserWechatDto userWechatEntities) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void saveUserInfo(UserWechatEntityDto userWechatEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public LocalAuthDto selectUserAuthById(int eventKey) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public UserWechatEntityDto selectUserWechatById(String openId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void deleteUserInfoById(String openId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void unboundWechat(UserWechatEntityDto wechatEntity) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Boolean updateOpenId(UserWechatInfo weChatInfo) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public LocalAuthDto selectUserByOpenId(String openId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public LocalAuthDto selectUserByUserName(String userName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public ResponseDto saveUserAuth(LocalAuthDto localAuth) {
-		// TODO Auto-generated method stub
-		ResponseDto dto = new ResponseDto();
-		return dto;
-		
-	}
-*/
-
-	
-
 }
