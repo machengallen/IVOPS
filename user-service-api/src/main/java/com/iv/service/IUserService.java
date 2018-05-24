@@ -3,6 +3,9 @@ package com.iv.service;
 
 import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,7 +35,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/user/info", method = RequestMethod.GET)
-	ResponseDto getUserInfo();
+	ResponseDto getUserInfo(@RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 查看用户是否已绑定三方登录
