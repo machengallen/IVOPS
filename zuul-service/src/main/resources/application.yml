@@ -2,12 +2,17 @@ eureka:
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+  instance:
+    prefer-ip-address: true
 spring:
   profiles:
     active:
     - peer1
   application:
     name: zuul-service
+  http:
+    encoding:
+      enabled: true
 zuul:
   prefix: /v1
   sensitive-headers: Cookie,Set-Cookie
@@ -45,12 +50,39 @@ zuul:
     api-11:
       path: /authentication/**
       service-id: authentication-server
+    api-12:
+      path: /form/**
+      service-id: form-service
+    api-13:
+      path: /script/**
+      service-id: script-service
+    api-14:
+      path: /permission/**
+      service-id: permission-service
+    api-15:
+      path: /operation/script/**
+      service-id: operation-script-service
+    api-16:
+      path: /operation/vsphere/**
+      service-id: operation-vsphere-service
+    api-17:
+      path: /resource/**
+      service-id: resource-service
 
 ribbon:
   ReadTimeout: 5000
   ConnectTimeout: 5000
   MaxAutoRetries: 3
   MaxAutoRetriesNextServer: 1
+  
+iv:
+  public:
+    uris: /v1/wechat/**,
+          /login,
+          /v1/authentication/uaa/**,
+          /v1/alarm/aggregation/openalarm,
+          /v1/user/bind/wechatInfo,
+          /v1/user/register/account
 
 #jwt oauth2
 security:
@@ -75,9 +107,9 @@ security:
           -----END PUBLIC KEY-----
       id: zuul
       service-id: ${PREFIX:}zuul
-logging:
-  level:
-    org.springframework : DEBUG
+#logging:
+#  level:
+#    org.springframework : DEBUG
 ---
 spring:
   profiles: peer1
