@@ -1,13 +1,14 @@
-eureka:
+eureka:       
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
   instance:
     prefer-ip-address: true
+    status-page-url: http://10.10.9.55:${server.port}/swagger-ui.html
 spring:
   profiles:
     active:
-    - peer1
+    - peer2
   application:
     name: zuul-service
   http:
@@ -82,7 +83,10 @@ iv:
           /v1/authentication/uaa/**,
           /v1/alarm/aggregation/openalarm,
           /v1/user/bind/wechatInfo,
-          /v1/user/register/account
+          /v1/user/register/account,
+          /v1/**/v2/**,
+          /swagger-ui.html,
+          /swagger-resources/**
 
 #jwt oauth2
 security:
