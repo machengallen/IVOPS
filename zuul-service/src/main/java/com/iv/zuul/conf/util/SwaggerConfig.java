@@ -3,12 +3,14 @@ package com.iv.zuul.conf.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.ParameterBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.schema.ModelRef;
 import springfox.documentation.service.ApiInfo;
@@ -28,7 +30,6 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-
 	@Bean
 	public Docket devApi() {
 		//添加head参数start  
@@ -37,7 +38,7 @@ public class SwaggerConfig {
         tokenPar.name("Authorization").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();  
         pars.add(tokenPar.build());  
 		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName("dev")
+				/*.groupName("dev")
 				.genericModelSubstitutes(DeferredResult.class)
 				.useDefaultResponseMessages(true)
                 .forCodeGeneration(true)
@@ -46,7 +47,12 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("com.iv"))
                 .build()
                 .globalOperationParameters(pars)  
-                .apiInfo(devApiInfo());
+                .apiInfo(devApiInfo());*/
+				 .apiInfo(devApiInfo())
+		         .select()
+		         .apis(RequestHandlerSelectors.basePackage("com.iv"))
+		         .paths(PathSelectors.any())
+		         .build();
 	}
 	
 	 private ApiInfo devApiInfo() {
@@ -58,7 +64,7 @@ public class SwaggerConfig {
 	            .contact(new Contact("产品开发部", "http://mas.ivops.cn/login", "mac@inno-view.com"))//作者
 	            .license("The Apache License, Version 2.0")
 	            .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
-	            .build();
+	            .build();		 
 	 }
 	 
 	 @Bean

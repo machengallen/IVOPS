@@ -17,8 +17,22 @@ public class DocumentationConfig implements SwaggerResourcesProvider {
 	public List<SwaggerResource> get() {
 		// TODO Auto-generated method stub
 		List<SwaggerResource> resources = new ArrayList<SwaggerResource>();
-        resources.add(swaggerResource("团队服务", "/team/v2/api-docs", "1.0"));
-        resources.add(swaggerResource("用户服务", "/user/v2/api-docs", "1.0"));
+		resources.add(swaggerResource("用户服务", "/v1/user/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("微信服务", "/v1/wechat/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("告警服务", "/v1/alarm/aggregation/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("团队服务", "/v1/alarm/facade/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("策略服务", "/v1/alarm/strategy/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("租户服务", "/v1/tenant/mgt/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("邮箱服务", "/v1/email/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("团队服务", "/v1/group/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("通知服务", "/v1/message/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("报表服务", "/v1/alarm/report/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("工单服务", "/v1/form/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("脚本服务", "/v1/script/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("权限服务", "/v1/permission/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("团队服务", "/v1/operation/script/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("VMWare服务", "/v1/operation/vsphere/v2/api-docs", "1.0"));
+        resources.add(swaggerResource("资源服务", "/v1/resource/v2/api-docs", "1.0"));
         return resources;
 	}
 	private SwaggerResource swaggerResource(String name, String location, String version) {
