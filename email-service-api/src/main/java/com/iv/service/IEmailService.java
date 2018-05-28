@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.iv.common.enumeration.SendType;
 import com.iv.common.response.ResponseDto;
 import com.iv.dto.AlarmInfoTemplate;
+import com.iv.dto.FormInfoTemplate;
 
 
 public interface IEmailService {
@@ -25,4 +26,12 @@ public interface IEmailService {
 	 */
 	@RequestMapping(value = "/send/templateMessage", method = RequestMethod.POST)
 	ResponseDto alarmToMail(@RequestBody AlarmInfoTemplate alarmInfoTemplate);
+	
+	/**
+	 * 邮箱发送工单消息
+	 * @param alarmInfoTemplate
+	 * @return
+	 */
+	@RequestMapping(value = "/send/formMessage", method = RequestMethod.POST)
+	ResponseDto formToMail(@RequestBody FormInfoTemplate formInfoTemplate);
 }
