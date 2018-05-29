@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.TemplateFormMessageDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.dto.WeChat;
 import com.iv.entity.dto.UserWechatEntityDto;
@@ -83,4 +84,12 @@ public interface IWechatService {
 	 */
 	@RequestMapping(value = "/boolean/ifFocusWechat", method = RequestMethod.GET)
 	boolean ifFocusWechat(@RequestParam("userId") int userId);
+	
+	/**
+	 * 发送工单微信消息
+	 * @param templateFormMessageDto
+	 * @return
+	 */
+	@RequestMapping(value = "/form/weChatInfo", method = RequestMethod.POST)
+	ResponseDto SendFormWeChatInfo(@RequestBody TemplateFormMessageDto templateFormMessageDto);
 }
