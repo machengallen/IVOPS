@@ -1,5 +1,7 @@
 package com.iv.dto;
 
+import com.iv.common.enumeration.FormSendType;
+
 public class FormInfoTemplate {
 	private String[] toEmails;
 	private FormSendType formSendType;
