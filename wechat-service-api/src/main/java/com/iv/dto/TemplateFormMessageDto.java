@@ -15,7 +15,7 @@ public class TemplateFormMessageDto {
 	//详情页面路径
 	private String redirect_uri;
 	//发送主题
-	private FormSendType formSendType;
+	//private FormSendType formSendType;
 	//告警数据
 	private FormContent data;
 	public List<Integer> getUserIds() {
@@ -37,11 +37,11 @@ public class TemplateFormMessageDto {
 	public void setData(FormContent data) {
 		this.data = data;
 	}
-	public FormSendType getFormSendType() {
+	/*public FormSendType getFormSendType() {
 		return formSendType;
 	}
 	public void setFormSendType(FormSendType formSendType) {
 		this.formSendType = formSendType;
-	}
+	}*/
 			
 }
