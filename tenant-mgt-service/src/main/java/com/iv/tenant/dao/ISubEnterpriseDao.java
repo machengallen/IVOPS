@@ -2,6 +2,7 @@ package com.iv.tenant.dao;
 
 import java.util.List;
 
+import com.iv.tenant.api.dto.UserListDto;
 import com.iv.tenant.entity.EnterpriseEntity;
 import com.iv.tenant.entity.SubEnterpriseEntity;
 
@@ -17,6 +18,8 @@ public interface ISubEnterpriseDao {
 	
 	SubEnterpriseEntity selectById(int id) throws RuntimeException;
 	
+	SubEnterpriseEntity selectByIdentifier(String identifier) throws RuntimeException;
+	
 	List<SubEnterpriseEntity> selectByName(String name) throws RuntimeException;
 	
 	List<String> selectAllTenantId() throws RuntimeException;
@@ -26,4 +29,6 @@ public interface ISubEnterpriseDao {
 	void delById(int id) throws RuntimeException;
 	
 	List<SubEnterpriseEntity> selectByUserId(int userId) throws RuntimeException;
+	
+	UserListDto selectUsersByTenantId(String tenantId, int page, int items) throws RuntimeException;
 }

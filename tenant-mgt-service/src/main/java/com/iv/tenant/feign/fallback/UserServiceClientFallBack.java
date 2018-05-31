@@ -3,6 +3,8 @@ package com.iv.tenant.feign.fallback;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
@@ -73,13 +75,13 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	}
 
 	@Override
-	public ResponseDto getUserInfo() {
+	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
+	public ResponseDto getUserInfo(HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -26,10 +27,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return super.authenticationManager();
 	}
 	
-	/*@Bean
+	@Bean
 	protected Md5PasswordEncoder md5PasswordEncoder() {
 		return new Md5PasswordEncoder();
-	}*/
+	}
 	
 	protected void config(HttpSecurity http) throws Exception {
 		http.formLogin().loginPage("/login").permitAll().and().authorizeRequests().antMatchers("/health", "/css/**")
@@ -40,6 +41,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	protected void config(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(userDetailService);
 		auth.parentAuthenticationManager(authenticationManagerBean());
+	}
+	
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		// TODO Auto-generated method stub
+		auth.userDetailsService(userDetailService).passwordEncoder(md5PasswordEncoder());
+
+		/*
+		 * auth.inMemoryAuthentication() .withUser("admin") .password("123@abcd")
+		 * .roles("admin");
+		 */
 	}
 	
 }

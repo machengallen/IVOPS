@@ -35,7 +35,6 @@ public class SwaggerConfig {
         tokenPar.name("Authorization").description("令牌").modelRef(new ModelRef("string")).parameterType("header").required(false).build();  
         pars.add(tokenPar.build());
 		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName("dev")
 				.genericModelSubstitutes(DeferredResult.class)
 				.useDefaultResponseMessages(true)
                 .forCodeGeneration(true)
@@ -49,7 +48,7 @@ public class SwaggerConfig {
 	
 	 private ApiInfo devApiInfo() {
 	        return new ApiInfoBuilder()
-	            .title("告警策略管理 API")//大标题
+	            .title("告警策略管理 API(/v1/alarm/strategy/**)")//大标题
 	            .description("MAS Platform REST API, all the applications could access the Object model data via JSON.")//详细描述
 	            .version("1.0.0")//版本
 	            .termsOfServiceUrl("NO terms of service")

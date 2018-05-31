@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.tenant.api.dto.UserListDto;
 import com.iv.tenant.entity.EnterpriseEntity;
 import com.iv.tenant.entity.SubEnterpriseEntity;
 
@@ -46,8 +47,7 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.createQuery(
-						"from SubEnterpriseEntity s where s.enterprise=? order by s.id desc")
+				return ses.createQuery("from SubEnterpriseEntity s where s.enterprise=? order by s.id desc")
 						.setParameter(0, enterpriseEntity).setMaxResults(1).uniqueResult();
 			}
 		});
@@ -118,7 +118,7 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 	@Override
 	public List<SubEnterpriseEntity> selectAll() throws RuntimeException {
 		return (List<SubEnterpriseEntity>) HibernateTemplate.execute(new HibernateCallBack() {
-			
+
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				return ses.createQuery("from SubEnterpriseEntity").list();
@@ -135,6 +135,38 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 			public Object doInHibernate(Session ses) throws HibernateException {
 				return ses.createQuery("from SubEnterpriseEntity s join s.userIds u where u=?").setParameter(0, userId)
 						.list();
+			}
+		});
+	}
+
+	@Override
+	public SubEnterpriseEntity selectByIdentifier(String identifier) throws RuntimeException {
+		return (SubEnterpriseEntity) HibernateTemplate.execute(new HibernateCallBack() {
+
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				return ses.createQuery("from SubEnterpriseEntity s where s.subIdentifier=?").setParameter(0, identifier)
+						.uniqueResult();
+			}
+		});
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public UserListDto selectUsersByTenantId(String tenantId, int page, int items) throws RuntimeException {
+
+		return (UserListDto) HibernateTemplate.execute(new HibernateCallBack() {
+
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				UserListDto dto = new UserListDto();
+				dto.setTotal(
+						(long) ses.createQuery("select count(s.userIds) from SubEnterpriseEntity s where s.tenantId=?")
+								.setParameter(0, tenantId).uniqueResult());
+				dto.setUserIds(ses
+						.createQuery("select u from SubEnterpriseEntity s join s.userIds u where s.tenantId=?")
+						.setParameter(0, tenantId).setFirstResult((page - 1) * items).setMaxResults(items).list());
+				return dto;
 			}
 		});
 	}

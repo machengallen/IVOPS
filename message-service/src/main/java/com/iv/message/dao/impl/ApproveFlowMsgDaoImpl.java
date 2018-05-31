@@ -25,7 +25,7 @@ public class ApproveFlowMsgDaoImpl implements IApproveFlowMsgDao {
 				ses.saveOrUpdate(entity);
 				return null;
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		}, ConstantContainer.MESSAGE_DB);
 
 	}
 
@@ -53,7 +53,7 @@ public class ApproveFlowMsgDaoImpl implements IApproveFlowMsgDao {
 
 				return dto;
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		}, ConstantContainer.MESSAGE_DB);
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class ApproveFlowMsgDaoImpl implements IApproveFlowMsgDao {
 						.setParameter(0, confirmed).setParameterList("idList", ids).executeUpdate();
 				return null;
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		}, ConstantContainer.MESSAGE_DB);
 
 	}
 
@@ -80,7 +80,7 @@ public class ApproveFlowMsgDaoImpl implements IApproveFlowMsgDao {
 						.setParameter(0, confirmed).setParameter(1, userId).executeUpdate();
 				return null;
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		}, ConstantContainer.MESSAGE_DB);
 
 	}
 

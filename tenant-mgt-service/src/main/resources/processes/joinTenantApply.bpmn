@@ -11,6 +11,7 @@
       <extensionElements>
         <activiti:formProperty id="approved" name="joinApproved" type="boolean" required="true"></activiti:formProperty>
         <activiti:formProperty id="remark" name="remark" type="string"></activiti:formProperty>
+        <activiti:formProperty id="approver" name="approver" type="long" required="true"></activiti:formProperty>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="ApprovalTask"></sequenceFlow>

@@ -1,12 +1,12 @@
 package com.iv.authentication.service;
 
-import java.util.Collection;
 import java.util.HashSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,19 +14,34 @@ import org.springframework.stereotype.Service;
 
 import com.iv.authentication.feign.client.IUserServiceClient;
 import com.iv.authentication.pojo.LocalUser;
+import com.iv.common.util.spring.Constants;
 import com.iv.outer.dto.LocalAuthDto;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
 	@Autowired
 	private IUserServiceClient userServiceClient;
+	@Autowired
+	private Md5PasswordEncoder md5PasswordEncoder;
 	@Override
 	public UserDetails loadUserByUsername(String name) throws UsernameNotFoundException {
-		LocalAuthDto authDto = userServiceClient.selectLocalauthInfoByName(name);
-		if(null == authDto) {
+		
+		boolean f = name.endsWith(Constants.THREE_PARTY_LOGIN);
+		int lenth = Constants.THREE_PARTY_LOGIN.length();
+		LocalAuthDto authDto = null;
+		if(f) {
+			authDto = userServiceClient.selectLocalauthInfoByName(name.substring(0,name.length()-lenth));
+		} else {
+			authDto = userServiceClient.selectLocalauthInfoByName(name);
+		}
+		if (null == authDto) {
 			throw new UsernameNotFoundException("UserName " + name + " not found");
 		}
-		LocalUser localUser = new LocalUser(name, authDto.getPassWord(), new HashSet<GrantedAuthority>());
+		String passWord = authDto.getPassWord();
+		if(f) {
+			passWord = md5PasswordEncoder.encodePassword(authDto.getPassWord(), null);
+		}	
+		LocalUser localUser = new LocalUser(name, passWord, new HashSet<GrantedAuthority>());
 		localUser.setCurTenantId(authDto.getCurTenantId());
 		localUser.setEmail(authDto.getEmail());
 		localUser.setRealName(authDto.getRealName());

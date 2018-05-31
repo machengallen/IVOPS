@@ -63,12 +63,6 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 	}
 
 	@Override
-	public ResponseDto createGroup(OpsGroupDto opsGroupDto) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public ResponseDto deleteGroup(short groupId) {
 		// TODO Auto-generated method stub
 		return null;
@@ -88,6 +82,18 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 
 	@Override
 	public ResponseDto groupNameMod(short groupId, String groupName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto createGroup(OpsGroupDto opsGroupDto, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ResponseDto selectTenantUserPageInfo(HttpServletRequest request, GroupQuery groupQuery) {
 		// TODO Auto-generated method stub
 		return null;
 	}

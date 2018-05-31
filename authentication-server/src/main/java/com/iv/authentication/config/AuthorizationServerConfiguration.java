@@ -37,7 +37,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	 */
 	@Override
 	public void configure(final AuthorizationServerSecurityConfigurer security) throws Exception {
-		// TODO Auto-generated method stub
 		security.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
 	}
 	
@@ -47,13 +46,12 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	 */
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		// TODO Auto-generated method stub
 		clients.inMemory() // 使用in-memory存储 
 		.withClient(Constants.OAUTH2_CLIENT_ID) // client_id 
 		.secret(Constants.OAUTH2_CLIENT_SECRET) // client_secret 
 		.authorizedGrantTypes("password", "refresh_token") // 该client允许的授权类型
-		.accessTokenValiditySeconds(3600)
-		.refreshTokenValiditySeconds(3600)
+		//.accessTokenValiditySeconds(3600)
+		//.refreshTokenValiditySeconds(86400)
 		.scopes("read", "write")//允许的授权范围xin
 		.autoApprove(true); 
 		/*clients.inMemory()  
@@ -68,7 +66,6 @@ public class AuthorizationServerConfiguration extends AuthorizationServerConfigu
 	 */
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-		// TODO Auto-generated method stub
 		endpoints.authenticationManager(authenticationManager)//直接注入一个AuthenticationManager，自动开启密码授权类型
 		.userDetailsService(userDetailsService).accessTokenConverter(accessTokenConverter());//启动刷新token授权类型，会判断用户是否还是存活的
 	}

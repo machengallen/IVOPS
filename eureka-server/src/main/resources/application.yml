@@ -28,7 +28,8 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://${security.user.name}:${security.user.password}@10.10.31.21:8111/eureka/
-
+#      defaultZone: http://${security.user.name}:${security.user.password}@localhost:8111/eureka/
+#    register-with-eureka: false
 ---
 spring:
   profiles: dev-peer2

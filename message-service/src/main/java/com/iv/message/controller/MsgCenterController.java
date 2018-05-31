@@ -22,6 +22,7 @@ import com.iv.message.service.MsgCenterService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
 @Api(description = "消息中心系列接口")
@@ -31,7 +32,7 @@ public class MsgCenterController implements IMessageService {
 	@Autowired
 	private MsgCenterService service;
 
-	@ApiOperation("获取监控系统消息")
+	@ApiOperation(value = "监控系统消息查询", notes = "82700")
 	@GetMapping("/monitorSys")
 	public ResponseDto monitorSys(HttpServletRequest request, @RequestParam(required = true) MsgSysType type,
 			@RequestParam(required = true) int page, @RequestParam(required = true) int num) {
@@ -49,7 +50,7 @@ public class MsgCenterController implements IMessageService {
 		return dto;
 	}
 
-	@ApiOperation("获取租户管理系统消息")
+	@ApiOperation(value = "租户管理系统消息查询", notes = "82701")
 	@GetMapping("/tenantSys")
 	public ResponseDto tenantSys(HttpServletRequest request, @RequestParam(required = true) MsgSysType type,
 			@RequestParam(required = true) int page, @RequestParam(required = true) int num) {
@@ -67,7 +68,7 @@ public class MsgCenterController implements IMessageService {
 		return dto;
 	}
 
-	@ApiOperation("获取运营运维管理系统消息")
+	@ApiOperation(value = "运营运维管理系统消息查询", notes = "82702")
 	@GetMapping("/operationSys")
 	public ResponseDto operationSys(HttpServletRequest request, @RequestParam(required = true) MsgSysType type,
 			@RequestParam(required = true) int page, @RequestParam(required = true) int num) {
@@ -85,7 +86,7 @@ public class MsgCenterController implements IMessageService {
 		return dto;
 	}
 
-	@ApiOperation("清除消息")
+	@ApiOperation(value = "消息删除", notes = "82703")
 	@GetMapping("/clear")
 	public ResponseDto clear(HttpServletRequest request, @RequestParam(required = true) MsgSysType type,
 			@RequestParam(required = false) String id) {
@@ -107,6 +108,7 @@ public class MsgCenterController implements IMessageService {
 		return dto;
 	}
 
+	@ApiIgnore
 	@ApiOperation("生产待审批的申请消息")
 	@Override
 	public ResponseDto produceApproveMsg(String applicant, int approverId, String subEnterprise, String enterpriseName,
@@ -120,6 +122,7 @@ public class MsgCenterController implements IMessageService {
 		}
 	}
 
+	@ApiIgnore
 	@ApiOperation("生产审批结果消息")
 	@Override
 	public ResponseDto produceApplyMsg(int userId, boolean approved, String subEnterpriseName, String enterpriseName, String remark,
@@ -133,6 +136,7 @@ public class MsgCenterController implements IMessageService {
 		}
 	}
 
+	@ApiIgnore
 	@Override
 	@ApiOperation("生产告警消息")
 	public ResponseDto produceAlarmMsg(@RequestBody AlarmMsgDto alarmMsgDto) {
