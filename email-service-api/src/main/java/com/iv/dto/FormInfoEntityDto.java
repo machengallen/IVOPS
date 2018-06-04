@@ -5,6 +5,8 @@ public class FormInfoEntityDto {
 	private String 	formState;
 	/*需求单位*/
 	private String unitCode;
+	/*联系人电话*/
+	private String tel;
 	/*需求类别*/
 	private String demandTypeCode;
 	/*工单号*/
@@ -16,7 +18,7 @@ public class FormInfoEntityDto {
 	/*工单预期处理时间*/
 	private String formExpectEndTime;
 	/*工单预期结束时间*/
-	private String formApplyTime;
+	//private String formApplyTime;
 	/*工单需求*/
 	private String demandContent;
 		
@@ -62,17 +64,23 @@ public class FormInfoEntityDto {
 	public void setFormExpectEndTime(String formExpectEndTime) {
 		this.formExpectEndTime = formExpectEndTime;
 	}
-	public String getFormApplyTime() {
+	/*public String getFormApplyTime() {
 		return formApplyTime;
 	}
 	public void setFormApplyTime(String formApplyTime) {
 		this.formApplyTime = formApplyTime;
-	}
+	}*/
 	public String getDemandContent() {
 		return demandContent;
 	}
 	public void setDemandContent(String demandContent) {
 		this.demandContent = demandContent;
+	}
+	public String getTel() {
+		return tel;
+	}
+	public void setTel(String tel) {
+		this.tel = tel;
 	}
 	
 }
