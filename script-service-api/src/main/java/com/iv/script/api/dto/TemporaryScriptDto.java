@@ -1,14 +1,10 @@
 package com.iv.script.api.dto;
 
-import com.iv.common.enumeration.ItemType;
-
-public class ScriptDto {
-
+public class TemporaryScriptDto {
 	private int id;
 	private String name;// 文件名，自动生成
 	private String type;// 文本类型
 	private String alias;// 用户自定义别名
-	private ItemType itemType;// 业务类型	
 	public int getId() {
 		return id;
 	}
@@ -32,12 +28,6 @@ public class ScriptDto {
 	}
 	public void setAlias(String alias) {
 		this.alias = alias;
-	}
-	public ItemType getItemType() {
-		return itemType;
-	}
-	public void setItemType(ItemType itemType) {
-		this.itemType = itemType;
 	}
 	
 }

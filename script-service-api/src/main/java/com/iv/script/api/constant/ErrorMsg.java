@@ -20,7 +20,11 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	SCRIPT_DEL_PARTIAL_FAILED(46106, "脚本删除部分失败"),
 	
-	UPDATE_FAILED(46107, "更新失败");
+	UPDATE_FAILED(46107, "更新失败"),
+	
+	ITEMTYPE_SCRIPT_FAILED(46108, "领域脚本量统计"),
+	
+	PERSONAL_SCRIPT_FAILED(46109, "个人脚本贡献量统计");
 	
 	private int code;
     private String msg;
