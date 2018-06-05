@@ -1,5 +1,4 @@
 package com.iv.util;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.async.DeferredResult;
@@ -10,6 +9,7 @@ import springfox.documentation.service.ApiInfo;
 import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.UiConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
@@ -20,12 +20,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  */
 @Configuration
 @EnableSwagger2
-public class SwaggerConfig {
+public class SwaggerConfig {	
 
 	@Bean
 	public Docket devApi() {
 		return new Docket(DocumentationType.SWAGGER_2)
-				.groupName("dev")
 				.genericModelSubstitutes(DeferredResult.class)
 				.useDefaultResponseMessages(true)
                 .forCodeGeneration(true)
@@ -47,4 +46,10 @@ public class SwaggerConfig {
 	            .licenseUrl("http://www.apache.org/licenses/LICENSE-2.0.html")
 	            .build();
 	 }
+	 
+	 @Bean
+	    UiConfiguration uiConfig() {
+	        return new UiConfiguration(null, "list", "alpha", "schema",
+	                UiConfiguration.Constants.DEFAULT_SUBMIT_METHODS, false, true, 60000L);
+	    }
 }
