@@ -6,26 +6,34 @@ import com.iv.operation.script.util.ScriptSourceType;
 
 public class SingleTaskDto {
 
+	private Integer taskId;
 	private String taskName;// 作业任务名
 	private String taskDescription;// 任务描述
 	private ScriptSourceType scriptSrc;// 执行脚本来源
-	private int scriptId;// 脚本库文件id
 	private Set<String> scriptArgs;// 脚本执行传入参数
 	private int timeout;// 目标主机连接超时时间(毫秒)
 	
-	public SingleTaskDto(String taskName, String taskDescription, ScriptSourceType scriptSrc, int scriptId,
+	public SingleTaskDto(Integer taskId, String taskName, String taskDescription, ScriptSourceType scriptSrc,
 			Set<String> scriptArgs, int timeout) {
 		super();
+		this.taskId = taskId;
 		this.taskName = taskName;
 		this.taskDescription = taskDescription;
 		this.scriptSrc = scriptSrc;
-		this.scriptId = scriptId;
 		this.scriptArgs = scriptArgs;
 		this.timeout = timeout;
 	}
 	
 	public SingleTaskDto() {
 		super();
+	}
+
+	public Integer getTaskId() {
+		return taskId;
+	}
+
+	public void setTaskId(Integer taskId) {
+		this.taskId = taskId;
 	}
 
 	public String getTaskName() {
@@ -45,12 +53,6 @@ public class SingleTaskDto {
 	}
 	public void setScriptSrc(ScriptSourceType scriptSrc) {
 		this.scriptSrc = scriptSrc;
-	}
-	public int getScriptId() {
-		return scriptId;
-	}
-	public void setScriptId(int scriptId) {
-		this.scriptId = scriptId;
 	}
 	public Set<String> getScriptArgs() {
 		return scriptArgs;

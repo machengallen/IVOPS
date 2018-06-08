@@ -8,25 +8,24 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.TimeUnit;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jcraft.jsch.Channel;
 import com.jcraft.jsch.ChannelExec;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
 
 /**
  * ssh执行工具类
  * 
  * @author macheng 
- * 2018年5月24日 operation-script-service
+ * 2018年5月24日 
+ * operation-script-service
  * 
  */
 public class SSHExecutor {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(SSHExecutor.class);
+	//private static final Logger LOGGER = LoggerFactory.getLogger(SSHExecutor.class);
 	private Session session;
 
 	public SSHExecutor(Session session) throws JSchException {
@@ -77,25 +76,25 @@ public class SSHExecutor {
 	 * @throws JSchException
 	 * @throws InterruptedException
 	 */
-	public String exec(String cmd) throws IOException, JSchException, InterruptedException {
+	public String exec(String cmd) throws IOException, JSchException, InterruptedException{
 		ChannelExec channelExec = null;
 		StringBuffer buf = null;
-		//BufferedReader reader = null;
+		
+		
+		// read方式读取，ChannelShell模式下会阻塞
+		/*reader = new BufferedReader(new InputStreamReader(in, Charset.forName(charset)));
+		String buf = null;
+		while ((buf = reader.readLine()) != null) {
+		    System.out.println(buf);
+		}*/
 		try {
+			//BufferedReader reader = null;
 			channelExec = (ChannelExec) session.openChannel("exec");
 			channelExec.setCommand(cmd);
 			channelExec.setInputStream(null);
 			channelExec.setErrStream(System.err);
 			InputStream in = channelExec.getInputStream();
 			channelExec.connect();
-			
-			// read方式读取，ChannelShell模式下会阻塞
-			/*reader = new BufferedReader(new InputStreamReader(in, Charset.forName(charset)));
-			String buf = null;
-			while ((buf = reader.readLine()) != null) {
-			    System.out.println(buf);
-			}*/
-
 			int res = -1;
 			buf = new StringBuffer(1024);
 			byte[] tmp = new byte[1024];
@@ -112,18 +111,17 @@ public class SSHExecutor {
 					break;
 				}
 				TimeUnit.MILLISECONDS.sleep(100);
-			}
-			
-		} catch (Exception e) {
-			LOGGER.error("channelExce 执行异常", e);
+			} 
 		} finally {
 			/*try {
-                reader.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-			channelExec.disconnect();
-            //session.disconnect();
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+			if(null != channelExec) {
+				channelExec.disconnect();
+			}
+			//session.disconnect();
 		}
 		return buf == null ? null : buf.toString();
 	}
@@ -132,43 +130,73 @@ public class SSHExecutor {
 	 * sftp进行文件上传
 	 * @param session
 	 * @param uploadFileName
+	 * @throws JSchException 
+	 * @throws SftpException 
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public void sftp(Session session, String uploadFileName, InputStream fileStream) throws Exception {  
+	public void sftpPut(Session session, String uploadFileName, InputStream fileStream) throws JSchException, SftpException, IOException {  
 		ChannelSftp sftp = null;  
-        try {  
-            //创建sftp通信通道  
-        	sftp = (ChannelSftp) session.openChannel("sftp");  
-        	sftp.connect(Constant.CHANNEL_TIMEOUT);  
+          
 
-            //进入服务器指定的文件夹  
-            sftp.cd("/root");  
+        //列出指定的文件列表,可自定义保存位置 
+        /*Vector v = sftp.ls("/");  
+        for(int i=0; i < v.size(); i++){  
+            System.out.println(v.get(i));  
+        }*/
 
-            //列出指定的文件列表,可自定义保存位置 
-            /*Vector v = sftp.ls("/");  
-            for(int i=0; i < v.size(); i++){  
-                System.out.println(v.get(i));  
-            }*/
+        //要实现下载，对换以下流就可以
+        OutputStream outstream = null;  
+        //InputStream instream = new FileInputStream(new File(filePath));
 
-            //要实现下载，对换以下流就可以
-            OutputStream outstream = sftp.put(uploadFileName);  
-            //InputStream instream = new FileInputStream(new File(filePath));
-
-            byte b[] = new byte[1024];  
-            int n;  
-            while ((n = fileStream.read(b)) != -1) {  
-                outstream.write(b, 0, n);  
-            }  
-
-            outstream.flush();  
-            outstream.close();  
-            fileStream.close();  
-        } catch (Exception e) {  
-        	LOGGER.error("channelSftp 执行异常", e);
-        } finally {  
-            sftp.disconnect();  
-        }  
-    }  
+        try {
+			//创建sftp通信通道  
+			sftp = (ChannelSftp) session.openChannel("sftp");
+			sftp.connect(Constant.CHANNEL_TIMEOUT);
+			//进入服务器指定的文件夹  
+			sftp.cd("/root");
+			outstream = sftp.put(uploadFileName);
+			byte b[] = new byte[1024];
+			int n;
+			while ((n = fileStream.read(b)) != -1) {
+				outstream.write(b, 0, n);
+			}
+			outstream.flush();
+		} finally {
+			if(null != outstream) {
+				outstream.close();  
+			}
+			if(null != fileStream) {
+				fileStream.close();  
+			}
+			if(null != sftp) {
+				sftp.disconnect();  
+			}
+		}
+    }
+	
+	/**
+	 * 文件删除
+	 * @param session
+	 * @param uploadFileName
+	 * @throws JSchException 
+	 * @throws SftpException 
+	 */
+	public void sftpRm(Session session, String uploadFileName) throws JSchException, SftpException {
+		ChannelSftp sftp = null;
+		
+		try {
+			sftp = (ChannelSftp)session.openChannel("sftp");
+			sftp.connect(Constant.CHANNEL_TIMEOUT);
+			sftp.chmod(755, "/root/" + uploadFileName);
+			sftp.rm("/root/" + uploadFileName);
+			
+		} finally {
+			if(null != sftp) {
+				sftp.disconnect();  
+			}
+		}
+	}
 
 	public Session getSession() {
 		return this.session;
