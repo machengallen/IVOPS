@@ -3,6 +3,7 @@ package com.iv.script.api.service;
 import java.io.InputStream;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,7 +31,7 @@ public interface IScriptService {
 	 * @return
 	 */
 	@RequestMapping(value = "/temp/read", method = RequestMethod.GET)
-	InputStream tempRead(@RequestParam("scriptId") int scriptId);
+	ResponseEntity<byte[]> tempRead(@RequestParam("scriptId") int scriptId);
 
 	/**
 	 * 获取正式脚本库文件流
@@ -39,7 +40,7 @@ public interface IScriptService {
 	 * @return
 	 */
 	@RequestMapping(value = "/official/read", method = RequestMethod.GET)
-	InputStream officialRead(@RequestParam("scriptId") int scriptId);
+	ResponseEntity<byte[]> officialRead(@RequestParam("scriptId") int scriptId);
 
 	/**
 	 * 查询脚本库文件信息
