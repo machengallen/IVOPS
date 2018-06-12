@@ -1,13 +1,9 @@
 package com.iv.script.api.service;
 
-import java.io.InputStream;
-
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.iv.script.api.dto.ScriptDto;
 import com.iv.script.api.dto.TemporaryScriptDto;
@@ -20,9 +16,9 @@ public interface IScriptService {
 	 * @param inputStream
 	 * @return
 	 */
-	@RequestMapping(value = "/temp/write", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@RequestMapping(value = "/temp/write", method = RequestMethod.POST)
 	int tempWrite(@RequestParam("fileName") String fileName, @RequestParam("type") String type,
-			@RequestParam("fileStream") MultipartFile file);
+			@RequestParam("content") byte[] content);
 
 	/**
 	 * 获取临时文件流
