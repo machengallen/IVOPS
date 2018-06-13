@@ -9,12 +9,10 @@ public class PermissionDto {
 	private String description;
 	/*权限url*/
 	private String url;
-	/*是否需要订阅*/
-	private YesOrNo needSubscribe;
-	/*是否发布*/
-	private YesOrNo releaseOrNot;
 	/*是否有效*/
-	private YesOrNo isValid;
+	private YesOrNo isValid;	
+	/*服务类别*/
+	private String serviceType;
 	public String getCode() {
 		return code;
 	}
@@ -33,23 +31,19 @@ public class PermissionDto {
 	public void setUrl(String url) {
 		this.url = url;
 	}
-	public YesOrNo getNeedSubscribe() {
-		return needSubscribe;
-	}
-	public void setNeedSubscribe(YesOrNo needSubscribe) {
-		this.needSubscribe = needSubscribe;
-	}
-	public YesOrNo getReleaseOrNot() {
-		return releaseOrNot;
-	}
-	public void setReleaseOrNot(YesOrNo releaseOrNot) {
-		this.releaseOrNot = releaseOrNot;
-	}                                                                                                                                                                                              
+	                                                                                                                                                                                         
 	public YesOrNo getIsValid() {
 		return isValid;
 	}
 	public void setIsValid(YesOrNo isValid) {
 		this.isValid = isValid;
 	}
+	public String getServiceType() {
+		return serviceType;
+	}
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+	
 	
 }
