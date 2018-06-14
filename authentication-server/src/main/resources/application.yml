@@ -12,6 +12,18 @@ spring:
     - peer1
   application:
     name: authentication-server
+  #redis连接
+  redis:
+    host: 10.10.31.25
+    database: 2
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
 feign:
   hystrix:
     enabled: true    
@@ -32,7 +44,11 @@ logging:
 #iv:
 #  web:
 #    loginPage: http://10.10.9.25:7100/login
-   
+
+iv:
+  redis:
+    expireTime: 12
+
 ---
 spring:
   profiles: peer1
@@ -44,6 +60,8 @@ spring:
   profiles: peer1
 server:
   port: 8211
+
+
 
   
       
