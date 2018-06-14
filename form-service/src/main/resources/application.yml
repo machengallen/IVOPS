@@ -1,0 +1,73 @@
+server:
+  port: 9010
+eureka:
+  instance:
+    status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
+#    instance-id: ${spring.cloud.client.ipAddress}:${server.port}
+#    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+feign:
+  hystrix:
+    enabled: true
+#  command:
+#    default:
+#      execution:
+#        isolation:
+#          thread:
+#            timeoutInMilliseconds: 60000
+security:
+  basic:
+    enabled: false
+spring:
+  application:
+    name: form-service
+  http:
+    encoding:
+      enabled: true
+    multipart:
+      max-file-size: 10Mb
+      max-request-size: 10Mb
+  datasource:
+    url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false&useOldAliasMetadataBehavior=true
+    username: root
+    password: 123@abcd
+    driver-class-name: com.mysql.jdbc.Driver
+  jpa:
+    database: mysql
+    database-platform: mysql
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+    properties:
+      hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: root
+      hibernate.hbm2ddl.auto: update
+      hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+      hibernate.event.merge.entity_copy_observer: allow
+
+
+  ####校验流程文件，默认校验resources下的processes文件夹里的流程文件
+  activiti:
+      check-process-definitions: true
+
+iv:
+  upload:
+    savePath: E:\upload\form\
+    tempPath: E:\upload\form\temp\
+    #设置上传单个文件的大小的最大值，目前是设置为1024*1024字节，也就是1MB
+    fileSizeMax: 1048576
+    #设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
+    sizeMax: 10485760
+
+
+
+
+
+
+    
+
