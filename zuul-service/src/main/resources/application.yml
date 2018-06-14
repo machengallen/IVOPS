@@ -4,7 +4,7 @@ eureka:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
   instance:
     prefer-ip-address: true
-    status-page-url: http://10.10.9.26:${server.port}/swagger-ui.html
+    status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
 spring:
   profiles:
     active:
@@ -14,6 +14,21 @@ spring:
   http:
     encoding:
       enabled: true
+  #redis连接
+  redis:
+    host: 10.10.31.25
+    database: 2
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
+
+
+
 zuul:
   prefix: /v1
   sensitive-headers: Cookie,Set-Cookie
@@ -80,13 +95,70 @@ iv:
   public:
     uris: /v1/wechat/**,
           /login,
+          /logout,
           /v1/authentication/uaa/**,
+          /v1/uaa/**,
           /v1/alarm/aggregation/openalarm,
           /v1/user/bind/wechatInfo,
           /v1/user/register/account,
           /v1/**/v2/**,
           /swagger-ui.html,
           /swagger-resources/**
+
+  noToken:
+    uris: /v1/form/select/formListPage,
+          /v1/form/select/formById,
+          /v1/form/select/myFormListPage,
+          /v1/form/select/delFormListPage,
+          /v1/form/saveOrUpdateFormInfo,
+          /v1/form/save/MarkForm,
+          /v1/form/del/MarkForm,
+          /v1/form/select/currentForm,
+          /v1/form/select/dataCollection,
+          /v1/form/select/pieChartByKind,
+          /v1/form/select/groupAndClients,
+          /v1/form/select/companyInfoList,
+          /v1/form/select/conditionInfoList,
+          /v1/form/select/formPullDown,
+          /v1/form/select/demandTree,
+          /v1/form/select/engineerList,
+          /v1/form/select/formTrend,
+          /v1/group/select/groupUsersInfo,
+          /v1/group/select/groupUsersPageInfo,
+          /v1/group/select/groupsUsersInfo,
+          /v1/group/select/tenantUserPageInfo,
+          /v1/group/tenant/userInfos,
+          /v1/email/register/vcode,
+          /v1/tenant/mgt/apply/join/tenant,
+          /v1/tenant/mgt/apply/regis/tenant,
+          /v1/tenant/mgt/get/hisFlow/join/tenant,
+          /v1/tenant/mgt/get/hisFlow/regis/tenant,
+          /v1/tenant/mgt/get/tenant/conditions,
+          /v1/tenant/mgt/get/tenant/current,
+          /v1/tenant/mgt/get/tenant/joined,
+          /v1/tenant/mgt/switch,
+          /v1/alarm/aggregation/openalarm,
+          /v1/alarm/façade/get/myAlarm,
+          /v1/alarm/façade/refresh/alarmDetail,
+          /v1/alarm/strategy/get/strategy/all,
+          /v1/alarm/strategy/get/strategy/ids,
+          /v1/alarm/strategy/get/strategy/page,
+          /v1/user/bind/wechatInfo,
+          /v1/user/find/localAuthPassWord,
+          /v1/user/register/account,
+          /v1/user/saveOrUpdate/localAuth,
+          /v1/user/user/info,
+          /v1/wechat/wechat/getWechatLoginCode,
+          /v1/wechat/wechat/qrcodeCreate,
+          /v1/permission/get/subTenantRoles,
+          /v1/permission/subproject/Roles,
+          /v1/permission/formSys/permissions,
+          /v1/permission/get/personApis,
+          /v1/permission/get/subTenantRoles,
+          /v1/permission/subTenant/permissions,
+          /v1/permission/subproject/Roles
+
+
 
 #jwt oauth2
 security:
