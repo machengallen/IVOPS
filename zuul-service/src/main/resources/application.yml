@@ -101,12 +101,12 @@ iv:
           /v1/alarm/aggregation/openalarm,
           /v1/user/bind/wechatInfo,
           /v1/user/register/account,
-          /v1/**/v2/**,
           /swagger-ui.html,
           /swagger-resources/**
 
   noToken:
-    uris: /v1/form/select/formListPage,
+    uris: /v1/authentication/uaa/login,
+          /v1/form/select/formListPage,
           /v1/form/select/formById,
           /v1/form/select/myFormListPage,
           /v1/form/select/delFormListPage,

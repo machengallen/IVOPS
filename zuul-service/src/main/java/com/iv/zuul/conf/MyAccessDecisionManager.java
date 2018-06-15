@@ -11,6 +11,7 @@ import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +33,9 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
     @Value("${iv.noToken.uris}")
     private String[] noTokenUris;
 
+    @Value("${iv.public.uris}")
+    private String[] publicUris;
+
     //思路1
     // decide 方法是判定是否拥有权限的决策方法，
     //authentication 是释CustomUserService中循环添加到 GrantedAuthority 对象中的权限信息集合.
@@ -44,10 +48,17 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
     public void decide(Authentication authentication, Object object, Collection<ConfigAttribute> configAttributes) throws AccessDeniedException, InsufficientAuthenticationException {
 
 
-
         //将用户
         HttpServletRequest request = ((FilterInvocation) object).getHttpRequest();
         String requestURI = request.getRequestURI();
+        AntPathRequestMatcher matcher;
+        for (String publicUri:publicUris){
+            matcher = new AntPathRequestMatcher(publicUri);
+            if (matcher.matches(request)) {
+                return;
+            }
+        }
+
 
         //不需要验证的url
         if (Arrays.asList(noTokenUris).contains(requestURI)) {

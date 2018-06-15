@@ -61,7 +61,7 @@ public class MyInvocationSecurityMetadataSourceService implements
             array.add(cfg);
             //用权限的getUrl() 作为map的key，用ConfigAttribute的集合作为 value，
             //数据库查询将所有的Url放入集合中
-            map.put("/v1/form/select/client", array);
+            //map.put("/v1/form/select/client", array);
         }
 
 

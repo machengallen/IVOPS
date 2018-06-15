@@ -62,7 +62,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         .csrf()
           .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).disable();*/
 		//在过滤器之前添加自己的过滤器，查询请求的的uri用户是否有权限执行
-		http.addFilterBefore(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
+		http.addFilterAfter(myFilterSecurityInterceptor, FilterSecurityInterceptor.class);
 	}
 
 	private OAuth2AuthenticationProcessingFilter oAuth2AuthenticationProcessingFilter() {
