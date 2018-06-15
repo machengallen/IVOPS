@@ -110,7 +110,6 @@ iv:
           /v1/form/select/formById,
           /v1/form/select/myFormListPage,
           /v1/form/select/delFormListPage,
-          /v1/form/saveOrUpdateFormInfo,
           /v1/form/save/MarkForm,
           /v1/form/del/MarkForm,
           /v1/form/select/currentForm,
