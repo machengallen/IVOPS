@@ -1,9 +1,15 @@
 package com.iv.common.util.spring;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.jwt.Jwt;
 import org.springframework.security.jwt.JwtHelper;
+import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import net.sf.json.JSONObject;
 
@@ -26,5 +32,26 @@ public class JWTUtil {
 			LOGGER.error("解析JWT失败");
 			return null;
 		}		
+	}
+	
+	/**
+	 * 获取token中封装的用户属性
+	 * @param attribute 用户信息属性
+	 * @return
+	 */
+	public static String getReqValue(String attribute) {
+		
+		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+		
+		if (null == requestAttributes) {
+			return null;
+		}
+		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
+		String token = request.getHeader("Authorization");
+
+		if (StringUtils.isEmpty(token)) {
+			return null;
+		} 
+		return getJWtJson(token).getString(attribute);
 	}
 }
