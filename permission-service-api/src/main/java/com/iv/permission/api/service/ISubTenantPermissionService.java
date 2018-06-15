@@ -116,11 +116,11 @@ public interface ISubTenantPermissionService {
 	
 	/**
 	 * 查询组内拥有审批工单权限的人员列表
-	 * @param userId
+	 * @param code
 	 * @param tenantId
 	 * @param groupId
 	 * @return
 	 */
 	@RequestMapping(value = "/approve/formPerson", method = RequestMethod.GET)
-	Set<LocalAuthDto> approveFormPerson(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId, @RequestParam("groupId") String groupId);
+	Set<LocalAuthDto> approveFormPerson(@RequestParam("code") String code, @RequestParam("tenantId") String tenantId, @RequestParam("groupId") short groupId);
 }
