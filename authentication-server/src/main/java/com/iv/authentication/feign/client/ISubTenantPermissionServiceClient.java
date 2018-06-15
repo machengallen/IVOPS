@@ -80,4 +80,9 @@ class SubTenantPermissionServiceClientFallBack implements ISubTenantPermissionSe
     public List<PermissionDto> getPersonPermissions(int userId, String tenantId) {
         return null;
     }
+
+    @Override
+    public Set<LocalAuthDto> approveFormPerson(String code, String tenantId, short groupId) {
+        return null;
+    }
 }
