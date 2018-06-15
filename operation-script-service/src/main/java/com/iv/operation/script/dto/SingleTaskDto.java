@@ -1,6 +1,6 @@
 package com.iv.operation.script.dto;
 
-import java.util.Set;
+import java.util.List;
 
 import com.iv.operation.script.util.ScriptSourceType;
 
@@ -10,11 +10,11 @@ public class SingleTaskDto {
 	private String taskName;// 作业任务名
 	private String taskDescription;// 任务描述
 	private ScriptSourceType scriptSrc;// 执行脚本来源
-	private Set<String> scriptArgs;// 脚本执行传入参数
+	private List<String> scriptArgs;// 脚本执行传入参数
 	private int timeout;// 目标主机连接超时时间(毫秒)
 	
 	public SingleTaskDto(Integer taskId, String taskName, String taskDescription, ScriptSourceType scriptSrc,
-			Set<String> scriptArgs, int timeout) {
+			List<String> scriptArgs, int timeout) {
 		super();
 		this.taskId = taskId;
 		this.taskName = taskName;
@@ -54,10 +54,10 @@ public class SingleTaskDto {
 	public void setScriptSrc(ScriptSourceType scriptSrc) {
 		this.scriptSrc = scriptSrc;
 	}
-	public Set<String> getScriptArgs() {
+	public List<String> getScriptArgs() {
 		return scriptArgs;
 	}
-	public void setScriptArgs(Set<String> scriptArgs) {
+	public void setScriptArgs(List<String> scriptArgs) {
 		this.scriptArgs = scriptArgs;
 	}
 	public int getTimeout() {

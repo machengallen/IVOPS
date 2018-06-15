@@ -11,20 +11,25 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 @Entity
-@Table(name = "single_task_target_info")
+@Table(name = "single_task_target")
 public class SingleTaskTargetEntity implements Serializable{
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = -1687464013980632702L;
+	@JsonIgnore
 	private String id;
+	@JsonIgnore
 	private SingleTaskEntity singleTask;
 	private String hostIp;// 目标主机ip
 	private int port;// 目标主机sshd端口号
 	private String account;// 目标主机执行账户
+	@JsonIgnore
 	private String password;// 目标执行账户密码
 	private boolean isSuccess;// 执行是否成功
 	private String result;// 执行返回结果

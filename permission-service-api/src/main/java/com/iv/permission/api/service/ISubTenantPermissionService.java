@@ -89,6 +89,7 @@ public interface ISubTenantPermissionService {
 	ResponseDto getSubTenantRoles();
 	
 	
+	
 	/**
 	 * 编辑人员角色
 	 * @return
@@ -104,6 +105,22 @@ public interface ISubTenantPermissionService {
 	@RequestMapping(value = "/select/personRole", method = RequestMethod.GET)
 	Set<com.iv.outer.dto.SubTenantRoleDto> selectPersonRole(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId);
 	
+	/**
+	 * 获取用户获取的功能权限集
+	 * @param userId
+	 * @param tenantId
+	 * @return
+	 */
 	@RequestMapping(value = "/get/personPermissions", method = RequestMethod.GET)
 	List<PermissionDto> getPersonPermissions(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId);
+	
+	/**
+	 * 查询组内拥有审批工单权限的人员列表
+	 * @param userId
+	 * @param tenantId
+	 * @param groupId
+	 * @return
+	 */
+	@RequestMapping(value = "/approve/formPerson", method = RequestMethod.GET)
+	Set<LocalAuthDto> ApproveFormPerson(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId, @RequestParam("groupId") String groupId);
 }

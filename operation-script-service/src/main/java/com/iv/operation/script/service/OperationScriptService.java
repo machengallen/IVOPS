@@ -1,6 +1,5 @@
 package com.iv.operation.script.service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -16,6 +15,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,6 +26,7 @@ import com.iv.operation.script.dao.impl.SingleTaskTargetDaoImpl;
 import com.iv.operation.script.dto.HostDto;
 import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.dto.SingleTaskDto;
+import com.iv.operation.script.dto.SingleTaskPageDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
 import com.iv.operation.script.dto.TargetHostsDto;
 import com.iv.operation.script.entity.SingleTaskTargetEntity;
@@ -36,11 +37,19 @@ import com.iv.operation.script.util.ErrorMsg;
 import com.iv.operation.script.util.SSHAccount;
 import com.iv.operation.script.util.SSHExecutor;
 import com.iv.operation.script.util.SSHSessionFactory;
+import com.iv.operation.script.util.ScriptSourceType;
 import com.iv.operation.script.util.ThreadPoolUtil;
+import com.iv.script.api.dto.TemporaryScriptDto;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 
+/**
+ * @author macheng
+ * 2018年6月4日
+ * operation-script-service
+ * 单脚本任务管理服务
+ */
 @Service
 public class OperationScriptService {
 
@@ -76,7 +85,9 @@ public class OperationScriptService {
 			lifeEntity.setCreator(user);
 			scriptEntity.setTaskLife(lifeEntity);
 		}
-		scriptEntity.setId(dto.getTaskId());
+		if(null != dto.getTaskId()) {
+			scriptEntity.setId(dto.getTaskId());
+		}
 		scriptEntity.setScriptId(scriptId);
 		scriptEntity.setScriptSrc(dto.getScriptSrc());
 		scriptEntity.setScriptArgs(dto.getScriptArgs());
@@ -105,19 +116,20 @@ public class OperationScriptService {
 	 * 
 	 * @param dto
 	 * @param file
+	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public SingleTaskEntity singleTaskCreate(SingleTaskDto dto, MultipartFile file){
-		InputStream fileStream;
+	public SingleTaskEntity singleTaskCreate(SingleTaskDto dto, MultipartFile file) throws IOException{
+		/*InputStream fileStream;
 		try {
 			fileStream = file.getInputStream();
 		} catch (IOException e) {
 			LOGGER.error("文件流读取失败", e);
 			return null;
-		}
+		}*/
 		String fileName = file.getOriginalFilename();
 		String scriptType = fileName.substring(fileName.lastIndexOf(".") + 1);
-		int scriptId = scriptServiceClient.tempWrite(fileName, scriptType, fileStream);
+		int scriptId = scriptServiceClient.tempWrite(fileName, scriptType, file.getBytes());
 		return taskSaveOrUpdate(dto, scriptId);
 	}
 
@@ -128,8 +140,8 @@ public class OperationScriptService {
 	 * @param context
 	 */
 	public SingleTaskEntity singleTaskCreate(SingleTaskDto dto, String context, String scriptType) {
-		InputStream fileStream = new ByteArrayInputStream(context.getBytes());
-		int scriptId = scriptServiceClient.tempWrite(null, scriptType, fileStream);
+		//InputStream fileStream = new ByteArrayInputStream(context.getBytes());
+		int scriptId = scriptServiceClient.tempWrite(null, scriptType, context.getBytes());
 		return taskSaveOrUpdate(dto, scriptId);
 	}
 
@@ -142,9 +154,10 @@ public class OperationScriptService {
 	 * @param context
 	 * @param scriptType
 	 * @return
+	 * @throws IOException 
 	 */
 	public SingleTaskEntity singleTaskModify(SingleTaskDto dto, int taskId, int scriptId, MultipartFile file,
-			String context, String scriptType) {
+			String context, String scriptType) throws IOException {
 
 		switch (dto.getScriptSrc()) {
 		case SCRIPT_LIBRARY:
@@ -191,8 +204,29 @@ public class OperationScriptService {
 			if (null != host.getPort() && host.getPort() != 22) {
 				sshAccount.setPort(host.getPort());
 			}
-			InputStream fileStream = scriptServiceClient.tempRead(scriptEntity.getScriptId());
-			String fileName = scriptServiceClient.temporaryScriptInfoById(scriptEntity.getScriptId()).getName();
+			ResponseEntity<byte[]> fileStream;
+			if(scriptEntity.getScriptSrc().name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
+				fileStream = scriptServiceClient.officialRead(scriptEntity.getScriptId());
+			} else {
+				fileStream = scriptServiceClient.tempRead(scriptEntity.getScriptId());
+			}
+			if(null == fileStream) {
+				// 没有该文件或脚本库服务未响应
+				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(scriptEntity.getScriptId());
+			if(null == temporaryScriptDto) {
+				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+			String fileName = temporaryScriptDto.getName();
 			Session session = SSHSessionFactory.getSession(sshAccount);
 			if (null == session) {
 				// 获取ssh连接失败
@@ -210,7 +244,7 @@ public class OperationScriptService {
 					// 上传脚本
 					SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
 							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
-					OptResultDto sftp = sftpUpload(session, fileStream, fileName);
+					OptResultDto sftp = sftpUpload(session, fileName, fileStream.getBody());
 					if (!sftp.isSuccess()) {
 						targetEntity.setResult(sftp.getResult());
 						return targetEntity;
@@ -223,7 +257,7 @@ public class OperationScriptService {
 				}
 			});
 			i++;
-
+			session.disconnect();
 		}
 		// 获取任务结果集
 		for (int j = 1; j <= i; j++) {
@@ -249,7 +283,7 @@ public class OperationScriptService {
 
 	}
 	
-	public List<SingleTaskEntity> singleTaskGet(SingleTaskQueryDto queryDto) {
+	public SingleTaskPageDto singleTaskGet(SingleTaskQueryDto queryDto) {
 
 		return singleTaskDao.selectByCondition(queryDto);
 	}
@@ -284,11 +318,11 @@ public class OperationScriptService {
 		} catch (InterruptedException e) {
 			LOGGER.error("执行线程中断", e);
 			return OptResultDto.build(false, "执行线程中断");
-		} finally {
+		} /*finally {
 			if (null != executor) {
 				executor.disconnect();
 			}
-		}
+		}*/
 	}
 
 	/**
@@ -306,11 +340,11 @@ public class OperationScriptService {
 			LOGGER.error("获取ssh连接失败", e);
 		} catch (SftpException e) {
 			LOGGER.error("sftp操作失败", e);
-		} finally {
+		} /*finally {
 			if (null != executor) {
 				executor.disconnect();
 			}
-		}
+		}*/
 	}
 
 	/**
@@ -318,7 +352,7 @@ public class OperationScriptService {
 	 * 
 	 * @throws Exception
 	 */
-	public OptResultDto sftpUpload(Session session, InputStream fileStream, String fileName) {
+	public OptResultDto sftpUpload(Session session, String fileName, InputStream fileStream) {
 		SSHExecutor executor = null;
 		try {
 			executor = new SSHExecutor(session);
@@ -333,11 +367,37 @@ public class OperationScriptService {
 		} catch (IOException e) {
 			LOGGER.error("文件流读取失败", e);
 			return OptResultDto.build(false, "文件流读取失败");
-		} finally {
+		} /*finally {
 			if (null != executor) {
 				executor.disconnect();
 			}
-		}
-
+		}*/
+	}
+	
+	/**
+	 * 文件上传
+	 * 
+	 * @throws Exception
+	 */
+	public OptResultDto sftpUpload(Session session, String fileName, byte[] fileBytes) {
+		SSHExecutor executor = null;
+		try {
+			executor = new SSHExecutor(session);
+			executor.sftpPut(session, fileName, fileBytes);
+			return OptResultDto.build(true, null);
+		} catch (JSchException e) {
+			LOGGER.error("ssh连接失败", e);
+			return OptResultDto.build(false, "ssh连接失败");
+		} catch (SftpException e) {
+			LOGGER.error("ssh连接失败", e);
+			return OptResultDto.build(false, "sftp执行失败");
+		} catch (IOException e) {
+			LOGGER.error("文件流读取失败", e);
+			return OptResultDto.build(false, "文件流读取失败");
+		} /*finally {
+			if (null != executor) {
+				executor.disconnect();
+			}
+		}*/
 	}
 }

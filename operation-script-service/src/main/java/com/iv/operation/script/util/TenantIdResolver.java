@@ -20,6 +20,10 @@ public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		if (null == requestAttributes) {
+			String tenantId = TenantIdHolder.get();
+			if(!StringUtils.isEmpty(tenantId)) {
+				return ConstantContainer.OPERATION_SCRIPT_DB + "_" + tenantId;
+			}
 			return ConstantContainer.OPERATION_SCRIPT_DB;
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
@@ -28,7 +32,7 @@ public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 		if (StringUtils.isEmpty(token)) {
 			return ConstantContainer.OPERATION_SCRIPT_DB;
 		} else {
-			return ConstantContainer.OPERATION_SCRIPT_DB + JWTUtil.getJWtJson(token).getString("curTenantId");
+			return ConstantContainer.OPERATION_SCRIPT_DB + "_" + JWTUtil.getJWtJson(token).getString("curTenantId");
 		}
 	}
 

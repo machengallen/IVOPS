@@ -10,13 +10,22 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	SCRIPT_SRCTYPE_UNKNOW(50201, "脚本上传类型未知"),
 	
-	CREATE_TASK_FAILED(50202, "脚本上传类型未知"),
+	CREATE_TASK_FAILED(50202, "作业创建失败"),
 	
 	SSH_CONNECT_FAILED(50203, "获取ssh连接失败"),
 	
-	GET_TASKS_FAILED(50204, "获取任务列表失败"),
+	GET_DATA_FAILED(50204, "获取数据失败"),
 	
-	GET_TASKS_TARGET_FAILED(50205, "获取任务执行对象列表失败");
+	GET_TASKS_TARGET_FAILED(50205, "获取任务执行对象列表失败"),
+	
+	SCRIPT_NOT_EXIST(50206, "脚本文件不存在或脚本库服务已停止工作"),
+	
+	MOD_TASK_FAILED(50207, "任务编辑失败"),
+	
+	CREATE_TASK_SCHEDULE_FAILED(50208, "定时任务创建失败"),
+	
+	MOD_TASK_SCHEDULE_FAILED(50209, "定时任务修改失败");
+	
 	
 	private int code;
     private String msg;
