@@ -9,7 +9,7 @@ public class TextUploadDto {
 	private String type;
 	private String alias;
 	private ItemType itemType;
-	
+	private String remark;
 	public Integer getId() {
 		return id;
 	}
@@ -39,6 +39,12 @@ public class TextUploadDto {
 	}
 	public void setItemType(ItemType itemType) {
 		this.itemType = itemType;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	
 }

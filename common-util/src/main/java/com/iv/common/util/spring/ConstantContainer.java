@@ -43,4 +43,11 @@ public interface ConstantContainer {
 	String ALARM_STRATEGY_DB = "alarm_strategy_service";
 	
 	String OPERATION_SCRIPT_DB = "operation_script_service";
+	String GROUP_DB = "group_service";
+	
+	String ALARM_REPORT_DB = "alarm_report_service";
+	
+	String PERMISSION_SERVICE = "permission_service";
+	
+	String RESOURCE_SERVICE = "resource_service";
 }

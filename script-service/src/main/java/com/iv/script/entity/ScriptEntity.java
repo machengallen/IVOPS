@@ -1,19 +1,26 @@
 package com.iv.script.entity;
 
 import java.io.Serializable;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
 
 import com.iv.common.enumeration.ItemType;
+import com.iv.common.enumeration.YesOrNo;
 
 @Entity
 @Table(name = "script_library")
@@ -32,6 +39,12 @@ public class ScriptEntity implements Serializable{
 	private AuthorEntity creator;
 	private long modDate;
 	private AuthorEntity modifier;
+	private YesOrNo ifReviewed;//是否审核通过
+	private String remark;//脚本说明
+	private long quoteNUm;//引用量
+	private long clickNum;//点击量
+	private Set<ScriptLogEntity> scriptLog = new TreeSet<ScriptLogEntity>();//日志
+	
 	@Id
 	@GeneratedValue
 	public int getId() {
@@ -92,6 +105,39 @@ public class ScriptEntity implements Serializable{
 	}
 	public void setModifier(AuthorEntity modifier) {
 		this.modifier = modifier;
+	}
+	@OneToMany(cascade = {javax.persistence.CascadeType.ALL}, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OrderBy("opsDate")
+	public Set<ScriptLogEntity> getScriptLog() {
+		return scriptLog;
+	}
+	public void setScriptLog(Set<ScriptLogEntity> scriptLog) {
+		this.scriptLog = scriptLog;
+	}
+	@Enumerated(value=EnumType.ORDINAL)
+	public YesOrNo getIfReviewed() {
+		return ifReviewed;
+	}
+	public void setIfReviewed(YesOrNo ifReviewed) {
+		this.ifReviewed = ifReviewed;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+	public long getQuoteNUm() {
+		return quoteNUm;
+	}
+	public void setQuoteNUm(long quoteNUm) {
+		this.quoteNUm = quoteNUm;
+	}
+	public long getClickNum() {
+		return clickNum;
+	}
+	public void setClickNum(long clickNum) {
+		this.clickNum = clickNum;
 	}
 	
 }
