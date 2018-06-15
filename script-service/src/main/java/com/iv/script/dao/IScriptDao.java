@@ -9,7 +9,7 @@ import com.iv.script.entity.ScriptPagingWrap;
 
 public interface IScriptDao {
 
-	void save(ScriptEntity entity) throws RuntimeException;
+	ScriptEntity save(ScriptEntity entity) throws RuntimeException;
 	
 	List<ScriptEntity> selectAll(int first, int max) throws RuntimeException;
 	
@@ -24,4 +24,8 @@ public interface IScriptDao {
 	long countAll() throws RuntimeException;
 	
 	ScriptPagingWrap selectByCondition(ScriptQueryDto query, List<AuthorEntity> creators) throws RuntimeException;
+	
+	List<Object[]> itemTypeCount() throws RuntimeException;
+	
+	long personalScriptCount(int userId) throws RuntimeException;
 }
