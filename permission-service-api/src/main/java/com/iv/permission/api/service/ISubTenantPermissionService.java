@@ -122,5 +122,5 @@ public interface ISubTenantPermissionService {
 	 * @return
 	 */
 	@RequestMapping(value = "/approve/formPerson", method = RequestMethod.GET)
-	Set<LocalAuthDto> ApproveFormPerson(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId, @RequestParam("groupId") String groupId);
+	Set<LocalAuthDto> approveFormPerson(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId, @RequestParam("groupId") String groupId);
 }
