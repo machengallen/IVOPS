@@ -5,7 +5,6 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author liangk
@@ -39,9 +38,6 @@ public class FormInfoEntity implements Serializable {
     private Long updateDate;//更新时间
     private Byte  delFlag;//删除标记
 
-    @OneToMany(cascade = {CascadeType.ALL})
-    @JoinColumn(name = "form_id")
-    private List<FormFileEntity> fileEntities;// 附件
 
     @Id
     @GenericGenerator(name = "FormId", strategy = "com.iv.form.util.FormGenerator")

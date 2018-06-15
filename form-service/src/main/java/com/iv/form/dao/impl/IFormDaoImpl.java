@@ -407,9 +407,10 @@ public class IFormDaoImpl implements IFormDao {
                                 "\t\t\tform_change_logs d\n" +
                                 "\t\tWHERE\n" +
                                 "\t\t\ta.id = d.form_id\n" +
-                                "\t\tAND d.create_by = "+userId+"\n" +
+                                "\t\tAND d.create_by = "+userId+" or a.handler_id="+userId+"\n" +
                                 "\t)\n" +
-                                "AND a.del_flag = 0");
+                                "AND a.del_flag = 0 OR " +
+                                "EXISTS(SELECT j.form_id FROM form_audit_person j WHERE j.form_id=a.id AND j.user_id="+userId+")");
                 if (!StringUtils.isEmpty(formConditionDto.getId())) {
                     sql.append(" and a.id = ").append("'").append(formConditionDto.getId()).append("'");
                 }
@@ -1464,11 +1465,10 @@ public class IFormDaoImpl implements IFormDao {
                 CommonPage commonPage = new CommonPage();
 
                 StringBuffer condition = new StringBuffer();
-
                 if(!StringUtils.isEmpty(meritConditionDto.getStartTime())) {
                     condition.append(" and create_date>"+meritConditionDto.getStartTime()+"");
                 }
-                if(!StringUtils.isEmpty(meritConditionDto.getEndTime())) {
+                if(!StringUtils.isEmpty(meritConditionDto.getEndTime().toString())) {
                     condition.append(" and create_date<"+meritConditionDto.getEndTime()+"");
                 }
                 if(!StringUtils.isEmpty(meritConditionDto.getDemandCode())) {
@@ -1488,6 +1488,18 @@ public class IFormDaoImpl implements IFormDao {
                         .setFirstResult((meritConditionDto.getCurPage()-1)* meritConditionDto.getItems()).setMaxResults(meritConditionDto.getItems())
                         .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list());
                 return commonPage;
+            }
+        });
+    }
+
+    @Override
+    public void saveOrUpdateFormAuditPerson(FormAuditPersonEntity formAuditPersonEntity) {
+        HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                ses.saveOrUpdate(formAuditPersonEntity);
+                return null;
             }
         });
     }

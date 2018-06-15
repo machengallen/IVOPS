@@ -223,7 +223,7 @@ public interface IFormService {
      * @return
      */
     @RequestMapping(value = "/execute/upgrade", method = RequestMethod.GET)
-    ResponseDto executeUpgrade(@RequestParam("request") HttpServletRequest  request, @RequestParam("formId") String formId,@RequestParam("request")Integer userId,@RequestParam("reason")String reason);
+    ResponseDto executeUpgrade(@RequestParam("request") HttpServletRequest  request, @RequestParam("formId") String formId,@RequestParam("groupId")Integer groupId ,@RequestParam("userId")Integer userId,@RequestParam("reason")String reason);
 
     /**
      * 审核通过

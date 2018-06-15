@@ -18,6 +18,7 @@ import com.iv.form.dto.ConditionInfoDto;
 import com.iv.form.dto.FormPullDownDto;
 import com.iv.form.entity.*;
 import com.iv.form.feign.clients.GroupServiceClient;
+import com.iv.form.feign.clients.SubTenantPermissionServiceClient;
 import com.iv.form.feign.clients.UserServiceClient;
 import com.iv.form.util.CycleUtil;
 import com.iv.form.util.ExcelUtil;
@@ -52,6 +53,9 @@ public class FormService {
 
     @Autowired
     private GroupServiceClient groupServiceClient;
+
+    @Autowired
+    private SubTenantPermissionServiceClient subTenantPermissionServiceClient;
 
     @Autowired
     private EmailService emailService;
@@ -217,11 +221,9 @@ public class FormService {
         FormInfoPage  formInfoPage=FORM_DAO.selectMyFormListPage(userId,formConditionDto,demandIds);
 
 
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
+
         //添加工单记录
-        List<LinkedHashMap> data = (List<LinkedHashMap>) groupServiceClient.groupUsersPageInfo(request, groupQuery).getData();
+        List<LinkedHashMap> data = (List<LinkedHashMap>) groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -276,10 +278,8 @@ public class FormService {
         FormInfoPage  formInfoPage=FORM_DAO.selectDelFormListPage(userId,formConditionDto,demandIds);
 
         //添加工单记录
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupUsersPageInfo(request,groupQuery).getData();
+
+        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -332,10 +332,8 @@ public class FormService {
         String demandIds = StringUtils.collectionToCommaDelimitedString(childrenIds);
         FormInfoPage  formInfoPage=FORM_DAO.selectMarkFormListPage(userId,formConditionDto,demandIds);
         //添加工单记录
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupUsersPageInfo(request,groupQuery).getData();
+
+        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -483,10 +481,8 @@ public class FormService {
 
         FormInfoPage  formInfoPage=FORM_DAO.selectFormListPage(formConditionDto,userId,demandIds);
 
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupUsersPageInfo(request,groupQuery).getData();
+
+        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
 
         //添加工单记录
@@ -558,10 +554,8 @@ public class FormService {
         List<FormDemandEntity> formDemandEntities = FORM_OPT_DAO.selectDemandAll();
 
         //处理人列表
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
-        ResponseDto responseDto = groupServiceClient.groupUsersPageInfo(request,groupQuery);
+
+        ResponseDto responseDto = groupServiceClient.groupsUsersInfo();
         //优先级
         List<Map> priorityList = FORM_DAO.selectPriorityList();
         Object data = responseDto.getData();
@@ -625,18 +619,31 @@ public class FormService {
      * @param userId
      */
     @Transactional
-    public void executeDealWithEnd(FormOperateLogsDto formOperateLogsDto, int userId)throws BusException {
+    public void executeDealWithEnd(FormOperateLogsDto formOperateLogsDto, int userId,int curTenantId)throws BusException {
         //校验参数
         String formId = formOperateLogsDto.getFormId();
         if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(formId)){
             throw new BusException(ErrorMsg.FORM_HANDLER_ID_FAILED);
         }
 
+
+
         //更新数据库
         FormUserEntity user = saveOrUpdateUser(userId);
 
         //更新工单状态
         FormInfoEntity formInfoEntity = FORM_DAO.selectFormById(formId);
+
+        //查询审核人员
+        Set<LocalAuthDto> localAuthDtos = subTenantPermissionServiceClient.approveFormPerson("90120", String.valueOf(curTenantId), formInfoEntity.getGroupId().shortValue());
+        for(LocalAuthDto localAuthDto:localAuthDtos){
+            FormAuditPersonEntity formAuditPersonEntity = new FormAuditPersonEntity();
+            formAuditPersonEntity.setFormId(formId);
+            formAuditPersonEntity.setGroupId(formInfoEntity.getGroupId().shortValue());
+            formAuditPersonEntity.setUserId(localAuthDto.getId());
+            FORM_DAO.saveOrUpdateFormAuditPerson(formAuditPersonEntity);
+        }
+
         formInfoEntity.setFormState(Constant.FORM_STATE_RESOLVED);
         formInfoEntity.setUpdateBy(userId);
         formInfoEntity.setUpdateDate(System.currentTimeMillis());
@@ -679,7 +686,7 @@ public class FormService {
      * @param formId
      * @param handlerId 转派人员Id
      */
-    public void executeUpgrade(int userId, String formId, Integer handlerId,String reason)throws BusException {
+    public void executeUpgrade(int userId, String formId,Integer handlerGroupId ,Integer handlerId,String reason)throws BusException {
         //校验参数
 
         if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(formId)){
@@ -691,6 +698,7 @@ public class FormService {
 
         //更新工单状态
         FormInfoEntity formInfoEntity = FORM_DAO.selectFormById(formId);
+        formInfoEntity.setGroupId(handlerGroupId);
         formInfoEntity.setHandlerId(handlerId);
         formInfoEntity.setFormState(Constant.FORM_STATE_UPGRADE);
         formInfoEntity.setUpdateBy(userId);
@@ -1006,7 +1014,7 @@ public class FormService {
      * @return
      */
     public Object selectEngineerList(HttpServletRequest request) {
-        ResponseDto responseDto = groupServiceClient.selectUsersInfoByTenantId(request);
+        ResponseDto responseDto = groupServiceClient.groupsUsersInfo();
         Object data = responseDto.getData();
         return data;
     }
@@ -1050,10 +1058,8 @@ public class FormService {
      * @return
      */
     public Map selectGroupMeirt(HttpServletRequest request,Long startTime,Long endTime,Integer demandCode) {
-        GroupQuery groupQuery = new GroupQuery();
-        groupQuery.setCurPage(0);
-        groupQuery.setItems(1000);
-        List<LinkedHashMap> groupList = (List<LinkedHashMap>)groupServiceClient.groupUsersPageInfo(request,groupQuery).getData();
+
+        List<LinkedHashMap> groupList = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
         //总记录
         List<Map> totalNum = FORM_DAO.selectGroupMeirt(null, startTime, endTime, demandCode);
         //处理

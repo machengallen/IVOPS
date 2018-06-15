@@ -153,4 +153,7 @@ public interface IFormDao {
 
     //个人绩效
     CommonPage selectPersonMeirt(MeritConditionDto meritConditionDto);
+
+    //审核人
+    void saveOrUpdateFormAuditPerson(FormAuditPersonEntity formAuditPersonEntity);
 }

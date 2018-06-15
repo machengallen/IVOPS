@@ -388,11 +388,12 @@ public class FormController implements IFormService {
     @ApiOperation(value="工单处理完成",notes = "90118")
     public ResponseDto executeDealWithEnd(HttpServletRequest request, @RequestBody FormOperateLogsDto formOperateLogsDto) {
         int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
+        int curTenantId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("curTenantId"));
         ResponseDto dto = new ResponseDto();
 
         try {
             //保存工单
-            formService.executeDealWithEnd( formOperateLogsDto ,userId);
+            formService.executeDealWithEnd( formOperateLogsDto ,userId,curTenantId);
 
             dto.setErrorMsg(ErrorMsg.OK);
             return  dto;
@@ -408,13 +409,13 @@ public class FormController implements IFormService {
 
     @Override
     @ApiOperation(value="工单升级",notes = "90119")
-    public ResponseDto executeUpgrade(HttpServletRequest request, String formId,Integer handlerId,String reason) {
+    public ResponseDto executeUpgrade(HttpServletRequest request, String formId,Integer handlerGroupId ,Integer handlerId,String reason) {
         int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
         ResponseDto dto = new ResponseDto();
 
         try {
             //工单升级
-            formService.executeUpgrade( userId ,formId,handlerId,reason);
+            formService.executeUpgrade( userId ,formId,handlerGroupId ,handlerId,reason);
 
             dto.setErrorMsg(ErrorMsg.OK);
             return  dto;
