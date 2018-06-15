@@ -1,7 +1,6 @@
 package com.iv.form.service;
 
 
-import com.iv.common.enumeration.CycleType;
 import com.iv.form.dao.IFormDao;
 import com.iv.form.dao.impl.IFormDaoImpl;
 import com.iv.form.entity.FormInfoEntity;
@@ -152,13 +151,7 @@ public class FormActService {
 
 
     public static void main(String[] args){
-        System.out.println(CycleType.getTimePointList(CycleType.DAY));
-        System.out.println(CycleType.getTimePointList(CycleType.WEEK));
-        System.out.println(CycleType.getTimePointList(CycleType.TWO_WEEKS));
-        System.out.println(CycleType.getTimePointList(CycleType.MONTH));
-        System.out.println(CycleType.getTimePointList(CycleType.TWO_MONTHS));
-        System.out.println(CycleType.getTimePointList(CycleType.HALF_YEAR));
-        System.out.println(CycleType.getTimePointList(CycleType.YEAR));
+
     }
 
     public void test() {
