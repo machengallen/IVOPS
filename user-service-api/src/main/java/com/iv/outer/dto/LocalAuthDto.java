@@ -1,5 +1,7 @@
 package com.iv.outer.dto;
 
+import java.util.Set;
+
 /**
  * 用户基础信息供其他服务调用类（无三方登录信息）
  * @author zhangying
@@ -15,7 +17,8 @@ public class LocalAuthDto {
 	private String tel;	
 	private String curTenantId;
 	private String headimgurl;
-	private String passWord;	
+	private String passWord;
+	private Set<SubTenantRoleDto> roles;
 	public int getId() {
 		return id;
 	}
@@ -70,6 +73,14 @@ public class LocalAuthDto {
 	}
 	public void setPassWord(String passWord) {
 		this.passWord = passWord;
+	}	
+		
+	
+	public Set<SubTenantRoleDto> getRoles() {
+		return roles;
+	}
+	public void setRoles(Set<SubTenantRoleDto> roles) {
+		this.roles = roles;
 	}
 	@Override
 	public int hashCode() {

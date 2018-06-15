@@ -2,6 +2,8 @@ package com.iv.permission.api.service;
 
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,8 +14,10 @@ import com.iv.outer.dto.LocalAuthDto;
 import com.iv.permission.api.dto.PersonRoleDto;
 import com.iv.permission.api.dto.PageQueryDto;
 import com.iv.permission.api.dto.PermissionDto;
+import com.iv.permission.api.dto.CodesDto;
 import com.iv.permission.api.dto.FunctionDto;
 import com.iv.permission.api.dto.GlobalRoleCreate;
+import com.iv.permission.api.dto.IdsDto;
 
 /**
  * 运营权限管理api
@@ -34,22 +38,22 @@ public interface IPermissionService {
 	 * 权限增加（基础库）
 	 * @return
 	 */
-	@RequestMapping(value = "/ceate/permission", method = RequestMethod.POST)
-	ResponseDto createPermission(@RequestBody PermissionDto permissionDto);
+	@RequestMapping(value = "/create/permission", method = RequestMethod.POST)
+	ResponseDto createPermission(@RequestBody PermissionDto permissionDto,@RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 权限删除（基础库）
 	 * @return
 	 */
 	@RequestMapping(value = "/delete/permission", method = RequestMethod.POST)
-	ResponseDto deletePermission(@RequestParam("code") String code);
+	ResponseDto deletePermission(@RequestBody CodesDto codesDto);
 	
 	/**
 	 * 权限编辑（基础库）
 	 * @return
 	 */
 	@RequestMapping(value = "/edit/permission", method = RequestMethod.POST)
-	ResponseDto editPermission(@RequestParam("code") String code);
+	ResponseDto editPermission(@RequestBody PermissionDto permissionDto);
 	
 	/**
 	 * 获取运营权限列表（分页）
@@ -64,7 +68,7 @@ public interface IPermissionService {
 	 * @return
 	 */
 	@RequestMapping(value = "/create/function", method = RequestMethod.POST)
-	ResponseDto createFunction(@RequestBody FunctionDto functionDto);
+	ResponseDto createFunction(@RequestBody FunctionDto functionDto, @RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 获取权限列表，无分页
@@ -78,8 +82,8 @@ public interface IPermissionService {
 	 * @param id
 	 * @return
 	 */
-	@RequestMapping(value = "/delete/function", method = RequestMethod.GET)
-	ResponseDto deleteFunction(@RequestParam("id") String id);
+	@RequestMapping(value = "/delete/function", method = RequestMethod.POST)
+	ResponseDto deleteFunction(@RequestBody IdsDto idsDto);
 	
 	/**
 	 * 编辑功能
@@ -101,16 +105,16 @@ public interface IPermissionService {
 	 * @param globalRoleCreate
 	 * @return
 	 */
-	@RequestMapping(value = "/creae/globalRole", method = RequestMethod.POST)
-	ResponseDto createGlobalRole(@RequestBody GlobalRoleCreate globalRoleCreate);	
+	@RequestMapping(value = "/create/globalRole", method = RequestMethod.POST)
+	ResponseDto createGlobalRole(@RequestBody GlobalRoleCreate globalRoleCreate, @RequestParam("request") HttpServletRequest request);	
 	
 	/**
 	 * 角色删除（基础库）
 	 * @param roleId
 	 * @return
 	 */
-	@RequestMapping(value = "/delete/globalRole", method = RequestMethod.GET)
-	ResponseDto deleteGlobalRole(@RequestParam("roleId") int roleId);	
+	@RequestMapping(value = "/delete/globalRole", method = RequestMethod.POST)
+	ResponseDto deleteGlobalRole(@RequestBody IdsDto idsDto);	
 	
 	/**
 	 * 角色编辑（基础库）

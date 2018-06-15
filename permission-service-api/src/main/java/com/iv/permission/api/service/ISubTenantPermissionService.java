@@ -1,6 +1,9 @@
 package com.iv.permission.api.service;
 
+import java.util.List;
 import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,7 +14,9 @@ import com.iv.common.response.ResponseDto;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.permission.api.dto.SubTenantRoleDto;
 import com.iv.permission.api.dto.SubTenantUserRoleDto;
+import com.iv.permission.api.dto.IdsDto;
 import com.iv.permission.api.dto.PageQueryDto;
+import com.iv.permission.api.dto.PermissionDto;
 
 /**
  * 项目组权限api
@@ -42,8 +47,8 @@ public interface ISubTenantPermissionService {
 	 * 获取项目组权限列表（包括已获取、未订阅）
 	 * @return
 	 */
-	@RequestMapping(value = "/get/allPermissionStatus", method = RequestMethod.POST)
-	ResponseDto getAllPermissionStatus(@RequestBody PageQueryDto pageQueryDto);
+	@RequestMapping(value = "/get/allPermissionStatus", method = RequestMethod.GET)
+	ResponseDto getAllPermissionStatus();
 	
 	/**
 	 * 创建项目组角色
@@ -51,7 +56,7 @@ public interface ISubTenantPermissionService {
 	 * @return
 	 */
 	@RequestMapping(value = "/create/subTenantRole", method = RequestMethod.POST)
-	ResponseDto createSubTenantRole(@RequestBody SubTenantRoleDto createRoleDto);
+	ResponseDto createSubTenantRole(@RequestBody SubTenantRoleDto createRoleDto, @RequestParam("request") HttpServletRequest request);
 	
 	/**
 	 * 项目组已获取的权限
@@ -65,8 +70,8 @@ public interface ISubTenantPermissionService {
 	 * @param roleId
 	 * @return
 	 */
-	@RequestMapping(value = "/delete/subTenantRole", method = RequestMethod.GET)
-	ResponseDto deleteSubTenantRole(@RequestParam("roleId") int roleId);
+	@RequestMapping(value = "/delete/subTenantRole", method = RequestMethod.POST)
+	ResponseDto deleteSubTenantRole(@RequestBody IdsDto ids);
 	
 	/**
 	 * 编辑项目组角色
@@ -88,6 +93,17 @@ public interface ISubTenantPermissionService {
 	 * 编辑人员角色
 	 * @return
 	 */
-	@RequestMapping(value = "/edit/subTenantPersonRole", method = RequestMethod.GET)
+	@RequestMapping(value = "/edit/subTenantPersonRole", method = RequestMethod.POST)
 	ResponseDto editSubTenantPersonRole(@RequestBody SubTenantUserRoleDto subTenantUserRoleDto);
+	
+	/**
+	 * 查询用户角色列表（服务间调用）
+	 * @param userId
+	 * @return
+	 */
+	@RequestMapping(value = "/select/personRole", method = RequestMethod.GET)
+	Set<com.iv.outer.dto.SubTenantRoleDto> selectPersonRole(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId);
+	
+	@RequestMapping(value = "/get/personPermissions", method = RequestMethod.GET)
+	List<PermissionDto> getPersonPermissions(@RequestParam("userId") int userId, @RequestParam("tenantId") String tenantId);
 }
