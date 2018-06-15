@@ -21,6 +21,7 @@ spring:
     encoding:
       enabled: true
   datasource:
+    name: operation_script_service
     url: jdbc:mysql://10.10.31.25:3306/operation_script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123@abcd

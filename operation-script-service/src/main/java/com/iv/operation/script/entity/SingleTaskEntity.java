@@ -1,7 +1,7 @@
 package com.iv.operation.script.entity;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.ElementCollection;
@@ -16,7 +16,7 @@ import com.iv.operation.script.util.ScriptSourceType;
 
 
 @Entity
-@Table(name = "single_task_info")
+@Table(name = "single_task")
 public class SingleTaskEntity implements Serializable{
 
 	/**
@@ -28,7 +28,7 @@ public class SingleTaskEntity implements Serializable{
 	private String taskDescription;// 任务描述
 	private ScriptSourceType scriptSrc;// 执行脚本来源
 	private int scriptId;// 脚本库文件id
-	private Set<String> scriptArgs;// 脚本执行传入参数
+	private List<String> scriptArgs;// 脚本执行传入参数
 	private int timeout;// 目标主机连接超时时间(毫秒)
 	private SingleTaskLifeEntity taskLife;
 	
@@ -64,11 +64,11 @@ public class SingleTaskEntity implements Serializable{
 	public void setScriptId(int scriptId) {
 		this.scriptId = scriptId;
 	}
-	@ElementCollection
-	public Set<String> getScriptArgs() {
+	@ElementCollection(fetch = FetchType.EAGER)
+	public List<String> getScriptArgs() {
 		return scriptArgs;
 	}
-	public void setScriptArgs(Set<String> scriptArgs) {
+	public void setScriptArgs(List<String> scriptArgs) {
 		this.scriptArgs = scriptArgs;
 	}
 	public int getTimeout() {

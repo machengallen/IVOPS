@@ -1,7 +1,13 @@
 package com.iv.operation.script.dto;
 
-public class HostDto {
+import java.io.Serializable;
 
+public class HostDto implements Serializable{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7044973479683656637L;
 	private String hostIp;// 目标主机ip
 	private Integer port;// 目标主机sshd端口号
 	private String account;// 目标主机执行账户

@@ -127,7 +127,7 @@ public class SSHExecutor {
 	}
 	
 	/**
-	 * sftp进行文件上传
+	 * sftp文件上传(input流方式)
 	 * @param session
 	 * @param uploadFileName
 	 * @throws JSchException 
@@ -162,6 +162,7 @@ public class SSHExecutor {
 				outstream.write(b, 0, n);
 			}
 			outstream.flush();
+			sftp.chmod(755, "/root/" + uploadFileName);
 		} finally {
 			if(null != outstream) {
 				outstream.close();  
@@ -176,6 +177,40 @@ public class SSHExecutor {
     }
 	
 	/**
+	 * sftp文件上传(byte字节数组方式)
+	 * @param session
+	 * @param uploadFileName
+	 * @param fileStream
+	 * @throws IOException
+	 * @throws SftpException
+	 * @throws JSchException
+	 */
+	public void sftpPut(Session session, String uploadFileName, byte[] fileBytes) throws IOException, SftpException, JSchException {
+		
+		ChannelSftp sftp = null;  
+        OutputStream outstream = null;  
+        
+        try {
+			//创建sftp通信通道  
+			sftp = (ChannelSftp) session.openChannel("sftp");
+			sftp.connect(Constant.CHANNEL_TIMEOUT);
+			//进入服务器指定的文件夹  
+			sftp.cd("/root");
+			outstream = sftp.put(uploadFileName);
+			outstream.write(fileBytes);
+			outstream.flush();
+			sftp.chmod(755, "/root/" + uploadFileName);
+		} finally {
+			if(null != outstream) {
+				outstream.close();  
+			}
+			if(null != sftp) {
+				sftp.disconnect();  
+			}
+		}
+	}
+	
+	/**
 	 * 文件删除
 	 * @param session
 	 * @param uploadFileName
@@ -188,7 +223,7 @@ public class SSHExecutor {
 		try {
 			sftp = (ChannelSftp)session.openChannel("sftp");
 			sftp.connect(Constant.CHANNEL_TIMEOUT);
-			sftp.chmod(755, "/root/" + uploadFileName);
+			//sftp.chmod(755, "/root/" + uploadFileName);
 			sftp.rm("/root/" + uploadFileName);
 			
 		} finally {
