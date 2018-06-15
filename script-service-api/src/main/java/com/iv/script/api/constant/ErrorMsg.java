@@ -24,8 +24,17 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	ITEMTYPE_SCRIPT_FAILED(46108, "领域脚本量统计"),
 	
-	PERSONAL_SCRIPT_FAILED(46109, "个人脚本贡献量统计");
+	PERSONAL_SCRIPT_FAILED(46109, "个人脚本贡献量统计"),
 	
+	SCRIPT_APPLY_FAILED(46110, "提交脚本审核失败"),
+	
+	APPROVE_SCRIPT_FAILED(46111, "脚本审核失败"),	
+	
+	MY_SCRIPT_APPLY_FAILED(46112, "我的脚本申请列表查询失败"),
+	
+	MY_APPLIED_SCRIPT_FAILED(46113, "我审批的脚本申请列表查询失败"),
+	
+	SELECT_SCRIPT_INFO_FAILED(46114, "获取脚本详细信息失败");
 	private int code;
     private String msg;
 	
