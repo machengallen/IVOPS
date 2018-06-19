@@ -6,6 +6,7 @@ import com.iv.form.dao.IFormOptDao;
 import com.iv.form.entity.FormClientEntity;
 import com.iv.form.entity.FormCompanyEntity;
 import com.iv.form.entity.FormDemandEntity;
+import com.iv.form.entity.FormFileEntity;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import org.hibernate.HibernateException;
@@ -287,6 +288,58 @@ public class IFormOptDaoImpl implements IFormOptDao {
 
                 ses.createQuery("delete from FormDemandEntity a where a.id=? ")
                         .setParameter(0,id).executeUpdate();
+                return null;
+            }
+        });
+    }
+
+    /**
+     * 保存文件
+     * @param formFileEntity
+     */
+    @Override
+    public void saveOrUpdateFormFile(FormFileEntity formFileEntity) {
+        HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                ses.saveOrUpdate(formFileEntity);
+                return null;
+            }
+        });
+    }
+
+    //查询文件
+    @Override
+    public FormFileEntity selectFormFile(Integer id) {
+        return (FormFileEntity) HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                return ses.createQuery("from FormFileEntity a where a.id=?")
+                        .setParameter(0, id).uniqueResult();
+            }
+        });
+    }
+
+    /**
+     * 删除文件
+     * @param id
+     */
+    @Override
+    public void delFile(Integer id) {
+        HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+
+                ses.createSQLQuery("delete from r_form_file where file_id= ? ")
+                        .setParameter(0,id).executeUpdate();
+
+//                FormFileEntity esm = (FormFileEntity) ses.load(FormFileEntity.class, id);
+//                if (null != esm) {
+//                    ses.delete(esm);
+//                }
                 return null;
             }
         });

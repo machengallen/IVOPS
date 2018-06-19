@@ -21,9 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -248,9 +250,49 @@ public class FormOptionsController implements IFormOptionsService {
         return dto;
     }
 
+    @ApiOperation(value="上传文件",notes = "90139")
+    @RequestMapping(value = "/uploadFile" ,method = RequestMethod.POST)
+    public ResponseDto uploadFile(@RequestParam("file")MultipartFile file) {
+        ResponseDto dto = new ResponseDto();
+        try {
 
+            Map map = formOptService.uploadFile(file);
+            dto.setData(map);
+            dto.setErrorMsg(ErrorMsg.OK);
+            return  dto;
+        } catch(Exception e) {
+            LOGGER.info(ErrorMsg.UPLOAD_FAILED.toString(),e);
+            dto.setErrorMsg(ErrorMsg.UPLOAD_FAILED);
+        }
+        return dto;
+    }
 
+    @ApiOperation(value="下载文件",notes = "90140")
+    @RequestMapping(value = "/downloadFile" ,method = RequestMethod.GET)
+    public void downloadFile(HttpServletResponse response, @RequestParam("id")Integer id) {
+        ResponseDto dto = new ResponseDto();
+        try {
+            formOptService.download(response,id);
 
+        } catch(Exception e) {
+            LOGGER.info(ErrorMsg.UPLOAD_FILE_HAS_DEL.toString(),e);
+            dto.setErrorMsg(ErrorMsg.UPLOAD_FILE_HAS_DEL);
+        }
+    }
+
+    @ApiOperation(value="删除文件",notes = "90141")
+    @RequestMapping(value = "/del/file" ,method = RequestMethod.GET)
+    public ResponseDto delFile(@RequestParam("id")Integer id) {
+        ResponseDto dto = new ResponseDto();
+        try {
+            formOptService.delFile(id);
+            dto.setErrorMsg(ErrorMsg.OK);
+        } catch(Exception e) {
+            LOGGER.info(ErrorMsg.FORM_DEL_FAILED.toString(),e);
+            dto.setErrorMsg(ErrorMsg.FORM_DEL_FAILED);
+        }
+        return dto;
+    }
 
     @ApiOperation(value="测试")
     @RequestMapping(value = "test" ,method = RequestMethod.POST)

@@ -12,12 +12,16 @@ import com.iv.form.dto.FormDemandDto;
 import com.iv.form.entity.FormClientEntity;
 import com.iv.form.entity.FormCompanyEntity;
 import com.iv.form.entity.FormDemandEntity;
+import com.iv.form.entity.FormFileEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.util.*;
 
 /**
  * @author liangk
@@ -27,6 +31,11 @@ import java.util.Set;
 public class FormOptService {
 
     private static final IFormOptDao FORM_OPT_DAO = IFormOptDaoImpl.getInstance();
+
+    @Value("${iv.upload.savePath}")
+    private String savePath;
+
+
 
     /**
      * 公司列表
@@ -224,4 +233,138 @@ public class FormOptService {
     }
 
 
+    /**
+     * 上传
+     * @param file
+     * @return
+     * @throws ServletException
+     * @throws IOException
+     */
+    public Map uploadFile(MultipartFile file) throws ServletException, IOException {
+        //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
+        String savePath = this.savePath;
+
+        File tmpFile = new File(savePath);
+        if (!tmpFile.exists()) {
+            //创建临时目录
+            tmpFile.mkdir();
+        }
+
+        if (!file.isEmpty()) {
+            //如果fileitem中封装的是上传文件
+            //得到上传的文件名称，
+            String filename = file.getOriginalFilename();
+            System.out.println(filename);
+            if (filename == null || filename.trim().equals("")) {
+                return null;
+            }
+            //注意：不同的浏览器提交的文件名是不一样的，有些浏览器提交上来的文件名是带有路径的，如：  c:\a\b\1.txt，而有些只是单纯的文件名，如：1.txt
+            //处理获取到的上传文件的文件名的路径部分，只保留文件名部分
+            filename = filename.substring(filename.lastIndexOf("\\") + 1);
+            //得到文件保存的名称
+            String saveFilename = makeFileName(filename);
+            //得到文件的保存目录
+            String realSavePath = makePath(saveFilename, savePath);
+            File realSaveFile = new File(realSavePath);
+            if (!realSaveFile.exists()) {
+
+                realSaveFile.mkdir();
+            }
+
+            file.transferTo(new File(realSavePath + "\\" + saveFilename));
+
+            FormFileEntity formFileEntity = new FormFileEntity();
+            formFileEntity.setName(filename);
+            formFileEntity.setPath(realSavePath);
+            formFileEntity.setRealName(saveFilename);
+            FORM_OPT_DAO.saveOrUpdateFormFile(formFileEntity);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("id",formFileEntity.getId());
+            map.put("name",formFileEntity.getName());
+            map.put("url","");
+            return map;
+
+        }
+        return null;
+    }
+
+    /**
+     * 生成上传文件的文件名
+     * @Description: 生成上传文件的文件名，文件名以：uuid+"_"+文件的原始名称
+     * @param filename 文件的原始名称
+     * @return uuid+"_"+文件的原始名称
+     */
+    private String makeFileName(String filename){  //2.jpg
+        //为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
+        return UUID.randomUUID().toString() ;
+    }
+
+    /**
+     * 为防止一个目录下面出现太多文件，要使用年月
+     * @param filename 文件名，要根据文件名生成存储目录
+     * @param savePath 文件存储路径
+     * @return 新的存储目录
+     */
+    private String makePath(String filename,String savePath){
+        Calendar cal = Calendar.getInstance();
+        int year = cal.get(Calendar.YEAR);
+        int month = cal.get(Calendar.MONTH )+1;
+        //构造新的保存目录
+        String dir = savePath + "\\" + year + "\\" + month;  //upload\2\3  upload\3\5
+        //File既可以代表文件也可以代表目录
+        File file = new File(dir);
+        //如果目录不存在
+        if(!file.exists()){
+            //创建目录
+            file.mkdirs();
+        }
+        return dir;
+    }
+
+
+    /**
+     * 下载
+     * @param response
+     */
+    public void download(HttpServletResponse response,Integer id) {
+
+        FormFileEntity formFileEntity=FORM_OPT_DAO.selectFormFile(id);
+
+        String fileName = formFileEntity.getName();
+        response.setHeader("content-type", "application/octet-stream");
+        response.setContentType("application/octet-stream");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(new File(formFileEntity.getPath()+"\\"+formFileEntity.getRealName())));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    /**
+     * 删除文件
+     * @param id
+     */
+    public void delFile(Integer id) {
+        FORM_OPT_DAO.delFile(id);
+    }
 }

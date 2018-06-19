@@ -156,4 +156,7 @@ public interface IFormDao {
 
     //审核人
     void saveOrUpdateFormAuditPerson(FormAuditPersonEntity formAuditPersonEntity);
+
+    //查询工单附件
+    List<Map> selectFileByFormId(String formId);
 }

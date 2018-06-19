@@ -5,6 +5,8 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author liangk
@@ -16,6 +18,9 @@ import java.io.Serializable;
 public class FormInfoEntity implements Serializable {
 
     private static final long serialVersionUID = -5956249874638701781L;
+    @Id
+    @GenericGenerator(name = "FormId", strategy = "com.iv.form.util.FormGenerator")
+    @GeneratedValue(generator = "FormId")
     private String id;
     private Integer unitCode;//单位代码
     private Integer formOwnerId;//工单所有者id
@@ -27,6 +32,7 @@ public class FormInfoEntity implements Serializable {
     private String relationFormId;//关联工单号码
     private Long formApplyTime;//工单申请时间
     private Long formExpectEndTime;//工单期望结束时间
+    @Column(length=1000,name="demand_content")
     private String demandContent;//需求内容
     private Long formRealEndTime;//工单真正结束时间
     private Integer priority;//优先级
@@ -38,10 +44,12 @@ public class FormInfoEntity implements Serializable {
     private Long updateDate;//更新时间
     private Byte  delFlag;//删除标记
 
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @JoinTable(name = "r_form_file", joinColumns = { @JoinColumn(name = "form_id") }, inverseJoinColumns = {@JoinColumn(name = "file_id") })
+    private Set<FormFileEntity> files = new HashSet<FormFileEntity>();
 
-    @Id
-    @GenericGenerator(name = "FormId", strategy = "com.iv.form.util.FormGenerator")
-    @GeneratedValue(generator = "FormId")
+
+
     public String getId() {
         return id;
     }
@@ -78,7 +86,7 @@ public class FormInfoEntity implements Serializable {
         return applicantId;
     }
 
-    @Column(length=1000,name="demand_content")
+
     public String getDemandContent() {
         return demandContent;
     }
@@ -208,5 +216,13 @@ public class FormInfoEntity implements Serializable {
 
     public void setGroupId(Integer groupId) {
         this.groupId = groupId;
+    }
+
+    public Set<FormFileEntity> getFiles() {
+        return files;
+    }
+
+    public void setFiles(Set<FormFileEntity> files) {
+        this.files = files;
     }
 }

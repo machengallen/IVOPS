@@ -5,6 +5,7 @@ import com.iv.dto.CommonPage;
 import com.iv.form.entity.FormClientEntity;
 import com.iv.form.entity.FormCompanyEntity;
 import com.iv.form.entity.FormDemandEntity;
+import com.iv.form.entity.FormFileEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -54,5 +55,12 @@ public interface IFormOptDao {
     //删除需求
     void delDemandById(Integer id);
 
+    //文件
+    void saveOrUpdateFormFile(FormFileEntity formFileEntity);
 
+    //查询文件
+    FormFileEntity selectFormFile(Integer id);
+
+    //删除文件
+    void delFile(Integer id);
 }

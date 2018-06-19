@@ -32,6 +32,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.Normalizer;
 import java.util.*;
 
 
@@ -113,6 +114,8 @@ public class FormService {
             formInfoEntity.setCreateBy(userId);
             formInfoEntity.setCreateDate(System.currentTimeMillis());
 
+
+
         }else {//修改
             formInfoEntity=FORM_DAO.selectFormById(formMsgDto.getId());
             formInfoEntity.setUnitCode(formMsgDto.getUnitCode());
@@ -133,6 +136,18 @@ public class FormService {
             formInfoEntity.setUpdateBy(userId);
             formInfoEntity.setUpdateDate(System.currentTimeMillis());
         }
+
+        //保存文件
+        if (formMsgDto.getFileIds()!=null){
+            formInfoEntity.getFiles().clear();
+            HashSet<FormFileEntity> fileEntities = new HashSet<>();
+            for(Integer fileId:formMsgDto.getFileIds()){
+                FormFileEntity formFileEntity = FORM_OPT_DAO.selectFormFile(fileId);
+                fileEntities.add(formFileEntity);
+            }
+            formInfoEntity.setFiles(fileEntities);
+        }
+
         FORM_DAO.saveOrUpdateForm(formInfoEntity);
 
 
@@ -171,20 +186,22 @@ public class FormService {
 
         //查询信息
         Map formInfo = FORM_DAO.selectFormMapById(formId);
-        Map formEvaluate = FORM_DAO.selectFormEvaluateMapById(formId);
-        List<Map> formChangeLogsList = FORM_DAO.selectFormChangeMapById(formId);
+        List<Map> files= FORM_DAO.selectFileByFormId(formId);
+//        Map formEvaluate = FORM_DAO.selectFormEvaluateMapById(formId);
+       /* List<Map> formChangeLogsList = FORM_DAO.selectFormChangeMapById(formId);
         List<Map> formOperateLogsList = FORM_DAO.selectFormOperateMapById(formId);
         List<Map> formUpgradeLogsList= FORM_DAO.selectFormUpgradeMapById(formId);
-        List<Map> formAuditList = FORM_DAO.selectFormAuditMapById(formId);
+        List<Map> formAuditList = FORM_DAO.selectFormAuditMapById(formId);*/
 
 
         FormAllMsgDto formAllMsgDto = new FormAllMsgDto();
         formAllMsgDto.setFormInfo(formInfo);
-        formAllMsgDto.setFormEvaluate(formEvaluate);
-        formAllMsgDto.setFormChangeLogsList(formChangeLogsList);
+        formAllMsgDto.setFiles(files);
+//        formAllMsgDto.setFormEvaluate(formEvaluate);
+        /*formAllMsgDto.setFormChangeLogsList(formChangeLogsList);
         formAllMsgDto.setFormUpgradeLogsList(formUpgradeLogsList);
         formAllMsgDto.setFormOperateLogsList(formOperateLogsList);
-        formAllMsgDto.setFormAuditList(formAuditList);
+        formAllMsgDto.setFormAuditList(formAuditList);*/
 
 
         return formAllMsgDto;
@@ -619,7 +636,7 @@ public class FormService {
      * @param userId
      */
     @Transactional
-    public void executeDealWithEnd(FormOperateLogsDto formOperateLogsDto, int userId,int curTenantId)throws BusException {
+    public void executeDealWithEnd(FormOperateLogsDto formOperateLogsDto, int userId,String curTenantId)throws BusException {
         //校验参数
         String formId = formOperateLogsDto.getFormId();
         if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(formId)){
@@ -635,7 +652,7 @@ public class FormService {
         FormInfoEntity formInfoEntity = FORM_DAO.selectFormById(formId);
 
         //查询审核人员
-        Set<LocalAuthDto> localAuthDtos = subTenantPermissionServiceClient.approveFormPerson("90120", String.valueOf(curTenantId), formInfoEntity.getGroupId().shortValue());
+        Set<LocalAuthDto> localAuthDtos = subTenantPermissionServiceClient.approveFormPerson("90120", curTenantId, formInfoEntity.getGroupId().shortValue());
         for(LocalAuthDto localAuthDto:localAuthDtos){
             FormAuditPersonEntity formAuditPersonEntity = new FormAuditPersonEntity();
             formAuditPersonEntity.setFormId(formId);

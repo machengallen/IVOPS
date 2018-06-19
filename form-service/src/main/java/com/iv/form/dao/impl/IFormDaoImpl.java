@@ -408,9 +408,10 @@ public class IFormDaoImpl implements IFormDao {
                                 "\t\tWHERE\n" +
                                 "\t\t\ta.id = d.form_id\n" +
                                 "\t\tAND d.create_by = "+userId+" or a.handler_id="+userId+"\n" +
+                                "\t\tunion"+
+                                "\t\tSELECT j.form_id FROM form_audit_person j WHERE j.form_id=a.id AND j.user_id="+userId+""+
                                 "\t)\n" +
-                                "AND a.del_flag = 0 OR " +
-                                "EXISTS(SELECT j.form_id FROM form_audit_person j WHERE j.form_id=a.id AND j.user_id="+userId+")");
+                                "AND a.del_flag = 0 ");
                 if (!StringUtils.isEmpty(formConditionDto.getId())) {
                     sql.append(" and a.id = ").append("'").append(formConditionDto.getId()).append("'");
                 }
@@ -1500,6 +1501,19 @@ public class IFormDaoImpl implements IFormDao {
             public Object doInHibernate(Session ses) throws HibernateException {
                 ses.saveOrUpdate(formAuditPersonEntity);
                 return null;
+            }
+        });
+    }
+
+    @Override
+    public List<Map> selectFileByFormId(String formId) {
+        return (List<Map>) HibernateTemplate.execute(new HibernateCallBack() {
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                return ses.createSQLQuery("select b.id,b.`name`,b.url from r_form_file a JOIN form_file b on a.file_id=b.id where a.form_id= ? ")
+                        .setParameter(0,formId)
+                        .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).list();
+
             }
         });
     }

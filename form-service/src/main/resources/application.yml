@@ -1,5 +1,7 @@
 server:
   port: 9010
+  tomcat:
+    uri-encoding: UTF-8
 eureka:
   instance:
     status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
@@ -8,6 +10,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+
 feign:
   hystrix:
     enabled: true
@@ -26,6 +29,8 @@ spring:
   http:
     encoding:
       enabled: true
+      force: true
+      charset: UTF-8
     multipart:
       max-file-size: 10Mb
       max-request-size: 10Mb
@@ -51,6 +56,8 @@ spring:
       hibernate.event.merge.entity_copy_observer: allow
 
 
+
+
   ####校验流程文件，默认校验resources下的processes文件夹里的流程文件
   activiti:
       check-process-definitions: true
@@ -58,11 +65,11 @@ spring:
 iv:
   upload:
     savePath: E:\upload\form\
-    tempPath: E:\upload\form\temp\
     #设置上传单个文件的大小的最大值，目前是设置为1024*1024字节，也就是1MB
     fileSizeMax: 1048576
     #设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
     sizeMax: 10485760
+
 
 
 

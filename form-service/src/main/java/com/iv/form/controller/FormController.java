@@ -388,7 +388,7 @@ public class FormController implements IFormService {
     @ApiOperation(value="工单处理完成",notes = "90118")
     public ResponseDto executeDealWithEnd(HttpServletRequest request, @RequestBody FormOperateLogsDto formOperateLogsDto) {
         int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
-        int curTenantId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("curTenantId"));
+        String curTenantId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("curTenantId");
         ResponseDto dto = new ResponseDto();
 
         try {
