@@ -1,6 +1,7 @@
 package com.iv.dto;
 
 
+import java.util.List;
 
 /**
  * @author liangk
@@ -21,6 +22,8 @@ public class FormMsgDto {
     private Long formExpectEndTime;//工单期望结束时间
     private String demandContent;//需求内容
     private int priority;//优先级
+
+    private List<Integer> fileIds;//文件ids
 
     public Integer getGroupId() {
         return groupId;
@@ -116,5 +119,14 @@ public class FormMsgDto {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+
+    public List<Integer> getFileIds() {
+        return fileIds;
+    }
+
+    public void setFileIds(List<Integer> fileIds) {
+        this.fileIds = fileIds;
     }
 }
