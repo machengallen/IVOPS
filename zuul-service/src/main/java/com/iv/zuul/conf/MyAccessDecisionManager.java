@@ -67,6 +67,14 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 
         int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
 
+        //admin可以全部放出
+        String userName = JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userName");
+        if (userName.equals("admin")){
+            return;
+        }
+
+
+
          // 读取缓存
         String key="authentication"+userId;
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
