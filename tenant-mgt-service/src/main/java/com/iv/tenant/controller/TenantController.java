@@ -35,8 +35,7 @@ import springfox.documentation.annotations.ApiIgnore;
 /**
  * 租户管理
  * 
- * @author macheng 2018年4月4日 
- * alarm-aggregation-service-1.0.0-SNAPSHOT
+ * @author macheng 2018年4月4日 alarm-aggregation-service-1.0.0-SNAPSHOT
  * 
  */
 @RestController
@@ -77,20 +76,17 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-	/*@ApiOperation("获取指定企业信息及其下面的项目组列表")
-	@GetMapping("/get/enterprise/name")
-	public ResponseDto getEnterprisesByName(@RequestParam String name) {
-		ResponseDto response = null;
-		try {
-			response = new ResponseDto();
-			response.setData(service.getEnterpriseWithTenant(name));
-			response.setErrorMsg(ErrorMsg.OK);
-			return response;
-		} catch (Exception e) {
-			LOGGER.error("获取企业信息失败", e);
-			return ResponseDto.builder(ErrorMsg.ENTER_LIST_GET_FAILED);
-		}
-	}*/
+	/*
+	 * @ApiOperation("获取指定企业信息及其下面的项目组列表")
+	 * 
+	 * @GetMapping("/get/enterprise/name") public ResponseDto
+	 * getEnterprisesByName(@RequestParam String name) { ResponseDto response =
+	 * null; try { response = new ResponseDto();
+	 * response.setData(service.getEnterpriseWithTenant(name));
+	 * response.setErrorMsg(ErrorMsg.OK); return response; } catch (Exception e) {
+	 * LOGGER.error("获取企业信息失败", e); return
+	 * ResponseDto.builder(ErrorMsg.ENTER_LIST_GET_FAILED); } }
+	 */
 
 	@ApiOperation(value = "当前项目组信息查询", notes = "82303")
 	@GetMapping("/get/tenant/current")
@@ -107,7 +103,7 @@ public class TenantController implements ITenantFacadeService {
 			return ResponseDto.builder(ErrorMsg.GET_SUBTENANT_INFO_FAILED);
 		}
 	}
-	
+
 	@ApiIgnore
 	@ApiOperation(value = "当前项目组信息查询", notes = "82306")
 	@Override
@@ -120,7 +116,7 @@ public class TenantController implements ITenantFacadeService {
 			return null;
 		}
 	}
-	
+
 	@ApiIgnore
 	@ApiOperation(value = "当前项目组人员列表查询", notes = "82317")
 	@Override
@@ -160,7 +156,6 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-
 	@ApiOperation(value = "用户所加入的项目组列表查询", notes = "82307")
 	@GetMapping("/get/tenant/joined")
 	public ResponseDto getTenantsJoined(HttpServletRequest request) {
@@ -182,21 +177,19 @@ public class TenantController implements ITenantFacadeService {
 	 * @param dto
 	 * @return
 	 */
-	/*@ApiOperation("申请创建项目组")
-	@GetMapping("/apply/new/tenant")
-	public ResponseDto applyNewTenant(HttpServletRequest request, @RequestParam int enterpriseId,
-			@RequestParam String tenantName) {
-		ResponseDto response = null;
-		try {
-			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			return service.applyNewTenant(userId, enterpriseId, tenantName);
-		} catch (Exception e) {
-			LOGGER.error("申请租户失败", e);
-			response = new ResponseDto();
-			response.setErrorMsg(ErrorMsg.TENANT_CREATE_FAILED);
-			return response;
-		}
-	}*/
+	/*
+	 * @ApiOperation("申请创建项目组")
+	 * 
+	 * @GetMapping("/apply/new/tenant") public ResponseDto
+	 * applyNewTenant(HttpServletRequest request, @RequestParam int enterpriseId,
+	 * 
+	 * @RequestParam String tenantName) { ResponseDto response = null; try { int
+	 * userId =
+	 * JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+	 * return service.applyNewTenant(userId, enterpriseId, tenantName); } catch
+	 * (Exception e) { LOGGER.error("申请租户失败", e); response = new ResponseDto();
+	 * response.setErrorMsg(ErrorMsg.TENANT_CREATE_FAILED); return response; } }
+	 */
 
 	@ApiOperation(value = "项目组创建申请", notes = "82308")
 	@PostMapping("/apply/regis/tenant")
@@ -230,30 +223,30 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-	/*@ApiOperation("《管理员》创建项目组")
-	public ResponseDto createTenant(HttpServletRequest request, @RequestBody SubTenantInfoDto dto) {
-		try {
-			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			return service.createSubTenant(userId, dto.getName(), dto.getUserIds());
-		} catch (Exception e) {
-			LOGGER.error("创建项目组失败", e);
-			return ResponseDto.builder(ErrorMsg.CREATE_SUBTENANT_FAILED);
-		}
-	}*/
+	/*
+	 * @ApiOperation("《管理员》创建项目组") public ResponseDto
+	 * createTenant(HttpServletRequest request, @RequestBody SubTenantInfoDto dto) {
+	 * try { int userId =
+	 * JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+	 * return service.createSubTenant(userId, dto.getName(), dto.getUserIds()); }
+	 * catch (Exception e) { LOGGER.error("创建项目组失败", e); return
+	 * ResponseDto.builder(ErrorMsg.CREATE_SUBTENANT_FAILED); } }
+	 */
 
-	/*@ApiOperation("《管理员》删除项目组")
-	@GetMapping("/delete/tenant")
-	public ResponseDto deleteTenant(HttpServletRequest request, @RequestParam(required = true) int id,
-			@RequestParam(required = true) String refreshToken) {
-		try {
-			
-			service.deleteSubTenant(id, request.getHeader("Authorization"), refreshToken);
-			return ResponseDto.builder(ErrorMsg.OK);
-		} catch (Exception e) {
-			LOGGER.error("删除项目组失败", e);
-			return ResponseDto.builder(ErrorMsg.DEL_SUBTENANT_FAILED);
-		}
-	}*/
+	/*
+	 * @ApiOperation("《管理员》删除项目组")
+	 * 
+	 * @GetMapping("/delete/tenant") public ResponseDto
+	 * deleteTenant(HttpServletRequest request, @RequestParam(required = true) int
+	 * id,
+	 * 
+	 * @RequestParam(required = true) String refreshToken) { try {
+	 * 
+	 * service.deleteSubTenant(id, request.getHeader("Authorization"),
+	 * refreshToken); return ResponseDto.builder(ErrorMsg.OK); } catch (Exception e)
+	 * { LOGGER.error("删除项目组失败", e); return
+	 * ResponseDto.builder(ErrorMsg.DEL_SUBTENANT_FAILED); } }
+	 */
 
 	@ApiOperation(value = "用户添加", notes = "82310")
 	@PostMapping("/add/user")
@@ -270,8 +263,7 @@ public class TenantController implements ITenantFacadeService {
 
 	@ApiOperation(value = "申请流审批", notes = "82311")
 	@PostMapping("/approve")
-	public ResponseDto taskApprove(HttpServletRequest request,
-			@RequestBody TenantApproveReq dto) {
+	public ResponseDto taskApprove(HttpServletRequest request, @RequestBody TenantApproveReq dto) {
 		ResponseDto response = null;
 		try {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
@@ -287,57 +279,34 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-	@ApiOperation(value = "待审批项目组创建申请查询", notes = Constant.TENANT_REGIS_CODE)
-	@GetMapping("/get/pending/regis/tenant")
-	public ResponseDto getUserTasksTenantRegis(HttpServletRequest request,
+	/*
+	 * @ApiOperation("《项目组管理员》获取待审批的项目组创建申请")
+	 * 
+	 * @GetMapping("/get/pending/regis/tenant/{first}/{max}") public ResponseDto
+	 * getUserTasksTenantRegis(HttpServletRequest request,
+	 * 
+	 * @PathVariable(value = "first", required = true) int first,
+	 * 
+	 * @PathVariable(value = "max", required = true) int max) { ResponseDto response
+	 * = null; try { int userId =
+	 * JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+	 * ProcessDataDto tasks = service.getUserTasksTenantRegis(userId, first, max);
+	 * response = new ResponseDto(); response.setData(tasks);
+	 * response.setErrorMsg(ErrorMsg.OK); return response; } catch (Exception e) {
+	 * LOGGER.error("获取审批任务失败", e); response = new ResponseDto();
+	 * response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED); return
+	 * response; } }
+	 */
+
+	@ApiOperation(value = "我的申请-项目组创建申请", notes = "82313")
+	@GetMapping("/get/hisFlow/apply/regis")
+	public ResponseDto getMyApplyRegis(HttpServletRequest request,
 			@RequestParam(value = "curPage", required = true) int curPage,
 			@RequestParam(value = "items", required = true) int items) {
 		ResponseDto response = null;
 		try {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto tasks = service.getUserTasksTenantRegis(userId, (curPage - 1) * items, items);
-			response = new ResponseDto();
-			response.setData(tasks);
-			response.setErrorMsg(ErrorMsg.OK);
-			return response;
-		} catch (Exception e) {
-			LOGGER.error("获取审批任务失败", e);
-			response = new ResponseDto();
-			response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED);
-			return response;
-		}
-	}
-
-	/*@ApiOperation("《项目组管理员》获取待审批的项目组创建申请")
-	@GetMapping("/get/pending/regis/tenant/{first}/{max}")
-	public ResponseDto getUserTasksTenantRegis(HttpServletRequest request,
-			@PathVariable(value = "first", required = true) int first,
-			@PathVariable(value = "max", required = true) int max) {
-		ResponseDto response = null;
-		try {
-			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto tasks = service.getUserTasksTenantRegis(userId, first, max);
-			response = new ResponseDto();
-			response.setData(tasks);
-			response.setErrorMsg(ErrorMsg.OK);
-			return response;
-		} catch (Exception e) {
-			LOGGER.error("获取审批任务失败", e);
-			response = new ResponseDto();
-			response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED);
-			return response;
-		}
-	}*/
-
-	@ApiOperation(value = "项目组创建申请历史查询", notes = "82313")
-	@GetMapping("/get/hisFlow/regis/tenant")
-	public ResponseDto getHistoryTenantRegis(HttpServletRequest request,
-			@RequestParam(value = "curPage", required = true) int curPage,
-			@RequestParam(value = "items", required = true) int items) {
-		ResponseDto response = null;
-		try {
-			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto data = service.getHistoryTenantRegis(userId, (curPage - 1) * items, items);
+			ProcessDataDto data = service.getMyApplyRegis(userId, (curPage - 1) * items, items);
 			response = new ResponseDto();
 			response.setData(data);
 			response.setErrorMsg(ErrorMsg.OK);
@@ -350,15 +319,15 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-	/*@ApiOperation("《项目组管理员》获取项目组创建申请的历史工作流")
-	@GetMapping("/get/hisFlow/regis/tenant/{first}/{max}")
-	public ResponseDto getHistoryTenantRegis(HttpServletRequest request,
-			@PathVariable(value = "first", required = true) int first,
-			@PathVariable(value = "max", required = true) int max) {
+	@ApiOperation(value = "我的申请-项目组加入申请", notes = "82315")
+	@GetMapping("/get/hisFlow/apply/join")
+	public ResponseDto getMyApplyJoin(HttpServletRequest request,
+			@RequestParam(value = "curPage", required = true) int curPage,
+			@RequestParam(value = "items", required = true) int items) {
 		ResponseDto response = null;
 		try {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto data = service.getHistoryTenantRegis(userId, first, max);
+			ProcessDataDto data = service.getMyApplyJoin(userId, (curPage - 1) * items, items);
 			response = new ResponseDto();
 			response.setData(data);
 			response.setErrorMsg(ErrorMsg.OK);
@@ -370,16 +339,56 @@ public class TenantController implements ITenantFacadeService {
 			return response;
 		}
 	}
-*/
-	@ApiOperation(value = "待审批的加入项目组申请查询", notes = Constant.JOIN_TASKT_CODE)
-	@GetMapping("/get/pending/join/tenant")
-	public ResponseDto getUserTasksJoin(HttpServletRequest request,
+
+	/*
+	 * @ApiOperation("《项目组管理员》获取项目组创建申请的历史工作流")
+	 * 
+	 * @GetMapping("/get/hisFlow/regis/tenant/{first}/{max}") public ResponseDto
+	 * getHistoryTenantRegis(HttpServletRequest request,
+	 * 
+	 * @PathVariable(value = "first", required = true) int first,
+	 * 
+	 * @PathVariable(value = "max", required = true) int max) { ResponseDto response
+	 * = null; try { int userId =
+	 * JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+	 * ProcessDataDto data = service.getHistoryTenantRegis(userId, first, max);
+	 * response = new ResponseDto(); response.setData(data);
+	 * response.setErrorMsg(ErrorMsg.OK); return response; } catch (Exception e) {
+	 * LOGGER.error("获取历史工作流失败", e); response = new ResponseDto();
+	 * response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED); return
+	 * response; } }
+	 */
+
+	@ApiOperation(value = "我的审批-待审批-项目组创建申请", notes = Constant.TENANT_REGIS_CODE)
+	@GetMapping("/get/pending/regis")
+	public ResponseDto getMyApprovingRegis(HttpServletRequest request,
 			@RequestParam(value = "curPage", required = true) int curPage,
 			@RequestParam(value = "items", required = true) int items) {
 		ResponseDto response = null;
 		try {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto tasks = service.getUserTasksJoin(userId, (curPage - 1) * items, items);
+			ProcessDataDto tasks = service.getMyApprovingRegis(userId, (curPage - 1) * items, items);
+			response = new ResponseDto();
+			response.setData(tasks);
+			response.setErrorMsg(ErrorMsg.OK);
+			return response;
+		} catch (Exception e) {
+			LOGGER.error("获取审批任务失败", e);
+			response = new ResponseDto();
+			response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED);
+			return response;
+		}
+	}
+
+	@ApiOperation(value = "我的审批-待审批-项目组加入申请", notes = Constant.JOIN_TASKT_CODE)
+	@GetMapping("/get/pending/join")
+	public ResponseDto getMyApprovingJoin(HttpServletRequest request,
+			@RequestParam(value = "curPage", required = true) int curPage,
+			@RequestParam(value = "items", required = true) int items) {
+		ResponseDto response = null;
+		try {
+			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+			ProcessDataDto tasks = service.getMyApprovingJoin(userId, (curPage - 1) * items, items);
 			response = new ResponseDto();
 			response.setData(tasks);
 			response.setErrorMsg(ErrorMsg.OK);
@@ -392,21 +401,40 @@ public class TenantController implements ITenantFacadeService {
 		}
 	}
 
-	@ApiOperation(value = "加入项目组申请历史查询", notes = "82315")
-	@GetMapping("/get/hisFlow/join/tenant")
-	public ResponseDto getHistoryJoin(HttpServletRequest request,
-			@RequestParam(value = "curPage", required = true) int curPage,
-			@RequestParam(value = "items", required = true) int items) {
+	@ApiOperation(value = "我的审批-已审批-项目组创建申请", notes = Constant.TENANT_REGIS_CODE)
+	@GetMapping("/get/hisFlow/approve/regis")
+	public ResponseDto getMyApprovedRegis(HttpServletRequest request, @RequestParam("curPage") int curPage,
+			@RequestParam("items") int items) {
 		ResponseDto response = null;
 		try {
 			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
-			ProcessDataDto data = service.getHistoryJoin(userId, (curPage - 1) * items, items);
+			ProcessDataDto tasks = service.getMyApprovedRegis(userId, (curPage - 1) * items, items);
 			response = new ResponseDto();
-			response.setData(data);
+			response.setData(tasks);
 			response.setErrorMsg(ErrorMsg.OK);
 			return response;
 		} catch (Exception e) {
-			LOGGER.error("获取历史工作流失败", e);
+			LOGGER.error("获取审批历史失败", e);
+			response = new ResponseDto();
+			response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED);
+			return response;
+		}
+	}
+
+	@ApiOperation(value = "我的审批-已审批-项目组加入申请", notes = Constant.JOIN_TASKT_CODE)
+	@GetMapping("/get/hisFlow/approve/join")
+	public ResponseDto getMyApprovedJoin(HttpServletRequest request, @RequestParam("curPage") int curPage,
+			@RequestParam("items") int items) {
+		ResponseDto response = null;
+		try {
+			int userId = JWTUtil.getJWtJson(request.getHeader("Authorization")).getInt("userId");
+			ProcessDataDto tasks = service.getMyApprovedJoin(userId, (curPage - 1) * items, items);
+			response = new ResponseDto();
+			response.setData(tasks);
+			response.setErrorMsg(ErrorMsg.OK);
+			return response;
+		} catch (Exception e) {
+			LOGGER.error("获取审批历史失败", e);
 			response = new ResponseDto();
 			response.setErrorMsg(com.iv.common.response.ErrorMsg.GET_DATA_FAILED);
 			return response;

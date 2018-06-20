@@ -160,9 +160,9 @@ public class SubEnterpriseDaoImpl implements ISubEnterpriseDao {
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				UserListDto dto = new UserListDto();
-				dto.setTotal(
-						(long) ses.createQuery("select count(s.userIds) from SubEnterpriseEntity s where s.tenantId=?")
-								.setParameter(0, tenantId).uniqueResult());
+				dto.setTotal((long) ses
+						.createQuery("select count(u) from SubEnterpriseEntity s join s.userIds u where s.tenantId=?")
+						.setParameter(0, tenantId).uniqueResult());
 				dto.setUserIds(ses
 						.createQuery("select u from SubEnterpriseEntity s join s.userIds u where s.tenantId=?")
 						.setParameter(0, tenantId).setFirstResult((page - 1) * items).setMaxResults(items).list());

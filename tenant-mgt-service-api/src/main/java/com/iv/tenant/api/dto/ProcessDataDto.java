@@ -6,6 +6,18 @@ public class ProcessDataDto {
 
 	private List data;
 	private long totalNum;
+	
+	public ProcessDataDto(List data, long totalNum) {
+		super();
+		this.data = data;
+		this.totalNum = totalNum;
+	}
+	
+	public ProcessDataDto() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
 	public List getData() {
 		return data;
 	}
