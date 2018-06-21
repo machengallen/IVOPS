@@ -35,4 +35,8 @@ public interface IGroupDao {
 	void deleteGroupById(short id) throws RuntimeException;
 	
 	GroupEntity updateGroupName(final short id, String groupName) throws RuntimeException;
+	
+	List<GroupEntity> groupsInfo(List<Short> groupIds) throws RuntimeException;
+	
+	List<Integer> selectGroupUserIds(String subTenantId, short groupId) throws RuntimeException;
 }

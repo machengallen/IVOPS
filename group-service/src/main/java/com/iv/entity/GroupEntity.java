@@ -49,7 +49,7 @@ public class GroupEntity implements Serializable{
 		this.groupName = groupName;
 	}		
 	
-	@ElementCollection
+	@ElementCollection(fetch=FetchType.EAGER)
 	public List<Integer> getUserIds() {
 		return userIds;
 	}
