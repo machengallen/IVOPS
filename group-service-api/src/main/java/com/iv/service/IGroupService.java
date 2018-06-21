@@ -31,6 +31,15 @@ public interface IGroupService {
 	@RequestMapping(value = "/select/groupInfoById", method = RequestMethod.GET)
 	GroupEntityDto selectGroupInfo(@RequestParam("subTenantId") String subTenantId
 			, @RequestParam("groupId") short groupId);
+	
+	/**
+	 * 根据组id、租户id(告警轮询推送使用)
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/select/groupUserIds", method = RequestMethod.GET)
+	List<Integer> selectGroupUserIds(@RequestParam("subTenantId") String subTenantId
+			, @RequestParam("groupId") short groupId);
 		
 	/**
 	 * 查询当前用户所在组信息（人员非分页）
