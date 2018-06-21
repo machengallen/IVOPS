@@ -13,7 +13,7 @@ public class LocalAuthDto {
 	private String userName;
 	private String realName;
 	private String nickName;
-	private String email;
+	private String email; 
 	private String tel;	
 	private String curTenantId;
 	private String headimgurl;
