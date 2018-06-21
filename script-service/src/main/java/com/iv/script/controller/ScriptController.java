@@ -55,7 +55,7 @@ public class ScriptController implements IScriptService{
 	 * @param file
 	 * @return
 	 */
-	@ApiOperation(value = "上传脚本文件", notes = "87100")
+	@ApiOperation(value = "上传脚本文件", notes = "827100")
 	@RequestMapping(value = "/upload/file", method = RequestMethod.POST)
 	public ResponseDto fileUpload(@RequestParam(required = true) MultipartFile file,
 			@RequestParam(required = true) String alias, @RequestParam(required = true) ItemType itemType,
@@ -71,7 +71,7 @@ public class ScriptController implements IScriptService{
 		}
 	}
 
-	@ApiOperation(value = "上传（或更新）内容文本", notes = "87101")
+	@ApiOperation(value = "上传（或更新）内容文本", notes = "827101")
 	@RequestMapping(value = "/upload/text", method = RequestMethod.POST)
 	public ResponseDto textUpload(@RequestBody TextUploadDto dto, HttpServletRequest request) {
 		ResponseDto responseDto = new ResponseDto();
@@ -97,8 +97,8 @@ public class ScriptController implements IScriptService{
 	 * @param
 	 * @return
 	 */
-	@ApiOperation(value = "获取文件列表", notes = "87102")
-	@RequestMapping(value = "get/list", method = RequestMethod.POST)
+	@ApiOperation(value = "获取文件列表", notes = "827102")
+	@RequestMapping(value = "/get/list", method = RequestMethod.POST)
 	public ResponseDto fileList(@RequestBody ScriptQueryDto query) {
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -119,7 +119,7 @@ public class ScriptController implements IScriptService{
 	 * @param response
 	 * @return
 	 */
-	@ApiOperation(value = "文件下载", notes = "87103")
+	@ApiOperation(value = "文件下载", notes = "827103")
 	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	public ResponseDto download(@RequestParam int id, HttpServletResponse response) {
 		ResponseDto responseDto = new ResponseDto();
@@ -132,7 +132,7 @@ public class ScriptController implements IScriptService{
 		}
 	}
 
-	/*@ApiOperation(value = "文件编辑", notes = "87105")
+	@ApiOperation(value = "文件编辑", notes = "87105")
 	@RequestMapping(value = "/editor", method = RequestMethod.GET)
 	public ResponseEntity<byte[]> editor(@RequestParam int id) {
 
@@ -142,7 +142,7 @@ public class ScriptController implements IScriptService{
 			LOGGER.error("下载文件失败", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
-	}*/
+	}
 
 	/**
 	 * 删除文件
@@ -151,7 +151,7 @@ public class ScriptController implements IScriptService{
 	 * @param response
 	 * @return
 	 */
-	@ApiOperation(value = "文件删除", notes = "87104")
+	@ApiOperation(value = "文件删除", notes = "827104")
 	@RequestMapping(value = "/del", method = RequestMethod.POST)
 	public ResponseDto fileDelete(@RequestBody List<Integer> ids) {
 		ResponseDto responseDto = new ResponseDto();
@@ -231,7 +231,7 @@ public class ScriptController implements IScriptService{
 		return null;
 	}
 	
-	@ApiOperation(value = "领域脚本量统计", notes = "87106")
+	@ApiOperation(value = "领域脚本量统计", notes = "827105")
 	@RequestMapping(value = "/itemType/count", method = RequestMethod.GET)
 	public ResponseDto itemTypeCount() {
 		try {
@@ -249,7 +249,7 @@ public class ScriptController implements IScriptService{
 	 * @param request
 	 * @return
 	 */
-	@ApiOperation(value = "个人脚本量统计", notes = "87107")
+	@ApiOperation(value = "个人脚本量统计", notes = "827106")
 	@RequestMapping(value = "/personalScript/count", method = RequestMethod.GET)
 	public ResponseDto personalScriptCount(HttpServletRequest request) {
 		try {
@@ -266,8 +266,8 @@ public class ScriptController implements IScriptService{
 	 * 提交脚本审批
 	 * @param id
 	 * @return
-	 */
-	@ApiOperation(value = "提交脚本审批", notes = "87108")
+	 *//*
+	@ApiOperation(value = "提交脚本审批")
 	@RequestMapping(value = "/script/apply", method = RequestMethod.GET)
 	public ResponseDto scriptApply(int scriptId,HttpServletRequest request) {
 		try {
@@ -278,7 +278,7 @@ public class ScriptController implements IScriptService{
 			LOGGER.info("提交脚本审核失败");	
 			return ResponseDto.builder(ErrorMsg.SCRIPT_APPLY_FAILED);
 		}	
-	}
+	}*/
 	
 	@ApiOperation(value = "脚本申请流审批", notes = Constant.STORE_TASKT_CODE)
 	@PostMapping("/approve")
@@ -299,7 +299,7 @@ public class ScriptController implements IScriptService{
 		}
 	}
 	
-	@ApiOperation(value = "待我审批的脚本", notes = "87110")
+	@ApiOperation(value = "待我审批的脚本", notes = "827108")
 	@GetMapping("/get/pending/store/script")
 	public ResponseDto getUserTasksScriptStore(HttpServletRequest request,
 			@RequestParam(value = "curPage", required = true) int curPage,
@@ -320,7 +320,7 @@ public class ScriptController implements IScriptService{
 		} 
 	}
 	
-	@ApiOperation(value = "我发起的脚本申请", notes = "87111")
+	@ApiOperation(value = "我发起的脚本申请", notes = "827109")
 	@GetMapping("/get/my/apply")
 	public ResponseDto getMyScriptApply(HttpServletRequest request,
 			@RequestParam(value = "curPage", required = true) int curPage,
@@ -341,7 +341,7 @@ public class ScriptController implements IScriptService{
 		}
 	}
 	
-	@ApiOperation(value = "我已审批的脚本申请", notes = "87113")
+	@ApiOperation(value = "我已审批的脚本申请", notes = "827110")
 	@GetMapping("/get/my/approved")
 	public ResponseDto getMyApprovedScript(HttpServletRequest request,
 			@RequestParam(value = "curPage", required = true) int curPage,
@@ -367,7 +367,7 @@ public class ScriptController implements IScriptService{
 	 * @param scriptId
 	 * @return
 	 */
-	@ApiOperation(value = "脚本详情(脚本快速执行)", notes = "87112")
+	@ApiOperation(value = "脚本详情(脚本快速执行)", notes = "827111")
 	@RequestMapping(value = "/script/detailInfo", method = RequestMethod.GET)
 	public ResponseDto getScriptDetailInfo(int scriptId) {
 		try {
