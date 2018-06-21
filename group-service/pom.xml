@@ -79,6 +79,7 @@
              <artifactId>springfox-swagger-ui</artifactId>
              <version>2.6.1</version>
         </dependency>
+        
 		<dependency>
 	      <groupId>com.iv</groupId>
 		  <artifactId>common-util</artifactId>
@@ -96,7 +97,20 @@
 			<artifactId>group-service-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
-		</dependency>			
+		</dependency>	
+		<dependency>
+	      <groupId>com.iv</groupId>
+		  <artifactId>jpa-util</artifactId>
+		  <version>1.0.0-SNAPSHOT</version>
+	      <type>jar</type>
+    	</dependency>	
+    	<dependency>
+    		<groupId>com.iv</groupId>
+			<artifactId>tenant-mgt-service-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>jar</type>	
+    	</dependency>   
+    	   		
 	</dependencies>
 	
 	<dependencyManagement>
