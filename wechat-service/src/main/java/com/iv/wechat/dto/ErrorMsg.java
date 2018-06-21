@@ -3,6 +3,7 @@ package com.iv.wechat.dto;
 import com.iv.common.response.IErrorMsg;
 
 public enum ErrorMsg implements IErrorMsg {
+	OK(0,"ok"),
 
 	GET_WEXIN_LOGINCODE_FAILED(42400,"获取微信登录二维码失败"),
 	
@@ -14,7 +15,9 @@ public enum ErrorMsg implements IErrorMsg {
 
 	QRCODE_CREATE_FAILED(42406,"二维码加载失败"),
 	
-	SEND_WECHATINFO_FAILED(42407,"发送微信消息失败");
+	SEND_WECHATINFO_FAILED(42407,"发送微信消息失败"),
+	
+	SEND_FORM_WECHATINFO_FAILED(42408,"发送微信消息失败");
 	
 	private int code;
     private String msg;

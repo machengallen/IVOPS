@@ -18,4 +18,6 @@ public interface UserWechatDao {
 	UserWechatEntity selectUserWechatByUnionid(String unionid) throws RuntimeException;
 	
 	List<UserWechatEntity> selectUserWechatsByUnionids(Set<String> unionids) throws RuntimeException;
+	
+	void saveOrUpdateUserWechats(List<UserWechatEntity> userWechatEntitys) throws RuntimeException;
 }

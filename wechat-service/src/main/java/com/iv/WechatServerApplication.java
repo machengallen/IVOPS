@@ -1,13 +1,15 @@
 package com.iv;
-
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.SpringCloudApplication;
+import org.springframework.cloud.netflix.feign.EnableFeignClients;
 import org.springframework.context.annotation.PropertySource;
-@PropertySource(value={"classpath:test.properties"}, encoding="utf-8")
-@SpringBootApplication
+@SpringCloudApplication
+@EnableFeignClients
+@PropertySource(value={"classpath:config.properties"}, encoding="utf-8")
 public class WechatServerApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(WechatServerApplication.class, args);
 	}
+
 }

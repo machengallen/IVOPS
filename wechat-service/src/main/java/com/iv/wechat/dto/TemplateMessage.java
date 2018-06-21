@@ -10,19 +10,19 @@ import com.iv.dto.ContentData;
  */
 public class TemplateMessage {
 	//用户公众号openId
-	private String openId;
+	private String touser;
 	//微信模板id
 	private String template_id;
 	//详情页面路径
 	private String url;
 	//告警数据
 	private ContentData data;
-	
-	public String getOpenId() {
-		return openId;
+		
+	public String getTouser() {
+		return touser;
 	}
-	public void setOpenId(String openId) {
-		this.openId = openId;
+	public void setTouser(String touser) {
+		this.touser = touser;
 	}
 	public String getTemplate_id() {
 		return template_id;

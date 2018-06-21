@@ -7,9 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.TemplateFormMessageDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.dto.WeChat;
 import com.iv.entity.dto.UserWechatEntityDto;
@@ -21,6 +23,7 @@ import com.iv.wechat.util.SignUtil;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 
@@ -40,7 +43,7 @@ public class WeChatController implements IWechatService{
 	private WeChatService weChatService;
 
 	@Override
-	@ApiOperation("获取微信登录二维码")
+	@ApiOperation(value = "获取微信登录二维码", notes = "82400")
 	public ResponseDto getWechatLoginCode() {
 		// TODO Auto-generated method stub
 		ResponseDto dto = new ResponseDto();
@@ -57,28 +60,24 @@ public class WeChatController implements IWechatService{
 	}
 	
 	@Override
-	@ApiOperation("扫描微信二维码后回调地址")
-	public ResponseDto wxLoginCallBack(HttpServletRequest request) {
+	@ApiOperation(value = "扫描微信二维码后回调地址")
+	@ApiIgnore
+	public ResponseDto wxLoginCallBack(String code, HttpServletRequest request) {
 		// TODO Auto-generated method stub
 		ResponseDto dto = new ResponseDto();
-		try {
-			String code = request.getParameter("code");
-			if(!"authdeny".equals(code)) {
-				weChatService.wxLoginCallBack(code);
-			}else {
-				dto.setErrorMsg(ErrorMsg.WECHAT_CALLBACK_FAILURE);
-			}						
+		try {			
+			return weChatService.wxLoginCallBack(code,request);							
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("微信错误：微信扫描回调失败", e);
-			dto.setErrorMsg(ErrorMsg.WECHAT_CALLBACK_FAILURE);			
+			dto.setErrorMsg(ErrorMsg.WECHAT_CALLBACK_FAILURE);	
+			return dto;
 		}
-		return dto;
-	
 	}
 
 	@Override
-	@ApiOperation("微信服务器认证")
+	@ApiOperation(value = "微信服务器认证")
+	@ApiIgnore
 	public String xxtInterface(WeChat wc) {
 		// TODO Auto-generated method stub
 		String signature = wc.getSignature(); // 微信加密签名
@@ -94,7 +93,7 @@ public class WeChatController implements IWechatService{
 	}
 	
 	@Override
-	@ApiOperation("公众号二维码生成")
+	@ApiOperation(value = "公众号二维码生成", notes = "82401")
 	public ResponseDto qrcodeCreate(int userId) {
 		// TODO Auto-generated method stub
 		ResponseDto dto = new ResponseDto();
@@ -112,7 +111,8 @@ public class WeChatController implements IWechatService{
 	}
 
 	@Override
-	@ApiOperation("微信服务器推送消息入口")
+	@ApiOperation(value = "微信服务器推送消息入口")
+	@ApiIgnore
 	public String getWeiXinMessage(HttpServletRequest request) throws Exception {
 		// TODO Auto-generated method stub
 		// 将请求、响应的编码均设置为UTF-8（防止中文乱码）
@@ -127,7 +127,8 @@ public class WeChatController implements IWechatService{
 	}
 
 	@Override
-	@ApiOperation("根据unionid查询微信信息")
+	@ApiOperation(value = "根据unionid查询微信信息")
+	@ApiIgnore
 	public UserWechatEntityDto selectUserWechatByUnionid(String unionid) {
 		// TODO Auto-generated method stub
 		try {
@@ -141,12 +142,12 @@ public class WeChatController implements IWechatService{
 	}
 
 	@Override
-	@ApiOperation("发送微信模板消息")
-	public ResponseDto SendWeChatInfo(TemplateMessageDto templateMessageDto) {
+	@ApiOperation(value = "发送微信模板消息", notes = "82402")
+	public ResponseDto SendWeChatInfo(@RequestBody TemplateMessageDto templateMessageDto) {
 		// TODO Auto-generated method stub
 		try {
 			weChatService.SendWeChatInfo(templateMessageDto);	
-			return ResponseDto.builder(com.iv.common.response.ErrorMsg.OK);
+			return ResponseDto.builder(ErrorMsg.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("系统错误：发送微信模板消息失败", e);
@@ -155,7 +156,8 @@ public class WeChatController implements IWechatService{
 	}
 
 	@Override
-	@ApiOperation("根据userId判断是否已关注微信公众号")
+	@ApiOperation(value = "根据userId判断是否已关注微信公众号")
+	@ApiIgnore
 	public boolean ifFocusWechat(int userId) {
 		// TODO Auto-generated method stub
 		try {
@@ -165,6 +167,20 @@ public class WeChatController implements IWechatService{
 			// TODO: handle exception
 			LOGGER.error("系统错误：查询是否关注微信公众号信息失败", e);
 			return false;
+		}	
+	}
+
+	@Override
+	@ApiOperation(value = "发送工单微信模板消息", notes = "82403")
+	public ResponseDto SendFormWeChatInfo(@RequestBody TemplateFormMessageDto templateFormMessageDto) {
+		// TODO Auto-generated method stub
+		try {
+			weChatService.SendFormWeChatInfo(templateFormMessageDto);	
+			return ResponseDto.builder(ErrorMsg.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("系统错误：发送工单微信模板消息失败", e);
+			return ResponseDto.builder(ErrorMsg.SEND_FORM_WECHATINFO_FAILED);
 		}	
 	}
 

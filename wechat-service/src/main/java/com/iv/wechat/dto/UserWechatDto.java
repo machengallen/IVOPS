@@ -15,5 +15,9 @@ public class UserWechatDto {
 	public void setUserWechatEntities(List<UserWechatEntityDto> userWechatEntities) {
 		this.userWechatEntities = userWechatEntities;
 	}
+
+	
+
+	
 	
 }
