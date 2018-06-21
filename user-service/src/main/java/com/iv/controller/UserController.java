@@ -127,10 +127,10 @@ public class UserController implements IUserService {
 	@Override
 	@ApiOperation("根据用户id集合，查询用户信息")
 	@ApiIgnore
-	public List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery) {
+	public List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery, String tenantId) {
 		// TODO Auto-generated method stub
 		try {
-			return userService.selectUserInfos(usersWechatsQuery);
+			return userService.selectUserInfos(usersWechatsQuery,tenantId);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("系统错误：获取用户信息失败", e);	
