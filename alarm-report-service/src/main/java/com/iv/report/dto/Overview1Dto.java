@@ -1,13 +1,11 @@
 package com.iv.report.dto;
-
-import java.util.Map;
 import java.util.Set;
 
 public class Overview1Dto {
 
 	private Set<GroupByHostDto> hostsTop;
 	private Set<GroupBySeverityDto> severityRatio;
-	private Map<String,GroupByItemTypeDto> itemTypeRatio;
+	private Set<GroupByItemTypeDto> itemTypeRatio;
 	private AlarmAndHostNumDto unrecovered;
 	public Set<GroupByHostDto> getHostsTop() {
 		return hostsTop;
@@ -27,12 +25,11 @@ public class Overview1Dto {
 	public void setUnrecovered(AlarmAndHostNumDto unrecovered) {
 		this.unrecovered = unrecovered;
 	}
-	public Map<String, GroupByItemTypeDto> getItemTypeRatio() {
+	public Set<GroupByItemTypeDto> getItemTypeRatio() {
 		return itemTypeRatio;
 	}
-	public void setItemTypeRatio(Map<String, GroupByItemTypeDto> itemTypeRatio) {
+	public void setItemTypeRatio(Set<GroupByItemTypeDto> itemTypeRatio) {
 		this.itemTypeRatio = itemTypeRatio;
 	}
-	
 	
 }

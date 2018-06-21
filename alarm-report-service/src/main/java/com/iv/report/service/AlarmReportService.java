@@ -1,8 +1,10 @@
 package com.iv.report.service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -188,12 +190,14 @@ public class AlarmReportService {
 		for (Object[] object : list) {
 			GroupByHostDto byHostDto = new GroupByHostDto();
 			byHostDto.setHostIp(object[0].toString());
-			byHostDto.setCount((long) object[1]);
+			BigInteger obj = (BigInteger) object[1];
+			byHostDto.setCount(obj.longValue());
 			byHostDto.setHostName(object[2].toString());
 			Map<String, Long> map = new HashMap<String, Long>();
 			for (Object[] object2 : list1) {
 				if (object2[0].toString().equals(object[0].toString())) {
-					map.put(object2[1].toString(), (long) object2[2]);
+					BigInteger obj1 = (BigInteger) object2[2];
+					map.put(object2[1].toString(), obj1.longValue());
 				}
 			}
 			byHostDto.setItemTypeMap(map);
@@ -213,10 +217,13 @@ public class AlarmReportService {
 		Set<GroupBySeverityDto> bySeverityDtos = new TreeSet<GroupBySeverityDto>();
 		for (Object[] objects : list) {
 			GroupBySeverityDto bySeverityDto = new GroupBySeverityDto();
-			bySeverityDto.setSeverity((Severity) objects[0]);
-			bySeverityDto.setCount((Long) objects[1]);
+			Integer object0 = (Integer) objects[0];
+			BigInteger object1 = (BigInteger) objects[1];
+			BigInteger object2 = (BigInteger) objects[2];
+			bySeverityDto.setSeverity(Severity.values()[object0.intValue()]);
+			bySeverityDto.setCount(object1.longValue());
 			bySeverityDto
-					.setProportion((float) (Math.round((float) ((Long) objects[1]) / ((Long) objects[2]) * 1000)) / 10);
+					.setProportion((float) (Math.round((float) (object1.longValue()) / (object2.longValue()) * 1000)) / 10);
 			bySeverityDtos.add(bySeverityDto);
 		}
 		return bySeverityDtos;
@@ -227,9 +234,9 @@ public class AlarmReportService {
 	 * 
 	 * @param date
 	 */
-	public Map<String, GroupByItemTypeDto> getItemProportion(Long date) {
-		List<Object[]> list = alarmReportDao.groupByItemType(date);
-		Map<String, GroupByItemTypeDto> byItemDtos = new HashMap<String, GroupByItemTypeDto>();
+	public Set<GroupByItemTypeDto> getItemProportion(Long date) {
+		List<Object[]> list = alarmReportDao.groupByItemType(date);		
+		Set<GroupByItemTypeDto> GroupByItemTypeDtos = new HashSet<GroupByItemTypeDto>();
 		List<Map<String, Float>> mapList = alarmAnalysisUtil.getAlarmListByItemType(list);
 		List<String> itemTypeList = alarmAnalysisUtil.getItemTypeList();
 		for (String itemType : itemTypeList) {
@@ -238,10 +245,10 @@ public class AlarmReportService {
 			dto.setItemType(itemType);
 			dto.setMtta((float) Math.round(mapList.get(4).get(itemType) * 100 / 1000 / 60) / 100);
 			dto.setMttr((float) Math.round(mapList.get(1).get(itemType) * 100 / 1000 / 60) / 100);
-			dto.setProportion((float) Math.round(mapList.get(2).get(itemType) * 100 * 100 / list.size()) / 100);
-			byItemDtos.put(itemType, dto);
+			dto.setProportion((float) Math.round(mapList.get(2).get(itemType) * 100 * 100 / list.size()) / 100);			
+			GroupByItemTypeDtos.add(dto);
 		}
-		return byItemDtos;
+		return GroupByItemTypeDtos;
 	}
 
 	/**
