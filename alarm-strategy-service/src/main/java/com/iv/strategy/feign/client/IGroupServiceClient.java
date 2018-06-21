@@ -96,5 +96,11 @@ class GroupServiceClientFallBack implements IGroupServiceClient{
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public List<Integer> selectGroupUserIds(String subTenantId, short groupId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	
 }

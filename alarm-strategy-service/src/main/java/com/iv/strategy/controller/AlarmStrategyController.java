@@ -183,8 +183,8 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			int itempTypes = ItemType.values().length;
 			int totlalCount = severities * itempTypes;
 			Map<String, Object> map = new HashMap<>();
-			Set roles = ((Map) JWTUtil.getJWtJson(request.getHeader("Authorization")).get("permissions")).keySet();
-			map.put("curHireRoles", roles);
+			//Set roles = ((Map) JWTUtil.getJWtJson(request.getHeader("Authorization")).get("permissions")).keySet();
+			//map.put("curHireRoles", roles);
 			map.put("netPercentage", getPercentage(netCount, severities));
 			map.put("systemPercentage", getPercentage(systemCount, severities));
 			map.put("databasePercentage", getPercentage(databaseCount, severities));

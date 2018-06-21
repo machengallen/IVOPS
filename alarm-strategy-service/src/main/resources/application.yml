@@ -68,13 +68,13 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
 #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
    file: /var/log/ivops/alarm/alarm-strategy-service/peer1/alarm-strategy-service.log
    
@@ -84,12 +84,12 @@ server:
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
 #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
    file: /var/log/ivops/alarm/alarm-strategy-service/peer2/alarm-strategy-service.log

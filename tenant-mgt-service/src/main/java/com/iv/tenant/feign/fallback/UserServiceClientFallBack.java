@@ -43,13 +43,6 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 		return null;
 	}
 
-
-	@Override
-	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	@Override
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
 		// TODO Auto-generated method stub
@@ -82,6 +75,18 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 
 	@Override
 	public ResponseDto getUserInfo(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery, String tenantId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
 		return null;
 	}

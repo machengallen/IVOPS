@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import com.iv.common.requestInterceptor.FeignClientsConfigurationCustom;
 import com.iv.common.response.ResponseDto;
-import com.iv.dto.GroupUserInfosDto;
 import com.iv.enter.dto.GroupIdsDto;
 import com.iv.enter.dto.GroupQuery;
 import com.iv.enter.dto.OpsGroupDto;
@@ -94,6 +93,12 @@ class GroupServiceClientFallBack implements IGroupServiceClient {
 
 	@Override
 	public ResponseDto selectTenantUserPageInfo(HttpServletRequest request, GroupQuery groupQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Integer> selectGroupUserIds(String subTenantId, short groupId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
