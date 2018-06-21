@@ -2,6 +2,7 @@ package com.iv.permission.api.dto;
 
 import java.util.List;
 
+import com.iv.common.enumeration.ServiceType;
 import com.iv.common.enumeration.YesOrNo;
 
 public class FunctionDto {
