@@ -81,12 +81,20 @@ public interface IUserService {
 	UserOauthDto selectUserWechatUnionid(@RequestParam("userId") int userId, @RequestParam("loginType") LoginType loginType);
 	
 	/**
-	 * 根据用户id集合，查询用户信息
+	 * 根据用户id集合、租户信息，查询用户信息（包含角色）
 	 * @param usersWechatsQuery
 	 * @return
 	 */
 	@RequestMapping(value = "/select/userInfos",method = RequestMethod.POST)
 	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery,@RequestParam("tenantId") String tenantId);
+	
+	/**
+	 * 根据用户id集合，查询用户信息
+	 * @param usersWechatsQuery
+	 * @return
+	 */
+	@RequestMapping(value = "/select/userDetails",method = RequestMethod.POST)
+	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery);
 	
 	/**
 	 * 根据用户名称查询用户信息
