@@ -14,7 +14,6 @@ import com.iv.common.response.ResponseDto;
 import com.iv.dto.ErrorMsg;
 import com.iv.enter.dto.AccountDto;
 import com.iv.enter.dto.UsersQueryDto;
-import com.iv.entity.LocalAuth;
 import com.iv.enumeration.LoginType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
@@ -194,6 +193,19 @@ public class UserController implements IUserService {
 			LOGGER.error("系统错误:获取联合主键集失败", e);
 		}
 		return null;
+	}
+
+	@ApiOperation("根据用户列表id集合查询用户信息")
+	@ApiIgnore
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {		
+		// TODO Auto-generated method stub
+		try {
+			return userService.selectUserInfos(usersWechatsQuery);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("系统错误：获取用户信息失败", e);	
+		}
+		return null;		
 	}
 	
 }

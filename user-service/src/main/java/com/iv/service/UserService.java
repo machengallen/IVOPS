@@ -405,4 +405,35 @@ public class UserService {
 		}
 		return unionds;
 	}
+	
+	/**
+	 * 根据用户id集合，查询用户信息
+	 * @param usersWechatsQuery
+	 * @return
+	 */
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery){
+		LoginType loginType = usersWechatsQuery.getLoginType();
+		List<Integer> userIds = usersWechatsQuery.getUserIds();
+		LocalAuthDto localAuthDto = new LocalAuthDto();
+		List<LocalAuthDto> UserInfos = new ArrayList<LocalAuthDto>();
+		for (Integer userId : userIds) {
+			LocalAuth localAuth = localAuthDao.selectLocalAuthById(userId);
+			localAuthDto = convertLocalAuthDto(localAuth);
+			//查询用户微信头像信息
+			if(!StringUtils.isEmpty(usersWechatsQuery.getLoginType())) {
+				UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
+				if(null != userOauth) {
+					UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());					
+					localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
+				}				
+			}	
+			/*//查询用户角色名称列表信息（为匹配用户角色使用）
+			Set<SubTenantRoleDto> subTenantRoleDtos = subTenantPermissionService.selectPersonRole(userId,tenantId);
+			if(!CollectionUtils.isEmpty(subTenantRoleDtos)) {
+				localAuthDto.setRoles(subTenantRoleDtos);
+			}*/
+			UserInfos.add(localAuthDto);
+		}
+		return UserInfos;
+	}
 }
