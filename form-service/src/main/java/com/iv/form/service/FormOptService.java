@@ -1,5 +1,6 @@
 package com.iv.form.service;
 
+import com.iv.common.response.ResponseDto;
 import com.iv.constant.BusException;
 import com.iv.constant.ErrorMsg;
 import com.iv.dto.ClientConditionDto;
@@ -13,12 +14,16 @@ import com.iv.form.entity.FormClientEntity;
 import com.iv.form.entity.FormCompanyEntity;
 import com.iv.form.entity.FormDemandEntity;
 import com.iv.form.entity.FormFileEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.util.*;
@@ -31,7 +36,7 @@ import java.util.*;
 public class FormOptService {
 
     private static final IFormOptDao FORM_OPT_DAO = IFormOptDaoImpl.getInstance();
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(FormOptService.class);
     @Value("${iv.upload.savePath}")
     private String savePath;
 
@@ -243,7 +248,7 @@ public class FormOptService {
     public Map uploadFile(MultipartFile file) throws ServletException, IOException {
         //得到上传文件的保存目录，将上传的文件存放于WEB-INF目录下，不允许外界直接访问，保证上传文件的安全
         String savePath = this.savePath;
-
+        System.out.println(file.getContentType());
         File tmpFile = new File(savePath);
         if (!tmpFile.exists()) {
             //创建临时目录
@@ -296,7 +301,8 @@ public class FormOptService {
      */
     private String makeFileName(String filename){  //2.jpg
         //为防止文件覆盖的现象发生，要为上传文件产生一个唯一的文件名
-        return UUID.randomUUID().toString() ;
+        String s = filename.substring(filename.lastIndexOf(".") + 1);
+        return UUID.randomUUID().toString() +"."+s;
     }
 
     /**
@@ -326,14 +332,16 @@ public class FormOptService {
      * 下载
      * @param response
      */
-    public void download(HttpServletResponse response,Integer id) {
+    public void download(HttpServletRequest request, HttpServletResponse response, Integer id) {
 
         FormFileEntity formFileEntity=FORM_OPT_DAO.selectFormFile(id);
 
         String fileName = formFileEntity.getName();
-        response.setHeader("content-type", "application/octet-stream");
-        response.setContentType("application/octet-stream");
+        String characterEncoding = request.getCharacterEncoding();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
         response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        response.setCharacterEncoding(StringUtils.isEmpty(characterEncoding)?"UTF-8":characterEncoding);
+
         byte[] buff = new byte[1024];
         BufferedInputStream bis = null;
         OutputStream os = null;
@@ -359,6 +367,42 @@ public class FormOptService {
         }
 
     }
+
+
+    public ResponseDto download(int id, HttpServletResponse response) {
+
+        FormFileEntity formFileEntity=FORM_OPT_DAO.selectFormFile(id);
+        File file = new File(formFileEntity.getPath()+"\\"+formFileEntity.getRealName());
+        String fileName = formFileEntity.getName();
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+        response.setCharacterEncoding("UTF-8");
+        byte[] buff = new byte[1024];
+        BufferedInputStream bis = null;
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+            bis = new BufferedInputStream(new FileInputStream(file));
+            int i = bis.read(buff);
+            while (i != -1) {
+                os.write(buff, 0, buff.length);
+                os.flush();
+                i = bis.read(buff);
+            }
+        } catch (IOException e) {
+            LOGGER.error("IO异常", e);
+        } finally {
+            if (bis != null) {
+                try {
+                    bis.close();
+                } catch (IOException e) {
+                    LOGGER.error("IO异常", e);
+                }
+            }
+        }
+        return null;
+    }
+
 
     /**
      * 删除文件

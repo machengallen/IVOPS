@@ -653,6 +653,12 @@ public class FormService {
 
         //查询审核人员
         Set<LocalAuthDto> localAuthDtos = subTenantPermissionServiceClient.approveFormPerson("90120", curTenantId, formInfoEntity.getGroupId().shortValue());
+        //TODO 假装有人审核
+        /*LocalAuthDto localAuthDto1 = new LocalAuthDto();
+        localAuthDto1.setCurTenantId(curTenantId);
+        localAuthDto1.setId(userId);
+        localAuthDtos.add(localAuthDto1);*/
+
         for(LocalAuthDto localAuthDto:localAuthDtos){
             FormAuditPersonEntity formAuditPersonEntity = new FormAuditPersonEntity();
             formAuditPersonEntity.setFormId(formId);

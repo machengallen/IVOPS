@@ -255,7 +255,6 @@ public class FormOptionsController implements IFormOptionsService {
     public ResponseDto uploadFile(@RequestParam("file")MultipartFile file) {
         ResponseDto dto = new ResponseDto();
         try {
-
             Map map = formOptService.uploadFile(file);
             dto.setData(map);
             dto.setErrorMsg(ErrorMsg.OK);
@@ -269,16 +268,21 @@ public class FormOptionsController implements IFormOptionsService {
 
     @ApiOperation(value="下载文件",notes = "90140")
     @RequestMapping(value = "/downloadFile" ,method = RequestMethod.GET)
-    public void downloadFile(HttpServletResponse response, @RequestParam("id")Integer id) {
+    public ResponseDto downloadFile(HttpServletResponse response, @RequestParam("id") Integer id) {
         ResponseDto dto = new ResponseDto();
         try {
-            formOptService.download(response,id);
+            return formOptService.download(id,response);
 
         } catch(Exception e) {
             LOGGER.info(ErrorMsg.UPLOAD_FILE_HAS_DEL.toString(),e);
             dto.setErrorMsg(ErrorMsg.UPLOAD_FILE_HAS_DEL);
+            return dto;
         }
+
+
     }
+
+
 
     @ApiOperation(value="删除文件",notes = "90141")
     @RequestMapping(value = "/del/file" ,method = RequestMethod.GET)
