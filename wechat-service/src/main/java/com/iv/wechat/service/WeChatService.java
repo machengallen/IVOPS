@@ -18,14 +18,24 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.beans.BeanCopier;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.Constants;
+import com.iv.common.util.spring.SpringContextUtil;
+import com.iv.dto.TemplateFormMessageDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.enter.dto.UsersQueryDto;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.enumeration.LoginType;
+import com.iv.external.service.IAuthenticationServiceClient;
 import com.iv.external.service.UserServiceClient;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.UserOauthDto;
@@ -45,7 +55,6 @@ import com.iv.wechat.robot.TulingApiProcess;
 import com.iv.wechat.util.AuthorizationUtil;
 import com.iv.wechat.util.InitBean;
 import com.iv.wechat.util.MessageUtil;
-import com.iv.wechat.util.SpringContextUtil;
 import com.iv.wechat.util.WechatUtil;
 
 import net.sf.json.JSONObject;
@@ -71,8 +80,8 @@ public class WeChatService {
 	private String urlUserInfo;
 	@Value("${iv.wechat.focusTips}")
 	private String focusTips;
-	@Value("${iv.wechat.urlNodeBinding}")
-	private String urlNodeBinding;
+	/*@Value("${iv.wechat.urlNodeBinding}")
+	private String urlNodeBinding;*/
 	@Value("${iv.wechat.templateAlarm}")
 	private String templateAlarm;
 	@Value("${iv.wechat.templateRecovery}")
@@ -83,6 +92,8 @@ public class WeChatService {
 	private String appId;	
 	@Value("${iv.wechat.urlTemplateMsg}")
 	private String urlTemplateMsg;
+	@Value("${iv.wechat.templateForm}")
+	private String templateForm;
 	@Autowired
 	private UserServiceClient userService;
 	@Autowired
@@ -95,6 +106,10 @@ public class WeChatService {
 	private WechatUtil wechatUtil;
 	@Autowired
 	private MessageDaoImpl messageDao;
+	@Autowired
+    protected AuthenticationManager authenticationManager;
+	@Autowired
+	private IAuthenticationServiceClient authenticationServiceClient;
 	
 	
 	public String getWechatLoginCode() throws UnsupportedEncodingException {
@@ -103,7 +118,7 @@ public class WeChatService {
         return qrCode;	
 	}
 	
-	public ResponseDto wxLoginCallBack(String code) {
+	public ResponseDto wxLoginCallBack(String code, HttpServletRequest request) {
 		ResponseDto dto = new ResponseDto();
 		// 获取网页授权access_token
 		WeixinOauth2Token weixinOauth2Token = authorizationUtil.getAccessToken(openAppId, openSecret, code);
@@ -129,9 +144,12 @@ public class WeChatService {
         LocalAuthDto localAuthDto = userService.selectLocalAuthById(userOauthDto.getUserId());
         //用户自动登录
         dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
+        System.out.println(localAuthDto.getUserName());
+        System.out.println(localAuthDto.getPassWord());
+        dto.setData(authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuthDto.getUserName() + Constants.THREE_PARTY_LOGIN, localAuthDto.getPassWord()));
+    		   
         return dto;
 	}
-	
 	
 	
 	/**
@@ -243,9 +261,9 @@ public class WeChatService {
 							UserOauthDto userOauthDto = userService.bindInfo(userWechatEntity.getUnionid(), LoginType.WECHAT);
 							if (null == userOauthDto) {
 								// 感知前端，页面跳转
-								ResponseDto responseDto = new ResponseDto();
+								/*ResponseDto responseDto = new ResponseDto();
 								responseDto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
-								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
+								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);*/
 								// 完善微信账户信息
 								/*LocalAuth localAuth = LOCAL_USER_DAO.selectUserAuthById(Integer.parseInt(eventKey));
 								userWechatEntity.setRemark(localAuth.getRealName());
@@ -253,9 +271,9 @@ public class WeChatService {
 								userDao.saveUserInfo(userWechatEntity);*/
 							} else {
 								// 感知前端，错误提示
-								ResponseDto responseDto = new ResponseDto();
+								/*ResponseDto responseDto = new ResponseDto();
 								responseDto.setErrorMsg(ErrorMsg.WECHAT_BINDING_ILLEGAL);
-								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
+								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);*/
 							}
 						}
 					}
@@ -280,19 +298,19 @@ public class WeChatService {
 						//boolean result = LOCAL_USER_DAO.updateOpenId(Integer.parseInt(eventKey), wechatEntity);
 						if (true) {
 							// 感知前端，页面跳转
-							ResponseDto responseDto = new ResponseDto();
+							/*ResponseDto responseDto = new ResponseDto();
 							responseDto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
 							SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
 							// 完善微信账户信息
-							/*LocalAuth localAuth = LOCAL_USER_DAO.selectUserAuthById(Integer.parseInt(eventKey));
+*/							/*LocalAuth localAuth = LOCAL_USER_DAO.selectUserAuthById(Integer.parseInt(eventKey));
 							wechatEntity.setRemark(localAuth.getRealName());
 							wechatEntity.setTel(localAuth.getTel());
 							userDao.saveUserInfo(wechatEntity);*/
 						} else {
 							// 感知前端，错误提示
-							ResponseDto responseDto = new ResponseDto();
+							/*ResponseDto responseDto = new ResponseDto();
 							responseDto.setErrorMsg(ErrorMsg.WECHAT_BINDING_ILLEGAL);
-							SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
+							SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);*/
 						}
 					}
 				}
@@ -360,14 +378,14 @@ public class WeChatService {
 		String encodeUrl = URLEncoder.encode(templateMessageDto.getRedirect_uri(), "UTF-8");
 		String url = String.format(urlAlarmDetails, appId,encodeUrl);
 		templateMessage.setUrl(url);	
-		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateMessageDto.getUserIds(),LoginType.WECHAT.toString());
+		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateMessageDto.getUserIds(),LoginType.WECHAT);
 		Set<String> unionids = userService.selectUsersWechatUnionid(UsersQueryDto);
 		List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
 		String token = wechatUtil.getToken().getAccessToken();
 		String uri = urlTemplateMsg;
 		for (UserWechatEntity userWechatEntity : userWechatEntitys) {
-			String openId = userWechatEntity.getPlatformSigns().get(appId);
-			templateMessage.setOpenId(openId);		
+			String openId = userWechatEntity.getPlatformSigns().get(appId);			
+			templateMessage.setTouser(openId);		
 			JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
 			if (null == jsonObject) {
 				// token异常，重新获取
@@ -385,11 +403,44 @@ public class WeChatService {
 	 */
 	public boolean ifFocusWechat(int userId) {
 		boolean ifFocus = false;
-		String unionid = userService.selectUserWechatUnionid(userId,LoginType.WECHAT.toString());
-		UserWechatEntity userWechatEntity = userWechatDao.selectUserWechatByUnionid(unionid);
+		UserOauthDto userOauthDto = userService.selectUserWechatUnionid(userId,LoginType.WECHAT);
+		UserWechatEntity userWechatEntity = userWechatDao.selectUserWechatByUnionid(userOauthDto.getUnionid());
 		if(!StringUtils.isEmpty(userWechatEntity.getPlatformSigns().get(appId))) {
 			ifFocus = true;
 		}
 		return ifFocus;
+	}
+	
+	/**
+	 * 发送工单微信模板消息
+	 * @param templateFormMessageDto
+	 * @return
+	 * @throws Exception 
+	 */
+	public void SendFormWeChatInfo(TemplateFormMessageDto templateFormMessageDto) throws Exception {
+
+		TemplateMessage templateMessage = new TemplateMessage();
+		templateMessage.setData(templateFormMessageDto.getData());
+		templateMessage.setTemplate_id(templateForm);		
+		String encodeUrl = URLEncoder.encode(templateFormMessageDto.getRedirect_uri(), "UTF-8");
+		String url = String.format(urlAlarmDetails, appId,encodeUrl);
+		templateMessage.setUrl(url);	
+		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateFormMessageDto.getUserIds(),LoginType.WECHAT);
+		Set<String> unionids = userService.selectUsersWechatUnionid(UsersQueryDto);
+		List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
+		String token = wechatUtil.getToken().getAccessToken();
+		String uri = urlTemplateMsg;
+		for (UserWechatEntity userWechatEntity : userWechatEntitys) {
+			String openId = userWechatEntity.getPlatformSigns().get(appId);			
+			templateMessage.setTouser(openId);		
+			JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
+			if (null == jsonObject) {
+				// token异常，重新获取
+				System.out.println("****************更新 wechat token****************");
+				jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
+			}
+		}				
+		
+	
 	}
 }

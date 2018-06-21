@@ -3,6 +3,8 @@ package com.iv.external.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
@@ -32,12 +34,6 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
-	@Override
-	public String selectUserWechatUnionid(int userId, String loginType) throws RuntimeException {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	@Override
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
@@ -52,11 +48,7 @@ public class UserServiceClientFallBack implements UserServiceClient {
 	}
 
 
-	@Override
-	public LocalAuthDto getUserInfo() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 
 	@Override
 	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
@@ -64,11 +56,6 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
-	@Override
-	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ResponseDto findLocalAuthPassWord(AccountDto accountDto) {
@@ -81,4 +68,24 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public ResponseDto getUserInfo(HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery, String tenantId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

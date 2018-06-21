@@ -301,7 +301,7 @@ public class ScriptService {
 	public ResponseDto download(int id, HttpServletResponse response) {
 
 		ScriptEntity docInfoEntity = docScriptDaoImpl.selectById(id);
-		File file = new File(scriptRepositoryPath + docInfoEntity.getName());
+		File file = new File(scriptRepositoryPath + docInfoEntity.getItemType() + "\\" + docInfoEntity.getName());
 		response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
 		response.setHeader("Content-Disposition", "attachment;filename=" + docInfoEntity.getName());
 		response.setCharacterEncoding("UTF-8");
@@ -448,6 +448,7 @@ public class ScriptService {
 		List<String> approvers = new ArrayList<String>();
 		approvers.add("1");
 		approvers.add("2");
+		approvers.add("3");
 		return approvers;
 	}
 	

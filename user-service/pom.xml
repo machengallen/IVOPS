@@ -126,7 +126,15 @@
 			<artifactId>wechat-service-api</artifactId>
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
-    	</dependency>      		
+    	</dependency> 
+    	
+    	<dependency>
+    		<groupId>com.iv</groupId>
+			<artifactId>permission-service-api</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+			<type>jar</type>
+    	</dependency>  
+    	    	   	
 	</dependencies>
 
 	<dependencyManagement>

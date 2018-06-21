@@ -1,5 +1,9 @@
 package com.iv.dto;
 
+import java.util.Set;
+
+import com.iv.outer.dto.SubTenantRoleDto;
+
 /**
  * 封装用户基础信息以及微信信息类
  * @author zhangying
@@ -14,6 +18,7 @@ public class GroupUserInfosDto {
 	private byte boundFlag;
 	private String headimgurl;	
 	private String curTenantId;
+	private Set<SubTenantRoleDto> roles;
 	public int getId() {
 		return id;
 	}
@@ -55,6 +60,12 @@ public class GroupUserInfosDto {
 	}
 	public void setCurTenantId(String curTenantId) {
 		this.curTenantId = curTenantId;
+	}
+	public Set<SubTenantRoleDto> getRoles() {
+		return roles;
+	}
+	public void setRoles(Set<SubTenantRoleDto> roles) {
+		this.roles = roles;
 	}
 	
 }

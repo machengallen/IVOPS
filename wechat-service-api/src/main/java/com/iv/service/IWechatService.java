@@ -41,7 +41,7 @@ public interface IWechatService {
 	 * @param wc
 	 * @return
 	 */
-	@RequestMapping(value = "/wechat", method = RequestMethod.POST)
+	@RequestMapping(value = "/wechat", method = RequestMethod.GET)
 	public String xxtInterface(@RequestBody WeChat wc);
 		
 	

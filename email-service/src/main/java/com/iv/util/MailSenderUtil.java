@@ -27,28 +27,28 @@ public class MailSenderUtil {
 
 	@Autowired
 	private JavaMailSender mailSender;
-	@Autowired
-	private UserServiceClient userService;
+	/*@Autowired
+	private UserServiceClient userService;*/
 	// 发件人地址
 	@Value("${iv.mail.from}")
 	private String from;
 	// 发件人昵称
 	@Value("${iv.mail.fromName}")
 	private String fromName;
-	// 正文
+/*	// 正文
 	@Value("${iv.mail.context}")
-	private String context;
+	private String context;*/
 	// 标题
-	@Value("${iv.mail.subjectAlarm}")
+	/*@Value("${iv.mail.subjectAlarm}")
 	private String subjectAlarm;
 	@Value("${iv.mail.subjectRecovery}")
-	private String subjectRecovery;
+	private String subjectRecovery;*/
 	@Value("${iv.mail.subjectVCode}")
 	private String subjectVCode;
 	@Value("${iv.mail.contextVCode}")
 	private String contextVCode;
 
-	public void alarmToMail(String[] toEmails, SendType emailType, AlarmLifeEntityDto alarmLifeEntityDto) {
+	/*public void alarmToMail(String[] toEmails, SendType emailType, AlarmLifeEntityDto alarmLifeEntityDto) {
 		// 创建邮件消息体
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
 
@@ -66,7 +66,27 @@ public class MailSenderUtil {
 		} catch (Exception e) {
 			LOGGER.error("邮件发送异常", e);
 		}
+	}*/
+	public void alarmToMail(String[] toEmails, String subject, String fromName, String content) {
+		// 创建邮件消息体
+		MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+		try {
+			MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+			messageHelper.setFrom(new InternetAddress(this.from, fromName));
+			messageHelper.setTo(toEmails);
+			messageHelper.setSubject(subject); 
+			messageHelper.setText(content, true);
+			mailSender.send(mimeMessage);
+		} catch (MessagingException e) {
+			LOGGER.error("邮件消息体创建失败", e);
+		} catch (UnsupportedEncodingException e) {
+			LOGGER.error("邮件发送失败：不支持的编码错误", e);
+		} catch (Exception e) {
+			LOGGER.error("邮件发送异常", e);
+		}
 	}
+	
 	public void toMail(String[] toEmails, String text) {
 		// 创建邮件消息体
 		MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -93,31 +113,7 @@ public class MailSenderUtil {
 		}
 	}
 
-	private String toContent(AlarmLifeEntityDto alarmLifeEntityDto) {
-		LocalAuthDto localAuthDto = null;
-		if(alarmLifeEntityDto.getCurrentHandlerId() != 0) {
-			localAuthDto = userService.selectLocalAuthById(alarmLifeEntityDto.getCurrentHandlerId());
-		}
-
-		@SuppressWarnings("unlikely-arg-type")
-		String result = this.context.replace("TITLE", alarmLifeEntityDto.getTitle())
-				.replace("STATUS", "CLOSED".equals(alarmLifeEntityDto.getAlarmStatus())? "已恢复" : "已触发")
-				.replace("HOSTNAME", alarmLifeEntityDto.getHostName())
-				.replace("HOSTIP", alarmLifeEntityDto.getHostIp())
-				.replace("ALARMID", alarmLifeEntityDto.getId())
-				.replace("CONTENT", alarmLifeEntityDto.getContent())
-				.replace("SEVERITY", alarmLifeEntityDto.getSeverity().toString())
-				.replace("UPGRADE", String.valueOf(alarmLifeEntityDto.getUpgrade()))
-				.replace("DATE",alarmLifeEntityDto.getTime());
-		
-		if(null != localAuthDto) {
-			result = result.replace("CURRENT",
-					localAuthDto.getRealName() == null? localAuthDto.getUserName(): localAuthDto.getRealName());	
-		} else {
-			result = result.replace("CURRENT","");
-		}
-		return result;
-	}
+	
 
 
 }

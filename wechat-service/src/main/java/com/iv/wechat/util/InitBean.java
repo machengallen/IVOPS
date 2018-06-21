@@ -5,24 +5,28 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import com.iv.entity.dto.UserWechatEntityDto;
-import com.iv.external.service.UserServiceClient;
 import com.iv.wechat.autoReply.BatchOpenId;
 import com.iv.wechat.autoReply.BatchOpenIdList;
 import com.iv.wechat.autoReply.OpenIdData;
 import com.iv.wechat.autoReply.UserOpenIdList;
 import com.iv.wechat.dao.TokenDaoImpl;
+import com.iv.wechat.dao.UserWechatDaoImpl;
 import com.iv.wechat.dto.UserWechatDto;
+import com.iv.wechat.entity.UserWechatEntity;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -46,13 +50,17 @@ public class InitBean implements InitializingBean {
 	private String urlUserInfo;
 	@Value("${iv.wechat.urlUserInfoBatch}")
 	private String urlUserInfoBatch;
+	@Value("${iv.wechat.appId}")
+	private String appId;
+	
 
 	@Autowired
 	private WechatUtil wechatUtil;
 	@Autowired
 	private TokenDaoImpl tokenDao;
 	@Autowired
-	private UserServiceClient serviceClient;
+	private UserWechatDaoImpl userWechatDao;
+	
 
 	private static Logger logger = LoggerFactory.getLogger(InitBean.class);
 
@@ -119,10 +127,10 @@ public class InitBean implements InitializingBean {
 				// 获取微信服务端数据
 				JSONObject jsonObject = getToWechat(urlUserInfo, "OPENID", openId, null);
 				// 用户数据封装
-				UserWechatEntityDto userWechatEntity = (UserWechatEntityDto) JSONObject.toBean(jsonObject,
+				UserWechatEntityDto UserWechatEntityDto = (UserWechatEntityDto) JSONObject.toBean(jsonObject,
 						UserWechatEntityDto.class);
-				userWechatEntity.filterEmoji();
-				userWechatEntities.add(userWechatEntity);
+				UserWechatEntityDto.filterEmoji();
+				userWechatEntities.add(UserWechatEntityDto);
 			}
 			userWechatDto.setUserWechatEntities(userWechatEntities);
 			// 批量存储用户数据
@@ -181,13 +189,21 @@ public class InitBean implements InitializingBean {
 			List<UserWechatEntityDto> userList = JSONArray.toList(jsonObject.getJSONArray("user_info_list"),
 					UserWechatEntityDto.class);
 			userWechatEntities.addAll(userList);
-
+			List<UserWechatEntity> userWechatEntitys = new ArrayList<UserWechatEntity>();
 			// 统一过滤emoji
-			for (UserWechatEntityDto userWechatEntity : userWechatEntities) {
-				userWechatEntity.filterEmoji();
+			for (UserWechatEntityDto UserWechatEntityDto : userWechatEntities) {
+				UserWechatEntityDto.filterEmoji();
+				UserWechatEntity userWechatEntity = new UserWechatEntity(); 				
+				BeanCopier copy=BeanCopier.create(UserWechatEntityDto.class, UserWechatEntity.class, false);
+				copy.copy(UserWechatEntityDto, userWechatEntity, null);
+				Map<String, String> map = new HashMap<String, String>();
+				map.put(appId, UserWechatEntityDto.getOpenid());
+				userWechatEntity.setPlatformSigns(map);
+				userWechatEntitys.add(userWechatEntity);
 			}
-			UserWechatDto wechatDto = new UserWechatDto();
-			wechatDto.setUserWechatEntities(userWechatEntities);
+			userWechatDao.saveOrUpdateUserWechats(userWechatEntitys);
+			/*UserWechatDto wechatDto = new UserWechatDto();
+			wechatDto.setUserWechatEntities(userWechatEntities);*/
 			// 批量存储用户数据
 			//serviceClient.saveUsersInfo(wechatDto);
 

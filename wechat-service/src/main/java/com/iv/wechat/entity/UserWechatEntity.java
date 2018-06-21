@@ -192,7 +192,7 @@ public class UserWechatEntity implements Serializable {
 		this.subscribe_time = subscribe_time;
 	}
 		
-	@ElementCollection  
+	@ElementCollection(fetch=FetchType.EAGER) 
     @CollectionTable(name="platform_sign")  
     @MapKeyColumn(name="appId")  
     @Column(name="openId")

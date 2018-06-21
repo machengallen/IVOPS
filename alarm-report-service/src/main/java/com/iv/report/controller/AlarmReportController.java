@@ -3,6 +3,7 @@ package com.iv.report.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.enumeration.CycleType;
@@ -27,9 +28,9 @@ public class AlarmReportController implements IAlarmReportService {
 	@Autowired
 	private AlarmReportService alarmReportService;
 	
-	@Override
-	@ApiOperation("整体分析：获取告警分析报表数据")
-	public ResponseDto getAlarmAnalysisData(AnalysisQuery analysisQuery) {
+	@Override	
+	@ApiOperation(value = "告警整体分析数据", notes = "84500")
+	public ResponseDto getAlarmAnalysisData(@RequestBody AnalysisQuery analysisQuery) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -44,8 +45,8 @@ public class AlarmReportController implements IAlarmReportService {
 	}
 
 	@Override
-	@ApiOperation("压缩告警：获取告警分析报表数据")
-	public ResponseDto getPressAlarmAnalysisData(AnalysisQuery analysisQuery) {
+	@ApiOperation(value = "压缩告警分析数据", notes = "84501")
+	public ResponseDto getPressAlarmAnalysisData(@RequestBody AnalysisQuery analysisQuery) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();
 		try {
@@ -60,8 +61,8 @@ public class AlarmReportController implements IAlarmReportService {
 	}
 
 	@Override
-	@ApiOperation("人为处理告警：获取告警分析报表数据")
-	public ResponseDto getPersonAlarmAnalysisData(AnalysisQuery analysisQuery) {
+	@ApiOperation(value = "人为处理告警分析数据", notes = "84502")
+	public ResponseDto getPersonAlarmAnalysisData(@RequestBody AnalysisQuery analysisQuery) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();
 		try {	
@@ -76,7 +77,7 @@ public class AlarmReportController implements IAlarmReportService {
 	}
 
 	@Override
-	@ApiOperation("查询报表总览")
+	@ApiOperation(value = "Dashboard:查询报表总览", notes = "84503")
 	public ResponseDto getOverview(String date) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();
@@ -93,7 +94,7 @@ public class AlarmReportController implements IAlarmReportService {
 	}
 
 	@Override
-	@ApiOperation("查询报表总览1")
+	@ApiOperation(value = "Dashboard:查询报表总览1", notes = "84504")
 	public ResponseDto getOverview1(String date) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();
@@ -115,7 +116,7 @@ public class AlarmReportController implements IAlarmReportService {
 	}
 
 	@Override
-	@ApiOperation("查询报表告警数量趋势:告警量、平均响应时间、平均恢复时间")
+	@ApiOperation(value = "Dashboard:查询报表告警数量趋势", notes = "84505")
 	public ResponseDto getAlarmTrend(CycleType cycle) {
 		// TODO Auto-generated method stub
 		ResponseDto responseDto = new ResponseDto();

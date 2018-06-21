@@ -6,8 +6,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.wechat.autoReply.EventSubMessage;
 
 @Repository

@@ -1,5 +1,6 @@
 package com.iv.permission.api.dto;
 
+import com.iv.common.enumeration.ServiceType;
 import com.iv.common.enumeration.YesOrNo;
 
 public class PermissionInfoDto {

@@ -1,6 +1,6 @@
 eureka:
   instance:
-    status-page-url: http://10.10.9.26:${server.port}/swagger-ui.html
+    status-page-url: http://10.10.9.55:${server.port}/swagger-ui.html
     prefer-ip-address: true
   client:
     service-url:
@@ -48,6 +48,11 @@ spring:
 #        hibernate.c3p0.maxIdleTime: 120
 #        hibernate.c3p0.idleConnectionTestPeriod: 18000
 
+  activiti:
+      database-schema: script_service
+      jpa-enabled: true
+      db-identity-used: true
+
 logging:
   level:
     root: info
@@ -57,6 +62,7 @@ logging:
 iv:
   script:
     repositoryPath: E:\workspace\ivops\mas-file-storage\
+    temporaryPath: E:\workspace\ivops\mas-file-temp-storage\
 
 
 #-----多环境支持配置-----#

@@ -6,11 +6,10 @@ import java.util.Set;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
-
-import com.iv.common.util.hibernate.HibernateCallBack;
-import com.iv.common.util.hibernate.HibernateTemplate;
-import com.iv.common.util.hibernate.HibernateTemplateWithTenant;
 import com.iv.common.util.spring.ConstantContainer;
+import com.iv.jpa.util.hibernate.HibernateCallBack;
+import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 import com.iv.wechat.dao.UserWechatDao;
 import com.iv.wechat.entity.UserWechatEntity;
 
@@ -20,7 +19,7 @@ public class UserWechatDaoImpl implements UserWechatDao {
 	@Override
 	public void saveOrUpdateUserWechat(UserWechatEntity userWechatEntity) {
 		// TODO Auto-generated method stub
-		HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		HibernateTemplate.execute(new HibernateCallBack() {
 			
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -28,20 +27,20 @@ public class UserWechatDaoImpl implements UserWechatDao {
 				ses.saveOrUpdate(userWechatEntity);
 				return null;
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		});
 	}
 
 	@Override
 	public UserWechatEntity selectUserWechatByUnionid(String unionid) throws RuntimeException {
 		// TODO Auto-generated method stub
-		return (UserWechatEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (UserWechatEntity) HibernateTemplate.execute(new HibernateCallBack() {
 			
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				// TODO Auto-generated method stub
 				return ses.get(UserWechatEntity.class, unionid);
 			}
-		}, ConstantContainer.TENANT_SHARED_ID);
+		});
 	}
 
 	@SuppressWarnings("unchecked")
@@ -56,9 +55,33 @@ public class UserWechatDaoImpl implements UserWechatDao {
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				// TODO Auto-generated method stub
-				return ses.createQuery("from UserWechatEntity u where u.unionid in ?").setParameter(0, unionids).list();
+				return ses.createQuery("from UserWechatEntity u where u.unionid in :unionids")
+						.setParameterList("unionids", unionids).list();
 			}
 		});
+	}
+
+	@Override
+	/**
+	 * 保存微信信息列表
+	 */
+	public void saveOrUpdateUserWechats(List<UserWechatEntity> userWechatEntitys) throws RuntimeException {
+		HibernateTemplate.execute(new HibernateCallBack() {
+
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				// TODO Auto-generated method stub
+				for (int i = 1; i <= userWechatEntitys.size(); i++) {
+					ses.saveOrUpdate(userWechatEntitys.get(i - 1));
+					if (i % 50 == 0) {
+						ses.flush();
+						ses.clear();
+					}
+				}
+				return null;
+			}
+		});
+		
 	}
 
 }

@@ -14,6 +14,7 @@ import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
@@ -27,8 +28,10 @@ import com.iv.entity.LocalAuth;
 import com.iv.entity.UserOauth;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.enumeration.LoginType;
+import com.iv.external.service.SubTenantPermissionServiceClient;
 import com.iv.external.service.WechatServiceClient;
 import com.iv.outer.dto.LocalAuthDto;
+import com.iv.outer.dto.SubTenantRoleDto;
 import com.iv.outer.dto.UserOauthDto;
 
 /**
@@ -51,6 +54,8 @@ public class UserService {
 	/*@Autowired
 	private Md5PasswordEncoder md5PasswordEncoder;*/
 	private Md5PasswordEncoder md5PasswordEncoder = new Md5PasswordEncoder(); 
+	@Autowired
+	private SubTenantPermissionServiceClient subTenantPermissionService;
 	
 	/**
 	 * 获取用户信息
@@ -214,7 +219,7 @@ public class UserService {
 	 * @param usersWechatsQuery
 	 * @return
 	 */
-	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery){
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery,String tenantId){
 		LoginType loginType = usersWechatsQuery.getLoginType();
 		List<Integer> userIds = usersWechatsQuery.getUserIds();
 		LocalAuthDto localAuthDto = new LocalAuthDto();
@@ -222,13 +227,19 @@ public class UserService {
 		for (Integer userId : userIds) {
 			LocalAuth localAuth = localAuthDao.selectLocalAuthById(userId);
 			localAuthDto = convertLocalAuthDto(localAuth);
+			//查询用户微信头像信息
 			if(!StringUtils.isEmpty(usersWechatsQuery.getLoginType())) {
 				UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
 				if(null != userOauth) {
 					UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());					
 					localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
 				}				
-			}							
+			}	
+			//查询用户角色名称列表信息（为匹配用户角色使用）
+			Set<SubTenantRoleDto> subTenantRoleDtos = subTenantPermissionService.selectPersonRole(userId,tenantId);
+			if(!CollectionUtils.isEmpty(subTenantRoleDtos)) {
+				localAuthDto.setRoles(subTenantRoleDtos);
+			}
 			UserInfos.add(localAuthDto);
 		}
 		return UserInfos;

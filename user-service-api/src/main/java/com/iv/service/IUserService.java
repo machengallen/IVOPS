@@ -86,7 +86,7 @@ public interface IUserService {
 	 * @return
 	 */
 	@RequestMapping(value = "/select/userInfos",method = RequestMethod.POST)
-	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery);
+	List<LocalAuthDto> selectUserInfos(@RequestBody UsersQueryDto usersWechatsQuery,@RequestParam("tenantId") String tenantId);
 	
 	/**
 	 * 根据用户名称查询用户信息

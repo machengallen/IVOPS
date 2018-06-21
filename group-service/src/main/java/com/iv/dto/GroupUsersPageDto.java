@@ -1,4 +1,4 @@
-package com.iv.outer.dto;
+package com.iv.dto;
 import com.iv.dto.UserPagingDto;
 
 public class GroupUsersPageDto {
