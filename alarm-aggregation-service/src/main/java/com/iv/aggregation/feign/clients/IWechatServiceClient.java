@@ -6,6 +6,7 @@ import org.springframework.cloud.netflix.feign.FeignClient;
 import org.springframework.stereotype.Component;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.dto.TemplateFormMessageDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.dto.WeChat;
 import com.iv.entity.dto.UserWechatEntityDto;
@@ -65,6 +66,13 @@ class WechatServiceClientFallBack implements IWechatServiceClient{
 
 	@Override
 	public ResponseDto wxLoginCallBack(String code, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	@Override
+	public ResponseDto SendFormWeChatInfo(TemplateFormMessageDto templateFormMessageDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

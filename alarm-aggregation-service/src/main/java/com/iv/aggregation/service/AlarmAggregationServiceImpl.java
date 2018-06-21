@@ -61,6 +61,7 @@ import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.outer.dto.LocalAuthDto;
 
 import net.sf.json.JSONObject;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * 告警北向支撑服务
@@ -69,6 +70,7 @@ import net.sf.json.JSONObject;
  * alarm-aggregation-service-1.0.0-SNAPSHOT
  * 
  */
+@ApiIgnore
 @RestController
 public class AlarmAggregationServiceImpl implements IAlarmAggregationService {
 

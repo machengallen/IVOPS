@@ -28,7 +28,7 @@ public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 		if (StringUtils.isEmpty(token)) {
 			return ConstantContainer.ALARM_STRATEGY_DB;
 		} else {
-			return JWTUtil.getJWtJson(token).getString("curTenantId");
+			return ConstantContainer.ALARM_STRATEGY_DB + "_" + JWTUtil.getJWtJson(token).getString("curTenantId");
 		}
 	}
 
