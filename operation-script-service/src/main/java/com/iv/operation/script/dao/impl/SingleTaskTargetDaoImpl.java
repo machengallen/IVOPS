@@ -30,13 +30,13 @@ public class SingleTaskTargetDaoImpl implements ISingleTaskTargetDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<SingleTaskTargetEntity> selectBySingleTaskId(int taskId) throws RuntimeException {
+	public List<SingleTaskTargetEntity> selectByScheduleId(int scheduleId) throws RuntimeException {
 		return (List<SingleTaskTargetEntity>) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 
-				return ses.createQuery("from SingleTaskTargetEntity s where s.singleTask.id=?").setParameter(0, taskId)
+				return ses.createQuery("from SingleTaskTargetEntity s where s.taskSchedule.id=?").setParameter(0, scheduleId)
 						.list();
 			}
 		});

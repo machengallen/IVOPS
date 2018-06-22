@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingDeque;
 
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,16 +23,18 @@ import org.springframework.web.multipart.MultipartFile;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskTargetDaoImpl;
 import com.iv.operation.script.dto.HostDto;
 import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskPageDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
-import com.iv.operation.script.dto.TargetHostsDto;
+import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.entity.SingleTaskTargetEntity;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
+import com.iv.operation.script.entity.SingleTaskScheduleEntity;
 import com.iv.operation.script.feign.client.IScriptServiceClient;
 import com.iv.operation.script.util.ErrorMsg;
 import com.iv.operation.script.util.SSHAccount;
@@ -56,6 +59,8 @@ public class OperationScriptService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OperationScriptService.class);
 
 	@Autowired
+	private OperationScriptQuartzService quartzService;
+	@Autowired
 	private SingleTaskDaoImpl singleTaskDao;
 	@Autowired
 	private SingleTaskTargetDaoImpl singleTaskTargetDao;
@@ -63,6 +68,8 @@ public class OperationScriptService {
 	private SingleTaskLifeDaoImpl singleTaskLifeDao;
 	@Autowired
 	private IScriptServiceClient scriptServiceClient;
+	@Autowired
+	private SingleTaskScheduleDaoImpl singleTaskScheduleDao;
 
 	/**
 	 * 存储单脚本任务
@@ -181,6 +188,12 @@ public class OperationScriptService {
 			return null;
 		}
 	}
+	
+	public void singleTaskDel(int taskId) throws SchedulerException {
+		// 删除quartz定时作业
+		quartzService.removeSchedulerTask(taskId);
+		singleTaskDao.delById(taskId);
+	}
 
 	/**
 	 * 单脚本任务执行
@@ -188,39 +201,68 @@ public class OperationScriptService {
 	 * @param targetHostsDto
 	 * @return
 	 */
-	public List<SingleTaskTargetEntity> singleTaskExec(TargetHostsDto targetHostsDto) {
-		// 获取任务信息
-		SingleTaskEntity scriptEntity = singleTaskDao.selectById(targetHostsDto.getSingleTaskId());
-		// 执行任务
+	public List<SingleTaskTargetEntity> singleTaskExec(ImmediateHostsDto targetHostsDto) {
+		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(targetHostsDto.getScheduleId());
 		List<SingleTaskTargetEntity> taskTargetList = new ArrayList<SingleTaskTargetEntity>();
+		int count = 0;// 计数任务执行线程数
+		CompletionService<SingleTaskTargetEntity> completionService = doTask(count, scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+		// 获取任务结果集
+		for (int j = 1; j <= count; j++) {
+			try {
+				Future<SingleTaskTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
+				taskTargetList.add(future.get());// get不会阻塞
+			} catch (InterruptedException e) {
+				LOGGER.error(e.getMessage());
+			} catch (ExecutionException e) {
+				LOGGER.error(e.getMessage());
+			}
+		}
+		singleTaskTargetDao.delBySingleTaskId(scheduleEntity.getId());// 删除上次执行任务结果
+		singleTaskTargetDao.batchSave(taskTargetList);
+
+		// 更新任务生命周期
+		SingleTaskLifeEntity lifeEntity = scheduleEntity.getSingleTask().getTaskLife();
+		lifeEntity.execNumAdd();
+		lifeEntity.setExecDate(System.currentTimeMillis());
+		lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
+		singleTaskLifeDao.save(lifeEntity);
+		
+		// TODO 调用微信服务发送模板消息
+		// TODO 调用邮箱服务发送邮件通知消息
+		return taskTargetList;
+
+	}
+	
+	private CompletionService<SingleTaskTargetEntity> doTask(int count, SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<SingleTaskTargetEntity> taskTargetList) {
+		SingleTaskEntity taskEntity = scheduleEntity.getSingleTask();
 		final BlockingDeque<Future<SingleTaskTargetEntity>> blockingDeque = new LinkedBlockingDeque<Future<SingleTaskTargetEntity>>(
-				targetHostsDto.getTargetHosts().size());
+				targetHosts.size());
 		final CompletionService<SingleTaskTargetEntity> completionService = new ExecutorCompletionService<SingleTaskTargetEntity>(
 				ThreadPoolUtil.getInstance(), blockingDeque);
-		int i = 0;// 计数任务执行线程数
-		for (HostDto host : targetHostsDto.getTargetHosts()) {
+		
+		for (HostDto host : targetHosts) {
 			// 准备ssh连接
 			SSHAccount sshAccount = new SSHAccount(host.getAccount(), host.getPassword(), host.getHostIp());
 			if (null != host.getPort() && host.getPort() != 22) {
 				sshAccount.setPort(host.getPort());
 			}
 			ResponseEntity<byte[]> fileStream;
-			if(scriptEntity.getScriptSrc().name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
-				fileStream = scriptServiceClient.officialRead(scriptEntity.getScriptId());
+			if(taskEntity.getScriptSrc().name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
+				fileStream = scriptServiceClient.officialRead(taskEntity.getScriptId());
 			} else {
-				fileStream = scriptServiceClient.tempRead(scriptEntity.getScriptId());
+				fileStream = scriptServiceClient.tempRead(taskEntity.getScriptId());
 			}
 			if(null == fileStream) {
 				// 没有该文件或脚本库服务未响应
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(scriptEntity.getScriptId());
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
 			if(null == temporaryScriptDto) {
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
@@ -230,7 +272,7 @@ public class OperationScriptService {
 			Session session = SSHSessionFactory.getSession(sshAccount);
 			if (null == session) {
 				// 获取ssh连接失败
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SSH_CONNECT_FAILED.getMsg());
 				taskTargetList.add(targetEntity);
@@ -242,7 +284,7 @@ public class OperationScriptService {
 				@Override
 				public SingleTaskTargetEntity call() throws Exception {
 					// 上传脚本
-					SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scriptEntity, host.getHostIp(),
+					SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
 							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
 					OptResultDto sftp = sftpUpload(session, fileName, fileStream.getBody());
 					if (!sftp.isSuccess()) {
@@ -256,31 +298,10 @@ public class OperationScriptService {
 					return targetEntity;
 				}
 			});
-			i++;
+			count++;
 			session.disconnect();
 		}
-		// 获取任务结果集
-		for (int j = 1; j <= i; j++) {
-			try {
-				Future<SingleTaskTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
-				taskTargetList.add(future.get());// get不会阻塞
-			} catch (InterruptedException e) {
-				LOGGER.error(e.getMessage());
-			} catch (ExecutionException e) {
-				LOGGER.error(e.getMessage());
-			}
-		}
-		singleTaskTargetDao.delBySingleTaskId(scriptEntity.getId());// 删除上次执行任务结果
-		singleTaskTargetDao.batchSave(taskTargetList);
-
-		// 更新任务生命周期
-		SingleTaskLifeEntity lifeEntity = scriptEntity.getTaskLife();
-		lifeEntity.execNumAdd();
-		lifeEntity.setExecDate(System.currentTimeMillis());
-		lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
-		singleTaskLifeDao.save(lifeEntity);
-		return taskTargetList;
-
+		return completionService;
 	}
 	
 	public SingleTaskPageDto singleTaskGet(SingleTaskQueryDto queryDto) {
@@ -288,9 +309,9 @@ public class OperationScriptService {
 		return singleTaskDao.selectByCondition(queryDto);
 	}
 
-	public List<SingleTaskTargetEntity> singleTaskTargetGet(int taskId) {
+	public List<SingleTaskTargetEntity> singleTaskTargetGet(int scheduleId) {
 
-		return singleTaskTargetDao.selectBySingleTaskId(taskId);
+		return singleTaskTargetDao.selectByScheduleId(scheduleId);
 	}
 
 	/**

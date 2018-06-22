@@ -25,7 +25,8 @@ public class SingleTaskTargetEntity implements Serializable{
 	@JsonIgnore
 	private String id;
 	@JsonIgnore
-	private SingleTaskEntity singleTask;
+	private SingleTaskScheduleEntity taskSchedule;
+	//private SingleTaskEntity singleTask;
 	private String hostIp;// 目标主机ip
 	private int port;// 目标主机sshd端口号
 	private String account;// 目标主机执行账户
@@ -34,25 +35,22 @@ public class SingleTaskTargetEntity implements Serializable{
 	private boolean isSuccess;// 执行是否成功
 	private String result;// 执行返回结果
 	
-	
 	public SingleTaskTargetEntity() {
 		super();
 		this.port = 22;// 初始化默认ssh服务端口号
 	}
 	
-	
-	public SingleTaskTargetEntity(SingleTaskEntity singleTask, String hostIp, int port, String account, String password,
-			boolean isSuccess, String result) {
+	public SingleTaskTargetEntity(SingleTaskScheduleEntity taskSchedule, String hostIp, int port,
+			String account, String password, boolean isSuccess, String result) {
 		super();
-		this.singleTask = singleTask;
+		this.taskSchedule = taskSchedule;
 		this.hostIp = hostIp;
+		this.port = port;
 		this.account = account;
 		this.password = password;
 		this.isSuccess = isSuccess;
 		this.result = result;
-		this.port = port;
 	}
-
 
 	@Id
 	@GenericGenerator(name = "idGenerator", strategy = "uuid")
@@ -64,15 +62,24 @@ public class SingleTaskTargetEntity implements Serializable{
 		this.id = id;
 	}
 	@ManyToOne(fetch = FetchType.LAZY)
-	public SingleTaskEntity getSingleTask() {
+	public SingleTaskScheduleEntity getTaskSchedule() {
+		return taskSchedule;
+	}
+
+	public void setTaskSchedule(SingleTaskScheduleEntity taskSchedule) {
+		this.taskSchedule = taskSchedule;
+	}
+	
+	/*public SingleTaskEntity getSingleTask() {
 		return singleTask;
 	}
 	public void setSingleTask(SingleTaskEntity singleTask) {
 		this.singleTask = singleTask;
-	}
+	}*/
 	public String getHostIp() {
 		return hostIp;
 	}
+
 	public void setHostIp(String hostIp) {
 		this.hostIp = hostIp;
 	}

@@ -11,4 +11,8 @@ public interface ISingleTaskScheduleDao {
 	SingleTaskScheduleEntity selectById(int id) throws RuntimeException;
 	
 	List<SingleTaskScheduleEntity> selectByTaskId(int taskId) throws RuntimeException;
+	
+	void delById(int id) throws RuntimeException;
+	
+	int delByTaskId(int taskId) throws RuntimeException;
 }

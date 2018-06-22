@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import com.jcraft.jsch.Channel;
@@ -107,7 +108,7 @@ public class SSHExecutor {
 				}
 				if (channelExec.isClosed()) {
 					res = channelExec.getExitStatus();
-					System.out.println(String.format("SSH channel " + "Exit-status: %d", res));
+					System.out.println(String.format("SSH channel " + "Exit-status: %d - " + new Date().toLocaleString(), res));
 					break;
 				}
 				TimeUnit.MILLISECONDS.sleep(100);

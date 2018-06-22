@@ -3,7 +3,6 @@ package com.iv.operation.script.util;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import org.hibernate.HibernateException;
 import org.hibernate.c3p0.internal.C3P0ConnectionProvider;
 
 import com.iv.jpa.util.hibernate.AbstractMultiTenantConnectionProvider;
@@ -25,14 +24,8 @@ public class MultiTenantConnectionProviderImpl extends AbstractMultiTenantConnec
 
 	@Override
 	public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-		try {
-			connection.createStatement().execute("use operation_script_service");
-		} catch (SQLException e) {
-			throw new HibernateException(
-					"Could not alter JDBC connection to specified schema", e);
-		}
+		
 		connectionProvider.closeConnection(connection);
-
 	}
 
 	@Override

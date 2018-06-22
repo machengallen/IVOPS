@@ -24,8 +24,15 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	CREATE_TASK_SCHEDULE_FAILED(50208, "定时任务创建失败"),
 	
-	MOD_TASK_SCHEDULE_FAILED(50209, "定时任务修改失败");
+	MOD_TASK_SCHEDULE_FAILED(50209, "定时任务修改失败"),
 	
+	DEL_TASK_FAILED(50210, "任务删除失败"),
+	
+	DEL_SCHEDULE_FAILED(50211, "定时作业删除失败"),
+	
+	PAU_SCHEDULE_FAILED(50212, "定时作业暂停失败"),
+	
+	RES_SCHEDULE_FAILED(50213, "定时作业重启失败");
 	
 	private int code;
     private String msg;

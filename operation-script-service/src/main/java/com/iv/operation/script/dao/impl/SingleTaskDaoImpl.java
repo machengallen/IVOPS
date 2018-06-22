@@ -1,7 +1,6 @@
 package com.iv.operation.script.dao.impl;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -13,7 +12,6 @@ import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.operation.script.dto.SingleTaskPageDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
 import com.iv.operation.script.entity.SingleTaskEntity;
-import com.iv.operation.script.entity.SingleTaskTargetEntity;
 
 @Repository
 public class SingleTaskDaoImpl implements ISingleTaskDao {
@@ -66,6 +64,19 @@ public class SingleTaskDaoImpl implements ISingleTaskDao {
 				return pageDto;
 			}
 		});
+	}
+
+	@Override
+	public void delById(int id) throws RuntimeException {
+		HibernateTemplate.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				ses.delete(ses.load(SingleTaskEntity.class, id));
+				return null;
+			}
+		});
+		
 	}
 
 }

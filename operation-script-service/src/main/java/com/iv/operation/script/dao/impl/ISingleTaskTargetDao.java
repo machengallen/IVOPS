@@ -8,7 +8,7 @@ public interface ISingleTaskTargetDao {
 
 	void batchSave(List<SingleTaskTargetEntity> entities) throws RuntimeException;
 	
-	List<SingleTaskTargetEntity> selectBySingleTaskId(int taskId) throws RuntimeException;
+	List<SingleTaskTargetEntity> selectByScheduleId(int scheduleId) throws RuntimeException;
 	
 	void delBySingleTaskId(int taskId) throws RuntimeException;
 	

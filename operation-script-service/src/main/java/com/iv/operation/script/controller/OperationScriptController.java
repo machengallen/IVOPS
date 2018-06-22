@@ -16,7 +16,7 @@ import com.iv.common.response.ResponseDto;
 import com.iv.operation.script.dto.ScheduleHostsDto;
 import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
-import com.iv.operation.script.dto.TargetHostsDto;
+import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.service.OperationScriptQuartzService;
 import com.iv.operation.script.service.OperationScriptService;
@@ -26,6 +26,7 @@ import com.iv.operation.script.util.ScriptSourceType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 
 /**
  * 脚本作业API
@@ -34,7 +35,7 @@ import io.swagger.annotations.ApiImplicitParams;
  * 
  */
 @RestController
-@Api(description = "脚本作业相关接口")
+@Api(description = "linux系统作业相关接口")
 public class OperationScriptController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(OperationScriptController.class);
@@ -57,6 +58,7 @@ public class OperationScriptController {
 	 * @param timeout
 	 * @return
 	 */
+	@ApiOperation(value = "单脚本任务新增", notes = "90200")
 	@ApiImplicitParams({ @ApiImplicitParam(name = "scriptId", value = "脚本库文件id", dataType = "int", paramType = "query") })
 	@PostMapping("/create/single")
 	public ResponseDto singleTaskCreate(@RequestParam(required = false) MultipartFile file,
@@ -101,6 +103,7 @@ public class OperationScriptController {
 	 * @param queryDto
 	 * @return
 	 */
+	@ApiOperation(value = "单脚本任务查询", notes = "90201")
 	@PostMapping("/get/single")
 	public ResponseDto singleTaskGet(@RequestBody SingleTaskQueryDto queryDto) {
 		try {
@@ -118,6 +121,7 @@ public class OperationScriptController {
 	 * 
 	 * @return
 	 */
+	@ApiOperation(value = "单脚本任务编辑", notes = "90202")
 	@ApiImplicitParams({ @ApiImplicitParam(name = "scriptId", value = "脚本库文件id", dataType = "int", paramType = "query") })
 	@PostMapping("/modify/single")
 	public ResponseDto singleTaskModify(@RequestParam int taskId, @RequestParam(required = false) MultipartFile file,
@@ -140,6 +144,25 @@ public class OperationScriptController {
 			return ResponseDto.builder(ErrorMsg.MOD_TASK_FAILED);
 		}
 	}
+	
+	/**
+	 * 单脚本任务删除
+	 * @param scheduleId
+	 * @return
+	 */
+	@ApiOperation(value = "单脚本任务删除", notes = "90209")
+	@PostMapping("/del/single")
+	public ResponseDto singleTaskDel(@RequestParam int taskId) {
+
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			service.singleTaskDel(taskId);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("任务删除失败", e);
+			return ResponseDto.builder(ErrorMsg.DEL_TASK_FAILED);
+		}
+	}
 
 	/**
 	 * 执行单脚本任务
@@ -147,8 +170,9 @@ public class OperationScriptController {
 	 * @param targetHostsDto
 	 * @return
 	 */
+	@ApiOperation(value = "单脚本任务执行（立即执行）", notes = "90203")
 	@PostMapping("/exec/immediate")
-	public ResponseDto singleTaskExec(@RequestBody TargetHostsDto targetHostsDto) {
+	public ResponseDto singleTaskExec(@RequestBody ImmediateHostsDto targetHostsDto) {
 
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
@@ -166,11 +190,12 @@ public class OperationScriptController {
 	 * @param taskId
 	 * @return
 	 */
+	@ApiOperation(value = "单脚本任务最近执行结果查询", notes = "90204")
 	@GetMapping("/get/single/targets")
-	public ResponseDto singleTaskTargetGet(@RequestParam int taskId) {
+	public ResponseDto singleTaskTargetGet(@RequestParam int scheduleId) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(service.singleTaskTargetGet(taskId));
+			responseDto.setData(service.singleTaskTargetGet(scheduleId));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("获取任务执行对象失败", e);
@@ -184,6 +209,7 @@ public class OperationScriptController {
 	 * @param cronExp
 	 * @return
 	 */
+	@ApiOperation(value = "定时作业规则新增", notes = "90205")
 	@GetMapping("/create/schedule")
 	public ResponseDto scheduleCreate(@RequestParam int taskId, @RequestParam String cronExp) {
 		try {
@@ -201,6 +227,7 @@ public class OperationScriptController {
 	 * @param taskId
 	 * @return
 	 */
+	@ApiOperation(value = "定时作业规则查询", notes = "90206")
 	@GetMapping("/get/schedule")
 	public ResponseDto scheduleGet(@RequestParam int taskId) {
 		try {
@@ -219,11 +246,12 @@ public class OperationScriptController {
 	 * @param cronExp
 	 * @return
 	 */
+	@ApiOperation(value = "定时作业规则编辑", notes = "90207")
 	@GetMapping("/modify/schedule")
 	public ResponseDto scheduleModify(@RequestParam int scheduleId, @RequestParam String cronExp) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(quartzService.singleTaskSchedule(scheduleId, cronExp));
+			responseDto.setData(quartzService.singleTaskScheduleMod(scheduleId, cronExp));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("定时任务创建失败", e);
@@ -232,10 +260,29 @@ public class OperationScriptController {
 	}
 	
 	/**
-	 * 定时任务执行
+	 * 定时规则删除
+	 * @param scheduleId
+	 * @return
+	 */
+	@ApiOperation(value = "定时作业删除", notes = "90210")
+	@GetMapping("/del/schedule")
+	public ResponseDto scheduleDel(@RequestParam int scheduleId) {
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			quartzService.scheduleDel(scheduleId);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("定时作业删除失败", e);
+			return ResponseDto.builder(ErrorMsg.DEL_SCHEDULE_FAILED);
+		}
+	}
+	
+	/**
+	 * 定时作业执行
 	 * @param targetHostsDto
 	 * @return
 	 */
+	@ApiOperation(value = "定时作业执行", notes = "90208")
 	@PostMapping("/exec/schedule")
 	public ResponseDto scheduleExec(@RequestBody ScheduleHostsDto scheduleHostsDto) {
 
@@ -246,6 +293,44 @@ public class OperationScriptController {
 		} catch (Exception e) {
 			LOGGER.error("任务执行失败", e);
 			return ResponseDto.builder(ErrorMsg.EXEC_TASK_FAILED);
+		}
+	}
+	
+	/**
+	 * 定时作业暂停
+	 * @param targetHostsDto
+	 * @return
+	 */
+	@ApiOperation(value = "定时作业暂停", notes = "90211")
+	@PostMapping("/pause/schedule")
+	public ResponseDto schedulePause(@RequestParam int scheduleId) {
+
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			quartzService.schedulePause(scheduleId);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("定时作业暂停失败", e);
+			return ResponseDto.builder(ErrorMsg.PAU_SCHEDULE_FAILED);
+		}
+	}
+	
+	/**
+	 * 定时作业重启
+	 * @param targetHostsDto
+	 * @return
+	 */
+	@ApiOperation(value = "定时作业重启", notes = "90212")
+	@PostMapping("/resume/schedule")
+	public ResponseDto scheduleResume(@RequestParam int scheduleId) {
+
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			quartzService.scheduleResume(scheduleId);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("定时作业重启失败", e);
+			return ResponseDto.builder(ErrorMsg.RES_SCHEDULE_FAILED);
 		}
 	}
 	

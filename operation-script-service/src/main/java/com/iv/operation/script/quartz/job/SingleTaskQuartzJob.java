@@ -7,7 +7,7 @@ import org.quartz.JobExecutionException;
 
 import com.alibaba.fastjson.JSONObject;
 import com.iv.common.util.spring.SpringContextUtil;
-import com.iv.operation.script.dto.TargetHostsDto;
+import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.service.OperationScriptService;
 import com.iv.operation.script.util.TenantIdHolder;
 
@@ -25,7 +25,7 @@ public class SingleTaskQuartzJob implements Job {
 		JobDataMap dataMap = context.getMergedJobDataMap();// 任务自定义数据
 		TenantIdHolder.set(dataMap.getString("groupName"));// 保存租户id至线程变量
 		JSONArray array = JSONArray.fromObject(dataMap.get("targetHosts"));
-		TargetHostsDto targetHostsDto = JSONObject.parseObject(array.get(0).toString(), TargetHostsDto.class);
+		ImmediateHostsDto targetHostsDto = JSONObject.parseObject(array.get(0).toString(), ImmediateHostsDto.class);
 		SpringContextUtil.getBean(OperationScriptService.class).singleTaskExec(targetHostsDto);
 
 	}

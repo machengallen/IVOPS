@@ -49,4 +49,30 @@ public class SingleTaskScheduleDaoImpl implements ISingleTaskScheduleDao {
 		});
 	}
 
+	@Override
+	public void delById(int id) throws RuntimeException {
+		HibernateTemplate.execute(new HibernateCallBack() {
+
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				ses.delete(ses.load(SingleTaskScheduleEntity.class, id));
+				return null;
+			}
+		});
+
+	}
+
+	@Override
+	public int delByTaskId(int taskId) throws RuntimeException {
+
+		return (int) HibernateTemplate.execute(new HibernateCallBack() {
+
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				return ses.createQuery("delete from SingleTaskScheduleEntity s where s.singleTask.id=?")
+						.setParameter(0, taskId).executeUpdate();
+			}
+		});
+	}
+
 }
