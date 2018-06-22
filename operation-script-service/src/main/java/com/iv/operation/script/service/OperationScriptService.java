@@ -1,7 +1,6 @@
 package com.iv.operation.script.service;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingDeque;
@@ -24,28 +23,27 @@ import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskTargetDaoImpl;
+import com.iv.operation.script.constant.ErrorMsg;
+import com.iv.operation.script.constant.ScriptSourceType;
+import com.iv.operation.script.dao.impl.ImmediateTargetDaoImpl;
+import com.iv.operation.script.dao.impl.ScheduleTargetDaoImpl;
 import com.iv.operation.script.dto.HostDto;
+import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskPageDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
-import com.iv.operation.script.dto.ImmediateHostsDto;
-import com.iv.operation.script.entity.SingleTaskTargetEntity;
+import com.iv.operation.script.entity.ImmediateTargetEntity;
+import com.iv.operation.script.entity.ScheduleTargetEntity;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
-import com.iv.operation.script.entity.SingleTaskScheduleEntity;
 import com.iv.operation.script.feign.client.IScriptServiceClient;
-import com.iv.operation.script.util.ErrorMsg;
 import com.iv.operation.script.util.SSHAccount;
-import com.iv.operation.script.util.SSHExecutor;
 import com.iv.operation.script.util.SSHSessionFactory;
-import com.iv.operation.script.util.ScriptSourceType;
+import com.iv.operation.script.util.SSHUtil;
 import com.iv.operation.script.util.ThreadPoolUtil;
 import com.iv.script.api.dto.TemporaryScriptDto;
-import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
 
 /**
  * @author macheng
@@ -63,13 +61,15 @@ public class OperationScriptService {
 	@Autowired
 	private SingleTaskDaoImpl singleTaskDao;
 	@Autowired
-	private SingleTaskTargetDaoImpl singleTaskTargetDao;
+	private ScheduleTargetDaoImpl scheduleTargetDao;
 	@Autowired
 	private SingleTaskLifeDaoImpl singleTaskLifeDao;
 	@Autowired
 	private IScriptServiceClient scriptServiceClient;
 	@Autowired
 	private SingleTaskScheduleDaoImpl singleTaskScheduleDao;
+	@Autowired
+	private ImmediateTargetDaoImpl immediateTargetDao;
 
 	/**
 	 * 存储单脚本任务
@@ -194,22 +194,21 @@ public class OperationScriptService {
 		quartzService.removeSchedulerTask(taskId);
 		singleTaskDao.delById(taskId);
 	}
-
+	
 	/**
-	 * 单脚本任务执行
-	 * 
+	 * 单次任务执行
 	 * @param targetHostsDto
 	 * @return
 	 */
-	public List<SingleTaskTargetEntity> singleTaskExec(ImmediateHostsDto targetHostsDto) {
-		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(targetHostsDto.getScheduleId());
-		List<SingleTaskTargetEntity> taskTargetList = new ArrayList<SingleTaskTargetEntity>();
+	public List<ImmediateTargetEntity> excute (ImmediateHostsDto targetHostsDto) {
+		SingleTaskEntity taskEntity = singleTaskDao.selectById(targetHostsDto.getTaskId());
+		List<ImmediateTargetEntity> taskTargetList = new ArrayList<ImmediateTargetEntity>();
 		int count = 0;// 计数任务执行线程数
-		CompletionService<SingleTaskTargetEntity> completionService = doTask(count, scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+		CompletionService<ImmediateTargetEntity> completionService = doTask(count, taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
 		// 获取任务结果集
 		for (int j = 1; j <= count; j++) {
 			try {
-				Future<SingleTaskTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
+				Future<ImmediateTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
 				taskTargetList.add(future.get());// get不会阻塞
 			} catch (InterruptedException e) {
 				LOGGER.error(e.getMessage());
@@ -217,44 +216,27 @@ public class OperationScriptService {
 				LOGGER.error(e.getMessage());
 			}
 		}
-		singleTaskTargetDao.delBySingleTaskId(scheduleEntity.getId());// 删除上次执行任务结果
-		singleTaskTargetDao.batchSave(taskTargetList);
+		immediateTargetDao.delByTaskId(targetHostsDto.getTaskId());// 删除上次执行任务结果
+		immediateTargetDao.batchSave(taskTargetList);
 
 		// 更新任务生命周期
-		SingleTaskLifeEntity lifeEntity = scheduleEntity.getSingleTask().getTaskLife();
+		SingleTaskLifeEntity lifeEntity = taskEntity.getTaskLife();
 		lifeEntity.execNumAdd();
 		lifeEntity.setExecDate(System.currentTimeMillis());
 		lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
 		singleTaskLifeDao.save(lifeEntity);
-		
-		// TODO 调用微信服务发送模板消息
-		// TODO 调用邮箱服务发送邮件通知消息
 		return taskTargetList;
-
 	}
 	
-	private CompletionService<SingleTaskTargetEntity> doTask(int count, SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<SingleTaskTargetEntity> taskTargetList) {
-		SingleTaskEntity taskEntity = scheduleEntity.getSingleTask();
-		final BlockingDeque<Future<SingleTaskTargetEntity>> blockingDeque = new LinkedBlockingDeque<Future<SingleTaskTargetEntity>>(
-				targetHosts.size());
-		final CompletionService<SingleTaskTargetEntity> completionService = new ExecutorCompletionService<SingleTaskTargetEntity>(
-				ThreadPoolUtil.getInstance(), blockingDeque);
-		
+	
+	
+	private CompletionService<ImmediateTargetEntity> doTask(int count, SingleTaskEntity taskEntity, List<HostDto> targetHosts, List<ImmediateTargetEntity> taskTargetList) {
+		CompletionService<ImmediateTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
 		for (HostDto host : targetHosts) {
-			// 准备ssh连接
-			SSHAccount sshAccount = new SSHAccount(host.getAccount(), host.getPassword(), host.getHostIp());
-			if (null != host.getPort() && host.getPort() != 22) {
-				sshAccount.setPort(host.getPort());
-			}
-			ResponseEntity<byte[]> fileStream;
-			if(taskEntity.getScriptSrc().name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
-				fileStream = scriptServiceClient.officialRead(taskEntity.getScriptId());
-			} else {
-				fileStream = scriptServiceClient.tempRead(taskEntity.getScriptId());
-			}
+			ResponseEntity<byte[]> fileStream = getFileStream(taskEntity.getScriptSrc(), taskEntity.getScriptId());// 获取执行脚本内容流
 			if(null == fileStream) {
 				// 没有该文件或脚本库服务未响应
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
@@ -262,39 +244,39 @@ public class OperationScriptService {
 			}
 			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
 			if(null == temporaryScriptDto) {
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
 				continue;
 			}
 			String fileName = temporaryScriptDto.getName();
-			Session session = SSHSessionFactory.getSession(sshAccount);
+			Session session = getSession(host.getHostIp(), host.getAccount(), host.getPassword(), host.getPort());
 			if (null == session) {
 				// 获取ssh连接失败
-				SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SSH_CONNECT_FAILED.getMsg());
 				taskTargetList.add(targetEntity);
 				continue;
 			}
 			// 提交任务至线程池
-			completionService.submit(new Callable<SingleTaskTargetEntity>() {
+			completionService.submit(new Callable<ImmediateTargetEntity>() {
 
 				@Override
-				public SingleTaskTargetEntity call() throws Exception {
+				public ImmediateTargetEntity call() throws Exception {
 					// 上传脚本
-					SingleTaskTargetEntity targetEntity = new SingleTaskTargetEntity(scheduleEntity, host.getHostIp(),
+					ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
-					OptResultDto sftp = sftpUpload(session, fileName, fileStream.getBody());
+					OptResultDto sftp = SSHUtil.sftpUpload(session, fileName, fileStream.getBody());
 					if (!sftp.isSuccess()) {
 						targetEntity.setResult(sftp.getResult());
 						return targetEntity;
 					}
-					OptResultDto cmd = sshCmd(session, "./" + fileName);// 执行脚本
+					OptResultDto cmd = SSHUtil.sshCmd(session, "./" + fileName);// 执行脚本
 					targetEntity.setSuccess(Boolean.TRUE);
 					targetEntity.setResult(cmd.getResult());
-					sftpDelete(session, fileName);// 删除脚本
+					SSHUtil.sftpDelete(session, fileName);// 删除脚本
 					return targetEntity;
 				}
 			});
@@ -303,122 +285,41 @@ public class OperationScriptService {
 		}
 		return completionService;
 	}
+
+	private Session getSession(String ip, String userName, String password, Integer port) {
+		SSHAccount sshAccount = new SSHAccount(userName, password, ip);// 准备ssh连接
+		if (null != port && port != 22) {
+			sshAccount.setPort(port);
+		}
+		return SSHSessionFactory.getSession(sshAccount);
+	}
+	
+	private ResponseEntity<byte[]> getFileStream(ScriptSourceType scriptType, int scriptId) {
+		
+		ResponseEntity<byte[]> fileStream;
+		if(scriptType.name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
+			fileStream = scriptServiceClient.officialRead(scriptId);
+		} else {
+			fileStream = scriptServiceClient.tempRead(scriptId);
+		}
+		return fileStream;
+	}
+	
+	private <T> CompletionService<T> getExecutorService(int elements){
+		final BlockingDeque<Future<T>> blockingDeque = new LinkedBlockingDeque<Future<T>>(elements);
+		final CompletionService<T> completionService = new ExecutorCompletionService<T>(
+				ThreadPoolUtil.getInstance(), blockingDeque);
+		return completionService;
+	}
 	
 	public SingleTaskPageDto singleTaskGet(SingleTaskQueryDto queryDto) {
 
 		return singleTaskDao.selectByCondition(queryDto);
 	}
 
-	public List<SingleTaskTargetEntity> singleTaskTargetGet(int scheduleId) {
+	public List<ScheduleTargetEntity> singleTaskTargetGet(int scheduleId) {
 
-		return singleTaskTargetDao.selectByScheduleId(scheduleId);
-	}
-
-	/**
-	 * shell单指令执行
-	 * 
-	 * @param cmd
-	 * @return
-	 * @throws IOException
-	 * @throws JSchException
-	 * @throws InterruptedException
-	 */
-	public OptResultDto sshCmd(Session session, String cmd) {
-		SSHExecutor executor = null;
-		String result = null;
-		try {
-			executor = new SSHExecutor(session);
-			result = executor.exec(cmd);
-			return OptResultDto.build(true, result);
-		} catch (JSchException e) {
-			LOGGER.error("获取ssh session失败", e);
-			return OptResultDto.build(false, "ssh连接失败");
-		} catch (IOException e) {
-			LOGGER.error("文件流读取失败", e);
-			return OptResultDto.build(false, "文件流读取失败");
-		} catch (InterruptedException e) {
-			LOGGER.error("执行线程中断", e);
-			return OptResultDto.build(false, "执行线程中断");
-		} /*finally {
-			if (null != executor) {
-				executor.disconnect();
-			}
-		}*/
+		return scheduleTargetDao.selectByScheduleId(scheduleId);
 	}
 
-	/**
-	 * 删除脚本
-	 * 
-	 * @param session
-	 * @param fileName
-	 */
-	public void sftpDelete(Session session, String fileName) {
-		SSHExecutor executor = null;
-		try {
-			executor = new SSHExecutor(session);
-			executor.sftpRm(session, fileName);
-		} catch (JSchException e) {
-			LOGGER.error("获取ssh连接失败", e);
-		} catch (SftpException e) {
-			LOGGER.error("sftp操作失败", e);
-		} /*finally {
-			if (null != executor) {
-				executor.disconnect();
-			}
-		}*/
-	}
-
-	/**
-	 * 文件上传
-	 * 
-	 * @throws Exception
-	 */
-	public OptResultDto sftpUpload(Session session, String fileName, InputStream fileStream) {
-		SSHExecutor executor = null;
-		try {
-			executor = new SSHExecutor(session);
-			executor.sftpPut(session, fileName, fileStream);
-			return OptResultDto.build(true, null);
-		} catch (JSchException e) {
-			LOGGER.error("ssh连接失败", e);
-			return OptResultDto.build(false, "ssh连接失败");
-		} catch (SftpException e) {
-			LOGGER.error("ssh连接失败", e);
-			return OptResultDto.build(false, "sftp执行失败");
-		} catch (IOException e) {
-			LOGGER.error("文件流读取失败", e);
-			return OptResultDto.build(false, "文件流读取失败");
-		} /*finally {
-			if (null != executor) {
-				executor.disconnect();
-			}
-		}*/
-	}
-	
-	/**
-	 * 文件上传
-	 * 
-	 * @throws Exception
-	 */
-	public OptResultDto sftpUpload(Session session, String fileName, byte[] fileBytes) {
-		SSHExecutor executor = null;
-		try {
-			executor = new SSHExecutor(session);
-			executor.sftpPut(session, fileName, fileBytes);
-			return OptResultDto.build(true, null);
-		} catch (JSchException e) {
-			LOGGER.error("ssh连接失败", e);
-			return OptResultDto.build(false, "ssh连接失败");
-		} catch (SftpException e) {
-			LOGGER.error("ssh连接失败", e);
-			return OptResultDto.build(false, "sftp执行失败");
-		} catch (IOException e) {
-			LOGGER.error("文件流读取失败", e);
-			return OptResultDto.build(false, "文件流读取失败");
-		} /*finally {
-			if (null != executor) {
-				executor.disconnect();
-			}
-		}*/
-	}
 }

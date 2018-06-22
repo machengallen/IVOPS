@@ -1,4 +1,4 @@
-package com.iv.operation.script.util;
+package com.iv.operation.script.constant;
 
 public interface Constant {
 

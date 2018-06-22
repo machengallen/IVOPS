@@ -12,7 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import com.iv.operation.script.util.ScriptSourceType;
+import com.iv.operation.script.constant.ScriptSourceType;
 
 
 @Entity

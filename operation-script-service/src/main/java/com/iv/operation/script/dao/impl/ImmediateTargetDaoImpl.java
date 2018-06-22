@@ -8,18 +8,18 @@ import org.springframework.stereotype.Repository;
 
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
-import com.iv.operation.script.entity.SingleTaskTargetEntity;
+import com.iv.operation.script.entity.ImmediateTargetEntity;
 
 @Repository
-public class SingleTaskTargetDaoImpl implements ISingleTaskTargetDao {
+public class ImmediateTargetDaoImpl implements IImmediateTargetDao {
 
 	@Override
-	public void batchSave(List<SingleTaskTargetEntity> entities) throws RuntimeException {
+	public void batchSave(List<ImmediateTargetEntity> entities) throws RuntimeException {
 		HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				for (SingleTaskTargetEntity entity : entities) {
+				for (ImmediateTargetEntity entity : entities) {
 					ses.saveOrUpdate(entity);
 				}
 				return null;
@@ -30,25 +30,25 @@ public class SingleTaskTargetDaoImpl implements ISingleTaskTargetDao {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<SingleTaskTargetEntity> selectByScheduleId(int scheduleId) throws RuntimeException {
-		return (List<SingleTaskTargetEntity>) HibernateTemplate.execute(new HibernateCallBack() {
+	public List<ImmediateTargetEntity> selectByTaskId(int taskId) throws RuntimeException {
+		return (List<ImmediateTargetEntity>) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 
-				return ses.createQuery("from SingleTaskTargetEntity s where s.taskSchedule.id=?").setParameter(0, scheduleId)
+				return ses.createQuery("from ImmediateTargetEntity i where i.task.id=?").setParameter(0, taskId)
 						.list();
 			}
 		});
 	}
 
 	@Override
-	public void delBySingleTaskId(int taskId) throws RuntimeException {
+	public void delByTaskId(int taskId) throws RuntimeException {
 		HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				ses.createQuery("delete from SingleTaskTargetEntity s where s.singleTask.id=?").setParameter(0, taskId)
+				ses.createQuery("delete from ImmediateTargetEntity i where i.task.id=?").setParameter(0, taskId)
 						.executeUpdate();
 				return null;
 			}

@@ -4,13 +4,14 @@ import java.util.List;
 
 public class ScheduleHostsDto {
 
-	private int taskScheduleId;// 任务定时策略id
+	private int scheduleId;// 任务定时策略id
 	private List<HostDto> targetHosts;
-	public int getTaskScheduleId() {
-		return taskScheduleId;
+	
+	public int getScheduleId() {
+		return scheduleId;
 	}
-	public void setTaskScheduleId(int taskScheduleId) {
-		this.taskScheduleId = taskScheduleId;
+	public void setScheduleId(int scheduleId) {
+		this.scheduleId = scheduleId;
 	}
 	public List<HostDto> getTargetHosts() {
 		return targetHosts;

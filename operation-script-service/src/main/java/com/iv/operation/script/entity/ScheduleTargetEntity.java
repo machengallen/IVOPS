@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Entity
-@Table(name = "single_task_target")
-public class SingleTaskTargetEntity implements Serializable{
+@Table(name = "schedule_target")
+public class ScheduleTargetEntity implements Serializable{
 
 	/**
 	 * 
@@ -35,12 +35,12 @@ public class SingleTaskTargetEntity implements Serializable{
 	private boolean isSuccess;// 执行是否成功
 	private String result;// 执行返回结果
 	
-	public SingleTaskTargetEntity() {
+	public ScheduleTargetEntity() {
 		super();
 		this.port = 22;// 初始化默认ssh服务端口号
 	}
 	
-	public SingleTaskTargetEntity(SingleTaskScheduleEntity taskSchedule, String hostIp, int port,
+	public ScheduleTargetEntity(SingleTaskScheduleEntity taskSchedule, String hostIp, int port,
 			String account, String password, boolean isSuccess, String result) {
 		super();
 		this.taskSchedule = taskSchedule;

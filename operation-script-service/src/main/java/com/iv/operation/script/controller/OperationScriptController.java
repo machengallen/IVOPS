@@ -16,12 +16,12 @@ import com.iv.common.response.ResponseDto;
 import com.iv.operation.script.dto.ScheduleHostsDto;
 import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
+import com.iv.operation.script.constant.ErrorMsg;
+import com.iv.operation.script.constant.ScriptSourceType;
 import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.service.OperationScriptQuartzService;
 import com.iv.operation.script.service.OperationScriptService;
-import com.iv.operation.script.util.ErrorMsg;
-import com.iv.operation.script.util.ScriptSourceType;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -172,11 +172,11 @@ public class OperationScriptController {
 	 */
 	@ApiOperation(value = "单脚本任务执行（立即执行）", notes = "90203")
 	@PostMapping("/exec/immediate")
-	public ResponseDto singleTaskExec(@RequestBody ImmediateHostsDto targetHostsDto) {
+	public ResponseDto immediateExec(@RequestBody ImmediateHostsDto targetHostsDto) {
 
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(service.singleTaskExec(targetHostsDto));
+			responseDto.setData(service.excute(targetHostsDto));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("任务执行失败", e);
@@ -288,7 +288,7 @@ public class OperationScriptController {
 
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			quartzService.singleTaskExec(scheduleHostsDto);
+			quartzService.scheduleExec(scheduleHostsDto);
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("任务执行失败", e);
