@@ -90,6 +90,8 @@ public class WeChatService {
 	private String urlAlarmDetails;
 	@Value("${iv.wechat.appId}")
 	private String appId;	
+	@Value("${iv.wechat.secret}")
+	private String secret;	
 	@Value("${iv.wechat.urlTemplateMsg}")
 	private String urlTemplateMsg;
 	@Value("${iv.wechat.templateForm}")
@@ -442,5 +444,15 @@ public class WeChatService {
 		}				
 		
 	
+	}
+	
+	/**
+	 * 获取用户微信unioid
+	 * @param code
+	 * @return
+	 */
+	public String getUnionid(String code) {
+		WeixinOauth2Token weixinOauth2Token = authorizationUtil.getAccessToken(appId, secret, code);            
+        return weixinOauth2Token.getUnionid();
 	}
 }
