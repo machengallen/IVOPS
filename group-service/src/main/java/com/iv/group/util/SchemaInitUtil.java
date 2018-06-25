@@ -43,11 +43,6 @@ public class SchemaInitUtil {
 			String schemataSql = "SELECT sc.SCHEMA_NAME FROM information_schema.SCHEMATA sc where sc.SCHEMA_NAME like 's80%' or sc.SCHEMA_NAME like 't80%'";
 			sqlStatement(connection, schemataSql, ConstantContainer.BUS_SQL_SCRIPT_NAME);
 
-			// 初始化基础知识库表
-			/*schemataSql = "SELECT sc.SCHEMA_NAME FROM information_schema.SCHEMATA sc where sc.SCHEMA_NAME='"
-					+ ConstantContainer.KNOWLEDGE_DB_ID + "'";
-			sqlStatement(connection, schemataSql, ConstantContainer.KNOWLEDGE_SQL_SCRIPT_NAME);*/
-
 		} catch (SQLException e) {
 			LOGGER.error("**********table update failed**********", e);
 		}
