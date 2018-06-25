@@ -22,11 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
 import com.iv.operation.script.constant.ErrorMsg;
 import com.iv.operation.script.constant.ScriptSourceType;
 import com.iv.operation.script.dao.impl.ImmediateTargetDaoImpl;
-import com.iv.operation.script.dao.impl.ScheduleTargetDaoImpl;
 import com.iv.operation.script.dto.HostDto;
 import com.iv.operation.script.dto.ImmediateHostsDto;
 import com.iv.operation.script.dto.OptResultDto;
@@ -34,7 +32,6 @@ import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskPageDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
 import com.iv.operation.script.entity.ImmediateTargetEntity;
-import com.iv.operation.script.entity.ScheduleTargetEntity;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
 import com.iv.operation.script.feign.client.IScriptServiceClient;
@@ -61,13 +58,9 @@ public class OperationScriptService {
 	@Autowired
 	private SingleTaskDaoImpl singleTaskDao;
 	@Autowired
-	private ScheduleTargetDaoImpl scheduleTargetDao;
-	@Autowired
 	private SingleTaskLifeDaoImpl singleTaskLifeDao;
 	@Autowired
 	private IScriptServiceClient scriptServiceClient;
-	@Autowired
-	private SingleTaskScheduleDaoImpl singleTaskScheduleDao;
 	@Autowired
 	private ImmediateTargetDaoImpl immediateTargetDao;
 
@@ -317,9 +310,9 @@ public class OperationScriptService {
 		return singleTaskDao.selectByCondition(queryDto);
 	}
 
-	public List<ScheduleTargetEntity> singleTaskTargetGet(int scheduleId) {
+	public List<ImmediateTargetEntity> taskTargetGet(int taskId) {
 
-		return scheduleTargetDao.selectByScheduleId(scheduleId);
+		return immediateTargetDao.selectByTaskId(taskId);
 	}
 
 }

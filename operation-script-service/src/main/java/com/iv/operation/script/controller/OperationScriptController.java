@@ -170,7 +170,7 @@ public class OperationScriptController {
 	 * @param targetHostsDto
 	 * @return
 	 */
-	@ApiOperation(value = "单脚本任务执行（立即执行）", notes = "90203")
+	@ApiOperation(value = "单次任务执行（立即执行）", notes = "90203")
 	@PostMapping("/exec/immediate")
 	public ResponseDto immediateExec(@RequestBody ImmediateHostsDto targetHostsDto) {
 
@@ -185,20 +185,39 @@ public class OperationScriptController {
 	}
 	
 	/**
-	 * 获取任务执行对象列表
+	 * 获取单次任务执行结果
 	 * 
 	 * @param taskId
 	 * @return
 	 */
-	@ApiOperation(value = "单脚本任务最近执行结果查询", notes = "90204")
-	@GetMapping("/get/single/targets")
-	public ResponseDto singleTaskTargetGet(@RequestParam int scheduleId) {
+	@ApiOperation(value = "单次任务最近执行结果查询", notes = "90204")
+	@GetMapping("/get/immediate/results")
+	public ResponseDto taskTargetGet(@RequestParam int taskId) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(service.singleTaskTargetGet(scheduleId));
+			responseDto.setData(service.taskTargetGet(taskId));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("获取任务执行对象失败", e);
+			return ResponseDto.builder(ErrorMsg.GET_TASKS_TARGET_FAILED);
+		}
+	}
+	
+	/**
+	 * 获取定时作业执行结果
+	 * 
+	 * @param taskId
+	 * @return
+	 */
+	@ApiOperation(value = "定时作业最近执行结果查询", notes = "90213")
+	@GetMapping("/get/schedule/results")
+	public ResponseDto scheduleTargetGet(@RequestParam int scheduleId) {
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(quartzService.scheduleTargetGet(scheduleId));
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("获取任务执行结果失败", e);
 			return ResponseDto.builder(ErrorMsg.GET_TASKS_TARGET_FAILED);
 		}
 	}

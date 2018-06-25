@@ -102,6 +102,10 @@ public class OperationScriptQuartzService {
 		return scheduleEntity;
 	}
 
+	public List<ScheduleTargetEntity> scheduleTargetGet(int scheduleId) {
+		return scheduleTargetDao.selectByScheduleId(scheduleId);
+	}
+	
 	public List<SingleTaskScheduleEntity> scheduleGet(int taskId) {
 		return singleTaskScheduleDao.selectByTaskId(taskId);
 	}

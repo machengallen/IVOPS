@@ -16,7 +16,7 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	GET_DATA_FAILED(50204, "获取数据失败"),
 	
-	GET_TASKS_TARGET_FAILED(50205, "获取任务执行对象列表失败"),
+	GET_TASKS_TARGET_FAILED(50205, "获取任务执行结果失败"),
 	
 	SCRIPT_NOT_EXIST(50206, "脚本文件不存在或脚本库服务已停止工作"),
 	
