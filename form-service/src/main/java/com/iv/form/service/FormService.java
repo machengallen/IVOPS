@@ -42,7 +42,7 @@ import java.util.*;
  * form-service-api-1.0.0-SNAPSHOT
  */
 @Service
-@Transactional
+//@Transactional
 public class FormService {
     private static final Logger LOGGER = LoggerFactory.getLogger(FormService.class);
 
@@ -74,7 +74,7 @@ public class FormService {
      * @param userId 用户id
      * @return
      */
-    @Transactional
+    //@Transactional
     public FormInfoEntity saveOrUpdateFormInfo(FormMsgDto formMsgDto, int userId) throws BusException{
         //校验参数
         if(StringUtils.isEmpty(userId)){
@@ -168,7 +168,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
 
         return formInfoEntity;
     }
@@ -207,6 +208,24 @@ public class FormService {
         return formAllMsgDto;
     }
 
+    /**
+     * 查询工单信息
+     * @param formId
+     * @return
+     */
+    public Map selectFormByCallBack(String formId)throws BusException{
+        //校验参数
+        if(StringUtils.isEmpty(formId)){
+            throw new BusException(ErrorMsg.FORM_HANDLER_ID_FAILED);
+        }
+
+        //查询信息
+        Map formInfo = FORM_DAO.selectFormMapByCallBack(formId);
+
+
+        return formInfo;
+    }
+
 
     /**
      *查询我的工单列表
@@ -240,7 +259,7 @@ public class FormService {
 
 
         //添加工单记录
-        List<LinkedHashMap> data = (List<LinkedHashMap>) groupServiceClient.groupsUsersInfo().getData();
+        List<LinkedHashMap> data = groupServiceClient.groupsUsersInfo()==null?null:(List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -296,7 +315,7 @@ public class FormService {
 
         //添加工单记录
 
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
+        List<LinkedHashMap> data = groupServiceClient.groupsUsersInfo()==null?null:(List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -350,7 +369,7 @@ public class FormService {
         FormInfoPage  formInfoPage=FORM_DAO.selectMarkFormListPage(userId,formConditionDto,demandIds);
         //添加工单记录
 
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
+        List<LinkedHashMap> data = groupServiceClient.groupsUsersInfo()==null?null:(List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
         //添加工单记录
 
@@ -379,7 +398,7 @@ public class FormService {
      * 逻辑删除工单
      * @param userId
      */
-    @Transactional
+    //@Transactional
     public void delFormByLogic(int userId,String formId) throws BusException{
         //校验参数
         if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(formId)){
@@ -410,7 +429,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
 
     }
 
@@ -499,7 +519,7 @@ public class FormService {
         FormInfoPage  formInfoPage=FORM_DAO.selectFormListPage(formConditionDto,userId,demandIds);
 
 
-        List<LinkedHashMap> data = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
+        List<LinkedHashMap> data = groupServiceClient.groupsUsersInfo()==null?null:(List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
 
 
         //添加工单记录
@@ -575,7 +595,7 @@ public class FormService {
         ResponseDto responseDto = groupServiceClient.groupsUsersInfo();
         //优先级
         List<Map> priorityList = FORM_DAO.selectPriorityList();
-        Object data = responseDto.getData();
+        Object data = responseDto==null?null:responseDto.getData();
         conditionInfoDto.setFormHandlerDtos(data);
         conditionInfoDto.setFormApplicantDtos(applicantList);
         conditionInfoDto.setFormCompanyDtos(companyList);
@@ -592,7 +612,7 @@ public class FormService {
      * @param userId
      * @throws BusException
      */
-    @Transactional
+    //@Transactional
     public void executeTakeOver(String formId, int userId)throws BusException {
         //校验参数
         if(StringUtils.isEmpty(userId)||StringUtils.isEmpty(formId)){
@@ -626,7 +646,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
 
     }
 
@@ -635,7 +656,7 @@ public class FormService {
      * @param formOperateLogsDto
      * @param userId
      */
-    @Transactional
+    //@Transactional
     public void executeDealWithEnd(FormOperateLogsDto formOperateLogsDto, int userId,String curTenantId)throws BusException {
         //校验参数
         String formId = formOperateLogsDto.getFormId();
@@ -693,7 +714,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
 
     }
 
@@ -744,7 +766,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
     }
 
 
@@ -794,7 +817,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
 
     }
 
@@ -844,7 +868,8 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        wechatService.sendWechat(formInfoEntity);
+        String code="";
+        wechatService.sendWechat(formInfoEntity,code);
     }
 
     /**
@@ -1032,7 +1057,7 @@ public class FormService {
      */
     public Object selectEngineerList(HttpServletRequest request) {
         ResponseDto responseDto = groupServiceClient.groupsUsersInfo();
-        Object data = responseDto.getData();
+        Object data = responseDto==null?null:responseDto.getData();
         return data;
     }
 
@@ -1076,7 +1101,7 @@ public class FormService {
      */
     public Map selectGroupMeirt(HttpServletRequest request,Long startTime,Long endTime,Integer demandCode) {
 
-        List<LinkedHashMap> groupList = (List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
+        List<LinkedHashMap> data = groupServiceClient.groupsUsersInfo()==null?null:(List<LinkedHashMap>)groupServiceClient.groupsUsersInfo().getData();
         //总记录
         List<Map> totalNum = FORM_DAO.selectGroupMeirt(null, startTime, endTime, demandCode);
         //处理
@@ -1086,10 +1111,10 @@ public class FormService {
 
         Map collectNum = FORM_DAO.selectTotalMeirt(startTime, endTime, demandCode);
 
-        List totalData = dealwithGroupMeirt(groupList, totalNum);
-        List inhandData = dealwithGroupMeirt(groupList, inhandNum);
-        List endData = dealwithGroupMeirt(groupList, endNum);
-        List groupNameList = dealwithGroupName(groupList);
+        List totalData = dealwithGroupMeirt(data, totalNum);
+        List inhandData = dealwithGroupMeirt(data, inhandNum);
+        List endData = dealwithGroupMeirt(data, endNum);
+        List groupNameList = dealwithGroupName(data);
         Map<Object, Object> groupMeirt = new HashMap<>();
         groupMeirt.put("totalData",totalData);
         groupMeirt.put("inhandData",inhandData);
@@ -1144,6 +1169,7 @@ public class FormService {
      */
     private List dealWithITrendData(Set<FormNumTreDto> datas){
         List<Object> objects = new ArrayList<>();
+
         for (FormNumTreDto trendData:datas){
             Object data = trendData.getData();
             objects.add(data);
@@ -1152,8 +1178,11 @@ public class FormService {
     }
 
     private List dealwithGroupMeirt(List<LinkedHashMap> data,List<Map> num){
-
         List<Object> list = new ArrayList<>();
+        if(data==null){
+            return list;
+        }
+
         for (LinkedHashMap groupUsersPageDto:data ){
             int n=0;
             int groupId = Integer.parseInt(groupUsersPageDto.get("groupId").toString());
@@ -1170,6 +1199,9 @@ public class FormService {
     private List dealwithGroupName(List<LinkedHashMap> data){
 
         List<Object> list = new ArrayList<>();
+        if(data==null){
+            return list;
+        }
         for (LinkedHashMap groupUsersPageDto:data ){
             list.add(groupUsersPageDto.get("groupName").toString());
         }

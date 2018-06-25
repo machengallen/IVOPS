@@ -1,7 +1,7 @@
-server:
-  port: 9010
-  tomcat:
-    uri-encoding: UTF-8
+#server:
+#  port: 9010
+#  tomcat:
+#    uri-encoding: UTF-8
 eureka:
   instance:
     status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
@@ -26,6 +26,9 @@ security:
 spring:
   application:
     name: form-service
+  profiles:
+      active:
+      - dev-peer1
   http:
     encoding:
       enabled: true
@@ -54,14 +57,30 @@ spring:
       hibernate.hbm2ddl.auto: update
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
       hibernate.event.merge.entity_copy_observer: allow
+#------------------------以下多租户配置属性---------------------------#
+      hibernate.multiTenancy: SCHEMA
+      hibernate.tenant_identifier_resolver: com.iv.form.config.TenantIdResolver
+      hibernate.multi_tenant_connection_provider: com.iv.form.config.MultiTenantConnectionProviderImpl
+      hibernate.connection.password: 123@abcd
+      hibernate.connection.driver_class: com.mysql.jdbc.Driver
+      hibernate.c3p0.minPoolSize: 5
+      hibernate.c3p0.maxIdleTime: 120
+      hibernate.c3p0.idleConnectionTestPeriod: 18000
+  devtools:
+    restart:
+      enabled: false
 
-
-
-
-  ####校验流程文件，默认校验resources下的processes文件夹里的流程文件
+      ####校验流程文件，默认校验resources下的processes文件夹里的流程文件
   activiti:
-      check-process-definitions: true
+      check-process-definitions: false
 
+logging:
+  level:
+    root: info
+  file: E:\workspace\mas.log
+
+
+#自定义变量#
 iv:
   upload:
     savePath: E:\upload\form\
@@ -69,6 +88,64 @@ iv:
     fileSizeMax: 1048576
     #设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
     sizeMax: 10485760
+  wechat:
+    redirectUri: http://2038b2u538.iok.la/#/alarm/detail/
+
+
+
+
+#-----多环境支持配置-----#
+#开发环境#
+---
+server:
+  port: 9010
+spring:
+  profiles: dev-peer1
+
+---
+server:
+  port: 9011
+spring:
+  profiles: dev-peer2
+
+#生产环境#
+#生产环境#
+---
+server:
+  port: 9010
+spring:
+  profiles: product-peer1
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:4010/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:4010/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: mas
+logging:
+  file: /var/log/ivops/operation/script/operation-script-service/peer1/operation-script-service.log
+
+---
+server:
+  port: 9011
+spring:
+  profiles: product-peer2
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:4010/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:4010/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: mas
+logging:
+  file: /var/log/ivops/operation/script/operation-script
+
+
+
+
+
 
 
 

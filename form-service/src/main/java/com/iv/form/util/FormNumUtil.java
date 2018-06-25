@@ -13,13 +13,13 @@ public class FormNumUtil extends Thread{
     private static long orderNum = 0l;
     private static String date ;
 
-    public static void main(String[] args) throws InterruptedException {
-        System.out.println( System.currentTimeMillis());
-        for (int i = 0; i < 10000; i++) {
-            System.out.println(FormNumUtil.getOrderNo());
-            Thread.sleep(1000);
-        }
-    }
+//    public static void main(String[] args) throws InterruptedException {
+//        System.out.println( System.currentTimeMillis());
+//        for (int i = 0; i < 10000; i++) {
+//            System.out.println(FormNumUtil.getOrderNo());
+//            Thread.sleep(1000);
+//        }
+//    }
 
     public static synchronized String getOrderNo() {
         //部署时候将换成天为单位计工单

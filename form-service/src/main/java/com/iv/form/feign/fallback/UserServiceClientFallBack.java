@@ -43,6 +43,10 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery, String tenantId) {
+		return null;
+	}
 
 
 	@Override
