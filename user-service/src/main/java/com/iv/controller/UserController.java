@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.response.ResponseDto;
@@ -206,6 +209,16 @@ public class UserController implements IUserService {
 			LOGGER.error("系统错误：获取用户信息失败", e);	
 		}
 		return null;		
+	}
+	
+	/**
+	 * 用户自动登录
+	 */
+	@ApiOperation("用户自动登录")
+	@RequestMapping(value = "/get/token",method = RequestMethod.GET)
+	public ResponseDto getToken(@RequestParam("code") String code) {
+		// TODO Auto-generated method stub
+		return userService.getToken(code);
 	}
 	
 }

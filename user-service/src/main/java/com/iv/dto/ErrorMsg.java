@@ -28,7 +28,11 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	EMAIL_VCODE_ERROR(42210,"验证码错误或已失效"),
 	
-	PASSWORD_ILLEGAL(42211,"密码非法");
+	PASSWORD_ILLEGAL(42211,"密码非法"),
+	
+	CODE_NULL(42212,"code为空"),
+	
+	CODE_ILLEGAL(42213,"code非法");
 
 	private int code;
     private String msg;
