@@ -42,4 +42,22 @@ server:
   port: 8251
 spring:
   profiles: peer2
+  
+#生产环境#  
+---
+server:
+  port: 8250
+spring:
+  profiles: product-peer1
+logging:
+  file: /var/log/ivops/email/email-service/peer1/email-service.log
+   
+---
+server:
+  port: 8251
+spring:
+  profiles: product-peer2
+logging:
+  file: /var/log/ivops/email/email-service/peer2/email-service.log     
+
     
