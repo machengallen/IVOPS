@@ -92,4 +92,14 @@ public interface IWechatService {
 	 */
 	@RequestMapping(value = "/form/weChatInfo", method = RequestMethod.POST)
 	ResponseDto SendFormWeChatInfo(@RequestBody TemplateFormMessageDto templateFormMessageDto);
+	
+	/**
+	 * 获取unioid
+	 * @param templateFormMessageDto
+	 * @return
+	 */
+	@RequestMapping(value = "/get/unionid", method = RequestMethod.GET)
+	String getUnionid(@RequestParam("code") String code);
+	
+	
 }
