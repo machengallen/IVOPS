@@ -50,9 +50,9 @@ spring:
         hibernate.c3p0.minPoolSize: 5
         hibernate.c3p0.maxIdleTime: 120
         hibernate.c3p0.idleConnectionTestPeriod: 18000
-  devtools:
-    restart:
-      enabled: false
+#  devtools:
+#    restart:
+#      enabled: true
 
 logging:
   level:

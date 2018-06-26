@@ -19,18 +19,18 @@ CREATE TABLE IF NOT EXISTS `single_task` (
   `timeout` int(11) NOT NULL,
   `task_life_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK995cfca9ap04ggmrkkdf3eub0` (`task_life_id`),
-  CONSTRAINT `FK995cfca9ap04ggmrkkdf3eub0` FOREIGN KEY (`task_life_id`) REFERENCES `single_task_life` (`id`)
+  KEY `FK2asnil5j2ueokaf5kg9ic3k77` (`task_life_id`),
+  CONSTRAINT `FK2asnil5j2ueokaf5kg9ic3k77` FOREIGN KEY (`task_life_id`) REFERENCES `single_task_life` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `single_task_entity_script_args` (
   `single_task_entity_id` int(11) NOT NULL,
   `script_args` varchar(255) DEFAULT NULL,
-  KEY `FKdb94gp0e6qcgqm3nvedc9ej7t` (`single_task_entity_id`),
-  CONSTRAINT `FKdb94gp0e6qcgqm3nvedc9ej7t` FOREIGN KEY (`single_task_entity_id`) REFERENCES `single_task` (`id`)
+  KEY `FK83ct3v8gkn2ey0x023s6gx7if` (`single_task_entity_id`),
+  CONSTRAINT `FK83ct3v8gkn2ey0x023s6gx7if` FOREIGN KEY (`single_task_entity_id`) REFERENCES `single_task` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE IF NOT EXISTS `single_task_target` (
+CREATE TABLE IF NOT EXISTS `immediate_target` (
   `id` varchar(255) NOT NULL,
   `account` varchar(255) DEFAULT NULL,
   `host_ip` varchar(255) DEFAULT NULL,
@@ -38,10 +38,10 @@ CREATE TABLE IF NOT EXISTS `single_task_target` (
   `port` int(11) NOT NULL,
   `result` varchar(255) DEFAULT NULL,
   `success` bit(1) NOT NULL,
-  `single_task_id` int(11) DEFAULT NULL,
+  `task_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `FK71ak8oqfnv04hfehofnvuo8la` (`single_task_id`),
-  CONSTRAINT `FK71ak8oqfnv04hfehofnvuo8la` FOREIGN KEY (`single_task_id`) REFERENCES `single_task` (`id`)
+  KEY `FKrdori89y0wkgx0inj2dscfoyo` (`task_id`),
+  CONSTRAINT `FKrdori89y0wkgx0inj2dscfoyo` FOREIGN KEY (`task_id`) REFERENCES `single_task` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE IF NOT EXISTS `single_task_schedule` (
@@ -51,6 +51,20 @@ CREATE TABLE IF NOT EXISTS `single_task_schedule` (
   PRIMARY KEY (`id`),
   KEY `FKb2m3pmtlwqpoy9ettuq7x2km2` (`single_task_id`),
   CONSTRAINT `FKb2m3pmtlwqpoy9ettuq7x2km2` FOREIGN KEY (`single_task_id`) REFERENCES `single_task` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `schedule_target` (
+  `id` varchar(255) NOT NULL,
+  `account` varchar(255) DEFAULT NULL,
+  `host_ip` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  `port` int(11) NOT NULL,
+  `result` varchar(255) DEFAULT NULL,
+  `success` bit(1) NOT NULL,
+  `task_schedule_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FKjcrst87f55aemhubwq2jt8gps` (`task_schedule_id`),
+  CONSTRAINT `FKjcrst87f55aemhubwq2jt8gps` FOREIGN KEY (`task_schedule_id`) REFERENCES `single_task_schedule` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 end

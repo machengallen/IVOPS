@@ -6,8 +6,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
+import com.iv.common.dto.ObjectPageDto;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.operation.script.dto.ScheduleQueryDto;
 import com.iv.operation.script.entity.SingleTaskScheduleEntity;
 
 @Repository
@@ -73,6 +75,12 @@ public class SingleTaskScheduleDaoImpl implements ISingleTaskScheduleDao {
 						.setParameter(0, taskId).executeUpdate();
 			}
 		});
+	}
+
+	@Override
+	public ObjectPageDto selectPage(ScheduleQueryDto queryDto) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

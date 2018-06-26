@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
+import com.iv.common.dto.ObjectPageDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.constant.ErrorMsg;
 import com.iv.operation.script.constant.ScriptSourceType;
@@ -37,6 +38,7 @@ import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
 import com.iv.operation.script.dto.ScheduleHostsDto;
+import com.iv.operation.script.dto.ScheduleQueryDto;
 import com.iv.operation.script.dto.HostDto;
 import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.entity.ScheduleTargetEntity;
@@ -98,6 +100,11 @@ public class OperationScriptQuartzService {
 		SingleTaskScheduleEntity scheduleEntity = new SingleTaskScheduleEntity();
 		scheduleEntity.setSingleTask(singleTaskDao.selectById(taskId));
 		scheduleEntity.setCronExp(cronExp);
+		long time = System.currentTimeMillis();
+		scheduleEntity.setCreator(JWTUtil.getReqValue("realName"));
+		scheduleEntity.setCreaDate(time);
+		scheduleEntity.setModifier(JWTUtil.getReqValue("realName"));
+		scheduleEntity.setModDate(time);
 		singleTaskScheduleDao.save(scheduleEntity);
 		return scheduleEntity;
 	}
@@ -106,13 +113,19 @@ public class OperationScriptQuartzService {
 		return scheduleTargetDao.selectByScheduleId(scheduleId);
 	}
 	
-	public List<SingleTaskScheduleEntity> scheduleGet(int taskId) {
+	public List<SingleTaskScheduleEntity> scheduleGetByTask(int taskId) {
 		return singleTaskScheduleDao.selectByTaskId(taskId);
+	}
+	
+	public ObjectPageDto scheduleGetPage(ScheduleQueryDto queryDto) {
+		return singleTaskScheduleDao.selectPage(queryDto);
 	}
 
 	public SingleTaskScheduleEntity singleTaskScheduleMod(int scheduleId, String cronExp) throws SchedulerException {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		scheduleEntity.setCronExp(cronExp);
+		scheduleEntity.setModifier(JWTUtil.getReqValue("realName"));
+		scheduleEntity.setModDate(System.currentTimeMillis());
 		singleTaskScheduleDao.save(scheduleEntity);
 		// 刷新执行中的定时任务
 		Scheduler scheduler = schedulerFactory.getScheduler();
@@ -183,9 +196,9 @@ public class OperationScriptQuartzService {
 	public List<ScheduleTargetEntity> excute (ScheduleHostsDto targetHostsDto) {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(targetHostsDto.getScheduleId());
 		List<ScheduleTargetEntity> taskTargetList = new ArrayList<ScheduleTargetEntity>();
-		int count = 0;// 计数任务执行线程数
-		CompletionService<ScheduleTargetEntity> completionService = doTask(count, scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+		CompletionService<ScheduleTargetEntity> completionService = doTask(scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
 		// 获取任务结果集
+		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
 			try {
 				Future<ScheduleTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
@@ -202,8 +215,8 @@ public class OperationScriptQuartzService {
 		// 更新任务生命周期
 		SingleTaskLifeEntity lifeEntity = scheduleEntity.getSingleTask().getTaskLife();
 		lifeEntity.execNumAdd();
-		lifeEntity.setExecDate(System.currentTimeMillis());
-		lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
+		//lifeEntity.setExecDate(System.currentTimeMillis());
+		//lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
 		singleTaskLifeDao.save(lifeEntity);
 		
 		// TODO 调用微信服务发送模板消息
@@ -212,7 +225,7 @@ public class OperationScriptQuartzService {
 
 	}
 	
-	private CompletionService<ScheduleTargetEntity> doTask(int count, SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<ScheduleTargetEntity> taskTargetList) {
+	private CompletionService<ScheduleTargetEntity> doTask(SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<ScheduleTargetEntity> taskTargetList) {
 		SingleTaskEntity taskEntity = scheduleEntity.getSingleTask();
 		CompletionService<ScheduleTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
 		for (HostDto host : targetHosts) {
@@ -263,7 +276,6 @@ public class OperationScriptQuartzService {
 					return targetEntity;
 				}
 			});
-			count++;
 			session.disconnect();
 		}
 		return completionService;

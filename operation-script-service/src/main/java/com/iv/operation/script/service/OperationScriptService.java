@@ -196,9 +196,9 @@ public class OperationScriptService {
 	public List<ImmediateTargetEntity> excute (ImmediateHostsDto targetHostsDto) {
 		SingleTaskEntity taskEntity = singleTaskDao.selectById(targetHostsDto.getTaskId());
 		List<ImmediateTargetEntity> taskTargetList = new ArrayList<ImmediateTargetEntity>();
-		int count = 0;// 计数任务执行线程数
-		CompletionService<ImmediateTargetEntity> completionService = doTask(count, taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+		CompletionService<ImmediateTargetEntity> completionService = doTask(taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
 		// 获取任务结果集
+		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
 			try {
 				Future<ImmediateTargetEntity> future = completionService.take();// 阻塞等待第一个结果，返回后该结果从队列删除
@@ -215,15 +215,13 @@ public class OperationScriptService {
 		// 更新任务生命周期
 		SingleTaskLifeEntity lifeEntity = taskEntity.getTaskLife();
 		lifeEntity.execNumAdd();
-		lifeEntity.setExecDate(System.currentTimeMillis());
-		lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
+		//lifeEntity.setExecDate(System.currentTimeMillis());
+		//lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
 		singleTaskLifeDao.save(lifeEntity);
 		return taskTargetList;
 	}
 	
-	
-	
-	private CompletionService<ImmediateTargetEntity> doTask(int count, SingleTaskEntity taskEntity, List<HostDto> targetHosts, List<ImmediateTargetEntity> taskTargetList) {
+	private CompletionService<ImmediateTargetEntity> doTask(SingleTaskEntity taskEntity, List<HostDto> targetHosts, List<ImmediateTargetEntity> taskTargetList) {
 		CompletionService<ImmediateTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
 		for (HostDto host : targetHosts) {
 			ResponseEntity<byte[]> fileStream = getFileStream(taskEntity.getScriptSrc(), taskEntity.getScriptId());// 获取执行脚本内容流
@@ -273,7 +271,6 @@ public class OperationScriptService {
 					return targetEntity;
 				}
 			});
-			count++;
 			session.disconnect();
 		}
 		return completionService;
@@ -314,5 +311,5 @@ public class OperationScriptService {
 
 		return immediateTargetDao.selectByTaskId(taskId);
 	}
-
+	
 }

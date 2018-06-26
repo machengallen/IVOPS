@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.iv.common.response.ResponseDto;
 import com.iv.operation.script.dto.ScheduleHostsDto;
+import com.iv.operation.script.dto.ScheduleQueryDto;
 import com.iv.operation.script.dto.SingleTaskDto;
 import com.iv.operation.script.dto.SingleTaskQueryDto;
 import com.iv.operation.script.constant.ErrorMsg;
@@ -31,7 +32,9 @@ import io.swagger.annotations.ApiOperation;
 /**
  * 脚本作业API
  * 
- * @author macheng 2018年5月25日 operation-script-service
+ * @author macheng 
+ * 2018年5月25日 
+ * operation-script-service
  * 
  */
 @RestController
@@ -246,12 +249,30 @@ public class OperationScriptController {
 	 * @param taskId
 	 * @return
 	 */
-	@ApiOperation(value = "定时作业规则查询", notes = "90206")
-	@GetMapping("/get/schedule")
-	public ResponseDto scheduleGet(@RequestParam int taskId) {
+	@ApiOperation(value = "指定脚本任务的所有定时作业查询", notes = "90206")
+	@GetMapping("/get/single/schedules")
+	public ResponseDto scheduleGetByTask(@RequestParam int taskId) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(quartzService.scheduleGet(taskId));
+			responseDto.setData(quartzService.scheduleGetByTask(taskId));
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("获取定时策略失败", e);
+			return ResponseDto.builder(ErrorMsg.GET_DATA_FAILED);
+		}
+	}
+	
+	/**
+	 * 查询脚本任务的定时策略
+	 * @param taskId
+	 * @return
+	 */
+	@ApiOperation(value = "定时作业列表查询", notes = "90213")
+	@PostMapping("/get/schedule")
+	public ResponseDto scheduleGetPage(@RequestBody ScheduleQueryDto queryDto) {
+		try {
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(quartzService.scheduleGetPage(queryDto));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("获取定时策略失败", e);

@@ -23,6 +23,12 @@ public class SingleTaskScheduleEntity implements Serializable{
 	@JsonIgnore
 	private SingleTaskEntity singleTask;
 	private String cronExp;// cron触发器表达式
+	private String creator;// 作业创建人
+	private Long creaDate;// 创建时间
+	private String modifier;// 作业最后修改人
+	private Long modDate;// 最后修改时间
+	//private String executor;// 最后执行人
+	//private Long execDate;// 最后执行日期
 	
 	@Id
 	@GeneratedValue
@@ -44,6 +50,30 @@ public class SingleTaskScheduleEntity implements Serializable{
 	}
 	public void setCronExp(String cronExp) {
 		this.cronExp = cronExp;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+	public Long getCreaDate() {
+		return creaDate;
+	}
+	public void setCreaDate(Long creaDate) {
+		this.creaDate = creaDate;
+	}
+	public String getModifier() {
+		return modifier;
+	}
+	public void setModifier(String modifier) {
+		this.modifier = modifier;
+	}
+	public Long getModDate() {
+		return modDate;
+	}
+	public void setModDate(Long modDate) {
+		this.modDate = modDate;
 	}
 	
 }
