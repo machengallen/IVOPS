@@ -56,7 +56,30 @@ spring:
 server:
   port: 8241
 spring:
-  profiles: peer2   
+  profiles: peer2  
+   
+#生产环境#  
+---
+server:
+  port: 8240
+spring:
+  profiles: product-peer1
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:3220/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+logging:
+  file: /var/log/ivops/wechat/wechat-service/peer1/wechat-service.log
+   
+---
+server:
+  port: 8241
+spring:
+  profiles: product-peer2
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:3220/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+logging:
+  file: /var/log/ivops/wechat/wechat-service/peer2/wechat-service.log     
 
     
       

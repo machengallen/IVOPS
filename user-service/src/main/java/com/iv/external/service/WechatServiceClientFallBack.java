@@ -64,5 +64,10 @@ public class WechatServiceClientFallBack implements WechatServiceClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public String getUnionid(String code) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

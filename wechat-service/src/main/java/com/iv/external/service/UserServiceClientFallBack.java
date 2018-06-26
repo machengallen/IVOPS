@@ -88,4 +88,10 @@ public class UserServiceClientFallBack implements UserServiceClient {
 		return null;
 	}
 
+	@Override
+	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

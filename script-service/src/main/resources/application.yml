@@ -86,13 +86,8 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://db.mas.ivops:3220/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: mas
-  #------------------------以下多租户配置属性---------------------------#
-#  jpa:
-#    properties:
-#      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-#      hibernate.connection.username: mas
 logging:
    file: /var/log/ivops/script/peer1/script-service.log
    
@@ -102,12 +97,7 @@ server:
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://db.mas.ivops:3220/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: mas
-  #------------------------以下多租户配置属性---------------------------#
-#  jpa:
-#    properties:
-#      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-#      hibernate.connection.username: mas
 logging:
    file: /var/log/ivops/script/peer2/script-service.log       

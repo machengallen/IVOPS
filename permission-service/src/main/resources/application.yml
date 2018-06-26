@@ -55,5 +55,38 @@ server:
   port: 8291
 spring:
   profiles: peer2
+  
+#生产环境#  
+---
+server:
+  port: 8290
+spring:
+  profiles: product-peer1
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:3280/permission_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3280/permission_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: mas
+logging:
+  file: /var/log/ivops/permission/permission-service/peer1/permission-service.log
+   
+---
+server:
+  port: 8291
+spring:
+  profiles: product-peer2
+  datasource:
+    url: jdbc:mysql://db.mas.ivops:3280/permission_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: mas
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3280/permission_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: mas
+logging:
+  file: /var/log/ivops/permission/permission-service/peer2/permission-service.log  
 
       

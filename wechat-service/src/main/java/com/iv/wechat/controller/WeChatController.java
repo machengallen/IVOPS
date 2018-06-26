@@ -184,6 +184,15 @@ public class WeChatController implements IWechatService{
 		}	
 	}
 
+	/**
+	 * 获取用户微信统一id
+	 */
+	@Override
+	public String getUnionid(String code) {
+		// TODO Auto-generated method stub
+		return weChatService.getUnionid(code);
+	}
+
 }
 	
 

@@ -64,10 +64,7 @@ public class PermissionService {
 	 */
 	public Set<LocalAuthDto> getApprovalPersons(String code){			
 		Set<LocalAuthDto> set = new HashSet<LocalAuthDto>();
-		LocalAuthDto localAuthDto = new LocalAuthDto();
-		localAuthDto.setNickName("mac");
-		localAuthDto.setId(2);
-		localAuthDto.setRealName("马成");
+		LocalAuthDto localAuthDto = userServiceClient.selectLocalauthInfoByName("admin");
 		set.add(localAuthDto);
 		return set;
 	}		

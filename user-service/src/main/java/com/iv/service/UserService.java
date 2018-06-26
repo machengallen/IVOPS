@@ -18,6 +18,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.Constants;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.dao.impl.LocalAuthDaoImpl;
 import com.iv.dao.impl.UserOauthDaoImpl;
@@ -28,6 +29,7 @@ import com.iv.entity.LocalAuth;
 import com.iv.entity.UserOauth;
 import com.iv.entity.dto.UserWechatEntityDto;
 import com.iv.enumeration.LoginType;
+import com.iv.external.service.IAuthenticationServiceClient;
 import com.iv.external.service.SubTenantPermissionServiceClient;
 import com.iv.external.service.WechatServiceClient;
 import com.iv.outer.dto.LocalAuthDto;
@@ -56,6 +58,8 @@ public class UserService {
 	private Md5PasswordEncoder md5PasswordEncoder = new Md5PasswordEncoder(); 
 	@Autowired
 	private SubTenantPermissionServiceClient subTenantPermissionService;
+	@Autowired
+	private IAuthenticationServiceClient authenticationServiceClient;
 	
 	/**
 	 * 获取用户信息
@@ -435,5 +439,27 @@ public class UserService {
 			UserInfos.add(localAuthDto);
 		}
 		return UserInfos;
+	}
+	
+	/**
+	 * 用户自动登录获取token
+	 * @param code
+	 * @return
+	 */
+	public ResponseDto getToken(String code) {		
+		if(StringUtils.isEmpty(code)) {
+			return ResponseDto.builder(ErrorMsg.CODE_NULL);
+		}
+		try {
+			String unionid = wechatService.getUnionid(code);		
+			UserOauth userOauth = userOauthDao.selectUserOauthByUnionid(unionid, LoginType.WECHAT);       
+			LocalAuth localAuth = localAuthDao.selectLocalAuthById(userOauth.getUserId());    
+			Object object = authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuth.getUserName() + Constants.THREE_PARTY_LOGIN, localAuth.getPassWord());
+			return ResponseDto.builder(ErrorMsg.OK, object);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return ResponseDto.builder(ErrorMsg.CODE_ILLEGAL);
+		}
+		
 	}
 }
