@@ -18,8 +18,8 @@ public interface IScriptService {
 	 * @return
 	 */
 	@RequestMapping(value = "/temp/write", method = RequestMethod.POST)
-	int tempWrite(@RequestParam("fileName") String fileName, @RequestParam("type") String type, @RequestParam("scriptId") int scriptId,
-			@RequestParam("content") byte[] content);
+	int tempWrite(@RequestParam("fileName") String fileName, @RequestParam("type") String type,
+			@RequestParam("content") byte[] content, @RequestParam("scriptId") Integer scriptId);
 
 	/**
 	 * 获取临时文件流
