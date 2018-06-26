@@ -5,19 +5,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.iv.common.response.ResponseDto;
 import com.iv.script.api.dto.ScriptDto;
 import com.iv.script.api.dto.TemporaryScriptDto;
 
 public interface IScriptService {
 
 	/**
-	 * 存储临时文件
+	 * 存储/编辑临时文件
 	 * 
 	 * @param inputStream
 	 * @return
 	 */
 	@RequestMapping(value = "/temp/write", method = RequestMethod.POST)
-	int tempWrite(@RequestParam("fileName") String fileName, @RequestParam("type") String type,
+	int tempWrite(@RequestParam("fileName") String fileName, @RequestParam("type") String type, @RequestParam("scriptId") int scriptId,
 			@RequestParam("content") byte[] content);
 
 	/**
@@ -55,5 +56,14 @@ public interface IScriptService {
 	 */
 	@RequestMapping(value = "/temporaryScript/info", method = RequestMethod.GET)
 	TemporaryScriptDto temporaryScriptInfoById(@RequestParam("scriptId") int scriptId);
+	
+	/**
+	 * 删除临时文件
+	 * 
+	 * @param scriptId
+	 * @return
+	 */
+	@RequestMapping(value = "/delete/temporaryScript", method = RequestMethod.GET)
+	ResponseDto DeletetemporaryScript(@RequestParam("scriptId") int scriptId);		
 
 }
