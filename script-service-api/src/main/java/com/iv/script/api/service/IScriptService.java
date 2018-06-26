@@ -64,6 +64,6 @@ public interface IScriptService {
 	 * @return
 	 */
 	@RequestMapping(value = "/delete/temporaryScript", method = RequestMethod.GET)
-	ResponseDto DeletetemporaryScript(@RequestParam("scriptId") int scriptId);		
+	ResponseDto deleteTemporaryScript(@RequestParam("scriptId") int scriptId);		
 
 }
