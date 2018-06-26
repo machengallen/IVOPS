@@ -20,8 +20,8 @@ public class SingleTaskLifeEntity implements Serializable{
 	private Long creaDate;// 创建时间
 	private String modifier;// 任务最后修改人
 	private Long modDate;// 最后修改时间
-	private String executor;// 最后执行人
-	private Long execDate;// 最后执行日期
+	//private String executor;// 最后执行人
+	//private Long execDate;// 最后执行日期
 	private int execNum;// 总计执行次数
 	@Id
 	@GeneratedValue
@@ -43,7 +43,7 @@ public class SingleTaskLifeEntity implements Serializable{
 	public void setCreaDate(Long creaDate) {
 		this.creaDate = creaDate;
 	}
-	public String getExecutor() {
+	/*public String getExecutor() {
 		return executor;
 	}
 	public void setExecutor(String executor) {
@@ -54,7 +54,7 @@ public class SingleTaskLifeEntity implements Serializable{
 	}
 	public void setExecDate(Long execDate) {
 		this.execDate = execDate;
-	}
+	}*/
 	public int getExecNum() {
 		return execNum;
 	}
