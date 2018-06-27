@@ -1,33 +1,24 @@
 package com.iv.operation.script.controller;
 
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import com.iv.common.response.ResponseDto;
-import com.iv.operation.script.dto.ScheduleHostsDto;
-import com.iv.operation.script.dto.ScheduleQueryDto;
-import com.iv.operation.script.dto.SingleTaskDto;
-import com.iv.operation.script.dto.SingleTaskQueryDto;
 import com.iv.operation.script.constant.ErrorMsg;
+import com.iv.operation.script.constant.OperatingSystemType;
 import com.iv.operation.script.constant.ScriptSourceType;
-import com.iv.operation.script.dto.ImmediateHostsDto;
+import com.iv.operation.script.dto.*;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.service.OperationScriptQuartzService;
 import com.iv.operation.script.service.OperationScriptService;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 /**
  * 脚本作业API
@@ -68,10 +59,12 @@ public class OperationScriptController {
 			@RequestParam String taskName, @RequestParam String taskDescription,
 			@RequestParam ScriptSourceType scriptSrc, @RequestParam(required = false) String scriptType,
 			@RequestParam(required = false) String scriptContext, @RequestParam(required = false) Integer scriptId,
-			@RequestParam(required = false) List<String> scriptArgs, @RequestParam int timeout) {
+			@RequestParam(required = false) List<String> scriptArgs, @RequestParam int timeout,
+										@RequestParam OperatingSystemType systemType) {
+
 
 		SingleTaskDto scriptDto = new SingleTaskDto(null, taskName, taskDescription, scriptSrc, scriptArgs,
-				timeout);
+				timeout,systemType);
 		try {
 			SingleTaskEntity taskEntity = null;
 			switch (scriptSrc) {
@@ -131,9 +124,9 @@ public class OperationScriptController {
 			@RequestParam String taskName, @RequestParam String taskDescription,
 			@RequestParam ScriptSourceType scriptSrc, @RequestParam(required = false) String scriptType,
 			@RequestParam(required = false) String scriptContext, @RequestParam Integer scriptId,
-			@RequestParam(required = false) List<String> scriptArgs, @RequestParam int timeout) {
+			@RequestParam(required = false) List<String> scriptArgs, @RequestParam int timeout,@RequestParam OperatingSystemType systemType) {
 
-		SingleTaskDto scriptDto = new SingleTaskDto(taskId, taskName, taskDescription, scriptSrc, scriptArgs, timeout);
+		SingleTaskDto scriptDto = new SingleTaskDto(taskId, taskName, taskDescription, scriptSrc, scriptArgs, timeout,systemType);
 		try {
 			SingleTaskEntity taskEntity = service.singleTaskModify(scriptDto, taskId, scriptId, file, scriptContext, scriptType);
 			if(null == taskEntity) {

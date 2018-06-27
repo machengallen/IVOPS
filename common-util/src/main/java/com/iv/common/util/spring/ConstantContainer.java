@@ -50,4 +50,6 @@ public interface ConstantContainer {
 	String PERMISSION_SERVICE = "permission_service";
 	
 	String RESOURCE_SERVICE = "resource_service";
+
+	String FORM_SERVICE = "form_service";
 }

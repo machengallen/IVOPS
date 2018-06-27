@@ -1,16 +1,20 @@
 package com.iv.operation.script.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-
+import com.iv.common.util.spring.JWTUtil;
+import com.iv.operation.script.constant.ErrorMsg;
+import com.iv.operation.script.constant.OperatingSystemType;
+import com.iv.operation.script.constant.ScriptSourceType;
+import com.iv.operation.script.dao.impl.ImmediateTargetDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
+import com.iv.operation.script.dto.*;
+import com.iv.operation.script.entity.ImmediateTargetEntity;
+import com.iv.operation.script.entity.SingleTaskEntity;
+import com.iv.operation.script.entity.SingleTaskLifeEntity;
+import com.iv.operation.script.feign.client.IScriptServiceClient;
+import com.iv.operation.script.util.*;
+import com.iv.script.api.dto.TemporaryScriptDto;
+import com.jcraft.jsch.Session;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,28 +23,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.iv.common.util.spring.JWTUtil;
-import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
-import com.iv.operation.script.constant.ErrorMsg;
-import com.iv.operation.script.constant.ScriptSourceType;
-import com.iv.operation.script.dao.impl.ImmediateTargetDaoImpl;
-import com.iv.operation.script.dto.HostDto;
-import com.iv.operation.script.dto.ImmediateHostsDto;
-import com.iv.operation.script.dto.OptResultDto;
-import com.iv.operation.script.dto.SingleTaskDto;
-import com.iv.operation.script.dto.SingleTaskPageDto;
-import com.iv.operation.script.dto.SingleTaskQueryDto;
-import com.iv.operation.script.entity.ImmediateTargetEntity;
-import com.iv.operation.script.entity.SingleTaskEntity;
-import com.iv.operation.script.entity.SingleTaskLifeEntity;
-import com.iv.operation.script.feign.client.IScriptServiceClient;
-import com.iv.operation.script.util.SSHAccount;
-import com.iv.operation.script.util.SSHSessionFactory;
-import com.iv.operation.script.util.SSHUtil;
-import com.iv.operation.script.util.ThreadPoolUtil;
-import com.iv.script.api.dto.TemporaryScriptDto;
-import com.jcraft.jsch.Session;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author macheng
@@ -94,6 +82,7 @@ public class OperationScriptService {
 		scriptEntity.setTaskDescription(dto.getTaskDescription());
 		scriptEntity.setTaskName(dto.getTaskName());
 		scriptEntity.setTimeout(dto.getTimeout());
+		scriptEntity.setSystemType(dto.getSystemType());
 		lifeEntity.setModDate(date);
 		lifeEntity.setModifier(user);
 		singleTaskDao.save(scriptEntity);
@@ -196,7 +185,21 @@ public class OperationScriptService {
 	public List<ImmediateTargetEntity> excute (ImmediateHostsDto targetHostsDto) {
 		SingleTaskEntity taskEntity = singleTaskDao.selectById(targetHostsDto.getTaskId());
 		List<ImmediateTargetEntity> taskTargetList = new ArrayList<ImmediateTargetEntity>();
-		CompletionService<ImmediateTargetEntity> completionService = doTask(taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+		OperatingSystemType systemType = taskEntity.getSystemType();
+		CompletionService<ImmediateTargetEntity> completionService;
+		switch (systemType){
+			case LINUX:
+				completionService = doTask(taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+				break;
+            case WINDOWS:
+                completionService = doTaskWin(taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+                break;
+            default:
+                completionService = doTask(taskEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+                break;
+		}
+
+
 		// 获取任务结果集
 		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
@@ -311,5 +314,73 @@ public class OperationScriptService {
 
 		return immediateTargetDao.selectByTaskId(taskId);
 	}
-	
+
+
+	/***
+	 * windows执行命令
+	 * @param taskEntity
+	 * @param targetHosts
+	 * @param taskTargetList
+	 * @return
+	 */
+	private CompletionService<ImmediateTargetEntity> doTaskWin(SingleTaskEntity taskEntity, List<HostDto> targetHosts, List<ImmediateTargetEntity> taskTargetList) {
+		CompletionService<ImmediateTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
+		for (HostDto host : targetHosts) {
+			ResponseEntity<byte[]> fileStream = getFileStream(taskEntity.getScriptSrc(), taskEntity.getScriptId());// 获取执行脚本内容流
+			if(null == fileStream) {
+				// 没有该文件或脚本库服务未响应
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
+			if(null == temporaryScriptDto) {
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+			String fileName = temporaryScriptDto.getName();
+
+			//win telnet协议
+			TelnetClientUtil client = new TelnetClientUtil(host.getHostIp(),host.getPort(),host.getAccount(), host.getPassword());
+			try{
+				client.connect();
+			}catch (Exception e){
+				// 连接失败
+				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SSH_CONNECT_FAILED.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+
+			// 提交任务至线程池
+			completionService.submit(new Callable<ImmediateTargetEntity>() {
+
+				@Override
+				public ImmediateTargetEntity call() throws Exception {
+					// 上传脚本
+					ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
+							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
+					//执行脚本
+                    String s = new String(fileStream.getBody());
+                    System.out.println(s);
+                    String command = client.sendCommand("md \"C:\\Newfolder1\"");
+					targetEntity.setSuccess(Boolean.TRUE);
+					targetEntity.setResult(command);
+
+					return targetEntity;
+				}
+			});
+			client.disconnect();
+		}
+		return completionService;
+	}
+
+
+
 }

@@ -10,6 +10,7 @@ import com.iv.form.dao.impl.IFormOptDaoImpl;
 import com.iv.form.entity.FormInfoEntity;
 import com.iv.form.feign.clients.WechatServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,7 +29,10 @@ public class WechatService {
     @Autowired
     private WechatServiceClient wechatServiceClient;
 
-    public Boolean sendWechat(FormInfoEntity formInfoEntity){
+    @Value("${iv.wechat.redirectUri}")
+    private String redirectUri;
+
+    public Boolean sendWechat(FormInfoEntity formInfoEntity,String code){
         Boolean flag=true;
         try {
             TemplateFormMessageDto templateFormMessageDto = new TemplateFormMessageDto();
@@ -47,7 +51,7 @@ public class WechatService {
             List<Integer> userIds = new ArrayList<>();
             userIds.add(formInfoEntity.getHandlerId());
             templateFormMessageDto.setUserIds(userIds);
-            templateFormMessageDto.setRedirect_uri("http://www.baidu.com");
+            templateFormMessageDto.setRedirect_uri(redirectUri+"$"+code);
             wechatServiceClient.SendFormWeChatInfo(templateFormMessageDto);
         } catch (Exception e) {
             flag=false;

@@ -23,6 +23,11 @@ public class GroupServiceClientFallBack implements GroupServiceClient {
     }
 
     @Override
+    public List<Integer> selectGroupUserIds(String subTenantId, short groupId) {
+        return null;
+    }
+
+    @Override
     public ResponseDto groupUsersInfo(HttpServletRequest request) {
         return null;
     }

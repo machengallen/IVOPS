@@ -135,6 +135,48 @@ public class IFormDaoImpl implements IFormDao {
         });
     }
 
+
+
+    /**
+     * 查询工单信息
+     * @param formId
+     * @return
+     */
+    @Override
+    public Map selectFormMapByCallBack(String formId) {
+        return (Map) HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+
+                StringBuffer sql = new StringBuffer("SELECT\n" +
+                        "\ta.id,\n" +
+                        "\tb.real_name AS applicantName,\n" +
+                        "\ta.form_owner_phone AS tel,\n" +
+                        "\td.`label` AS demandTypeCode,\n" +
+                        "\ta.demand_content AS title,\n" +
+                        "\ta.form_apply_time AS formExpectEndTime,\n" +
+                        "\tg.`name` AS formState,\n" +
+                        "\tf.real_name AS handler,\n" +
+                        "\th. NAME priority,\n" +
+                        "\te.`name` AS unitCode\n" +
+                        "FROM\n" +
+                        "\tform_info a\n" +
+                        "LEFT JOIN form_user b ON a.applicant_id = b.id\n" +
+                        "LEFT JOIN form_client c ON a.form_owner_id = c.id\n" +
+                        "LEFT JOIN form_demand d ON a.demand_type_code = d.id\n" +
+                        "LEFT JOIN form_company e ON a.unit_code = e.id\n" +
+                        "LEFT JOIN form_user f ON a.handler_id = f.id\n" +
+                        "LEFT JOIN form_state g ON a.form_state = g.id\n" +
+                        "LEFT JOIN form_priority h ON a.priority = h.id\n" +
+                        "WHERE\n" +
+                        "\ta.id = "+formId+"");
+                return ses.createSQLQuery(sql.toString())
+                        .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).uniqueResult();
+            }
+        });
+    }
+
     /**
      * 查询工单流转记录
      * @param formId

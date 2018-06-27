@@ -1,18 +1,11 @@
 package com.iv.operation.script.entity;
 
+import com.iv.operation.script.constant.OperatingSystemType;
+import com.iv.operation.script.constant.ScriptSourceType;
+
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
-
-import com.iv.operation.script.constant.ScriptSourceType;
 
 
 @Entity
@@ -31,7 +24,8 @@ public class SingleTaskEntity implements Serializable{
 	private List<String> scriptArgs;// 脚本执行传入参数
 	private int timeout;// 目标主机连接超时时间(毫秒)
 	private SingleTaskLifeEntity taskLife;
-	
+	private OperatingSystemType systemType;
+
 	@Id
 	@GeneratedValue
 	public int getId() {
@@ -92,5 +86,12 @@ public class SingleTaskEntity implements Serializable{
 	public void setTargetHosts(Set<TaskTargetEntity> targetHosts) {
 		this.targetHosts = targetHosts;
 	}*/
-	
+
+	public OperatingSystemType getSystemType() {
+		return systemType;
+	}
+
+	public void setSystemType(OperatingSystemType systemType) {
+		this.systemType = systemType;
+	}
 }

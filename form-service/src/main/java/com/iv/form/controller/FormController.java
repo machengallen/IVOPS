@@ -17,8 +17,7 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,6 +102,9 @@ public class FormController implements IFormService {
         }
         return dto;
     }
+
+
+
 
     @Override
     @ApiOperation(value="我的工单列表分页",notes = "90104")
@@ -399,7 +401,7 @@ public class FormController implements IFormService {
             return  dto;
         } catch (BusException be){//业务异常
             dto.setErrorMsg(be.getErrorMsg());
-            LOGGER.info(ErrorMsg.FORM_SUBMIT_FAILED.toString(),be);
+            LOGGER.info(ErrorMsg.FORM_NO_AUDIT.toString(),be);
         } catch(Exception e) {
             LOGGER.info(ErrorMsg.FORM_SUBMIT_FAILED.toString(),e);
             dto.setErrorMsg(ErrorMsg.FORM_SUBMIT_FAILED);
@@ -617,4 +619,27 @@ public class FormController implements IFormService {
         }
         return dto;
     }
+
+
+    @ApiOperation(value="工单信息（回调用）",notes = "90142")
+    @RequestMapping(value = "/select/formByCallBack", method = RequestMethod.GET)
+    public ResponseDto selectFormByCallBack(@RequestParam("formId") String formId) {
+        ResponseDto dto = new ResponseDto();
+        try {
+            String[] split = formId.split("\\$");
+            String form=split[0];
+            Map map = formService.selectFormByCallBack(form);
+            dto.setData(map);
+            dto.setErrorMsg(ErrorMsg.OK);
+            return  dto;
+        } catch (BusException be){//业务异常
+            dto.setErrorMsg(be.getErrorMsg());
+            LOGGER.info(ErrorMsg.FORM_SUBMIT_FAILED.toString(),be);
+        } catch(Exception e) {
+            LOGGER.info(ErrorMsg.FORM_INFO_FAILED.toString(),e);
+            dto.setErrorMsg(ErrorMsg.FORM_INFO_FAILED);
+        }
+        return dto;
+    }
+
 }

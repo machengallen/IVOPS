@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `single_task` (
   `task_name` varchar(255) DEFAULT NULL,
   `timeout` int(11) NOT NULL,
   `task_life_id` int(11) DEFAULT NULL,
+  `system_type` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK2asnil5j2ueokaf5kg9ic3k77` (`task_life_id`),
   CONSTRAINT `FK2asnil5j2ueokaf5kg9ic3k77` FOREIGN KEY (`task_life_id`) REFERENCES `single_task_life` (`id`)

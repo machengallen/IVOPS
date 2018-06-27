@@ -12,7 +12,6 @@ import com.iv.form.dto.FormDemandDto;
 import com.iv.form.entity.FormClientEntity;
 import com.iv.form.entity.FormCompanyEntity;
 import com.iv.form.entity.FormDemandEntity;
-import com.iv.form.service.FormActService;
 import com.iv.form.service.FormOptService;
 import com.iv.service.IFormOptionsService;
 import io.swagger.annotations.Api;
@@ -42,8 +41,7 @@ public class FormOptionsController implements IFormOptionsService {
 
     @Autowired
     private FormOptService formOptService;
-    @Autowired
-    private FormActService formActService;
+
 
 
     @Override
@@ -304,7 +302,7 @@ public class FormOptionsController implements IFormOptionsService {
     public ResponseDto test() {
         ResponseDto dto = new ResponseDto();
         try {
-            formActService.test();
+
 
             dto.setErrorMsg(ErrorMsg.OK);
             return  dto;

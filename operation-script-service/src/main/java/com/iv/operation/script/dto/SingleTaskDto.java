@@ -1,8 +1,9 @@
 package com.iv.operation.script.dto;
 
-import java.util.List;
-
+import com.iv.operation.script.constant.OperatingSystemType;
 import com.iv.operation.script.constant.ScriptSourceType;
+
+import java.util.List;
 
 public class SingleTaskDto {
 
@@ -12,18 +13,37 @@ public class SingleTaskDto {
 	private ScriptSourceType scriptSrc;// 执行脚本来源
 	private List<String> scriptArgs;// 脚本执行传入参数
 	private int timeout;// 目标主机连接超时时间(毫秒)
-	
-	public SingleTaskDto(Integer taskId, String taskName, String taskDescription, ScriptSourceType scriptSrc,
-			List<String> scriptArgs, int timeout) {
-		super();
+	private OperatingSystemType systemType;// 操作系统
+
+//	public SingleTaskDto(Integer taskId, String taskName, String taskDescription, ScriptSourceType scriptSrc,
+//			List<String> scriptArgs, int timeout) {
+//		super();
+//		this.taskId = taskId;
+//		this.taskName = taskName;
+//		this.taskDescription = taskDescription;
+//		this.scriptSrc = scriptSrc;
+//		this.scriptArgs = scriptArgs;
+//		this.timeout = timeout;
+//	}
+
+	public SingleTaskDto(Integer taskId, String taskName, String taskDescription, ScriptSourceType scriptSrc, List<String> scriptArgs, int timeout, OperatingSystemType systemType) {
 		this.taskId = taskId;
 		this.taskName = taskName;
 		this.taskDescription = taskDescription;
 		this.scriptSrc = scriptSrc;
 		this.scriptArgs = scriptArgs;
 		this.timeout = timeout;
+		this.systemType = systemType;
 	}
-	
+
+	public OperatingSystemType getSystemType() {
+		return systemType;
+	}
+
+	public void setSystemType(OperatingSystemType systemType) {
+		this.systemType = systemType;
+	}
+
 	public SingleTaskDto() {
 		super();
 	}

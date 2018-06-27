@@ -18,16 +18,20 @@ public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 	public String resolveCurrentTenantIdentifier() {
 
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-		if(null == requestAttributes) {
-			return ConstantContainer.ALARM_AGGREGATION_DB;
+		if (null == requestAttributes) {
+			String tenantId = TenantIdHolder.get();
+			if(!StringUtils.isEmpty(tenantId)) {
+				return ConstantContainer.FORM_SERVICE + "_" + tenantId;
+			}
+			return ConstantContainer.FORM_SERVICE;
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();
 		String token = request.getHeader("Authorization");
 
 		if (StringUtils.isEmpty(token)) {
-			return ConstantContainer.ALARM_AGGREGATION_DB;
+			return ConstantContainer.FORM_SERVICE;
 		} else {
-			return JWTUtil.getJWtJson(token).getString("curTenantId");
+			return ConstantContainer.FORM_SERVICE + "_" + JWTUtil.getJWtJson(token).getString("curTenantId");
 		}
 	}
 
