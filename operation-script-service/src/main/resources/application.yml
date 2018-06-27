@@ -1,7 +1,7 @@
 eureka:
   instance:
     prefer-ip-address: true
-    status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
+    status-page-url: http://10.10.9.26:${server.port}/swagger-ui.html
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
