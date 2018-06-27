@@ -24,14 +24,19 @@ public class TelnetClientUtil {
      */
     private static final String TERM_TYPE = "VT220";
 
-    private TelnetClient client = new TelnetClient(TERM_TYPE);// Telnet客户端
-    private InputStream input; // Telnet输入流，用于获取Telnet服务器的返回信息
-    private OutputStream output; // Telnet输出流，用于向服务器发送命令
-    private String hostname; // IP地址或主机名
-    private int port = 23; // 端口。默认为23
-    private String username; // 用户名
-    private String password; // 密码
-    private String prompt; // 命令提示符，用于判断是否读取到了返回信息的结尾
+    private  TelnetClient client = new TelnetClient(TERM_TYPE);// Telnet客户端
+    private  InputStream input; // Telnet输入流，用于获取Telnet服务器的返回信息
+    private  OutputStream output; // Telnet输出流，用于向服务器发送命令
+    private  String hostname; // IP地址或主机名
+    private  int port = 23; // 端口。默认为23
+    private  String username; // 用户名
+    private  String password; // 密码
+    private  String prompt; // 命令提示符，用于判断是否读取到了返回信息的结尾
+    private  int timeout=5000; // 过时时间
+
+
+
+
 
     /**
      * 创建Telnet客户端，用于连接Windows的Telnet服务器。使用默认端口：23
@@ -68,6 +73,14 @@ public class TelnetClientUtil {
         this.password = password;
     }
 
+    public TelnetClientUtil(String hostname, int port, String username, String password, int timeout) {
+        this.hostname = hostname;
+        this.port = port;
+        this.username = username;
+        this.password = password;
+        this.timeout = timeout;
+    }
+
     /**
      * 连接到Telnet服务器
      *
@@ -75,8 +88,8 @@ public class TelnetClientUtil {
      * @throws SocketException
      * @throws IOException
      */
-    public String connect() throws SocketException, IOException {
-        client.setDefaultTimeout(2000);
+    public  String connect() throws SocketException, IOException {
+        client.setDefaultTimeout(timeout);
         client.connect(hostname, port);
         input = client.getInputStream();
         output = client.getOutputStream();
@@ -102,7 +115,7 @@ public class TelnetClientUtil {
      * @return - 执行命令后，在命令行输出的信息
      * @throws IOException
      */
-    public String sendCommand(String command) throws IOException {
+    public  String sendCommand(String command) throws IOException {
         output.write(command.getBytes());
         output.write('\r');
         output.write('\n');
@@ -116,7 +129,7 @@ public class TelnetClientUtil {
      * @return - 断开连接的命令
      */
 
-    public String disconnect() {
+    public  String disconnect() {
         try {
             input.close();
             output.close();
@@ -134,7 +147,7 @@ public class TelnetClientUtil {
      *            - 指定的字符
      * @return - 从上次读取的位置，到<code>end</code>位置的输出内容
      */
-    private String readTo(String end) {
+    private  String readTo(String end) {
         StringBuffer sb = new StringBuffer();
 
         char endChar = end.charAt(end.length() - 1);
@@ -159,7 +172,7 @@ public class TelnetClientUtil {
      *
      * @return - 从上次读取的位置，到命令提示符的输出内容
      */
-    private String readToPrompt() {
+    private  String readToPrompt() {
         return readTo(prompt);
     }
 }

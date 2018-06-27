@@ -1,27 +1,28 @@
 package com.iv.operation.script.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletionService;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingDeque;
-
-import org.quartz.CronScheduleBuilder;
-import org.quartz.CronTrigger;
-import org.quartz.Job;
-import org.quartz.JobBuilder;
-import org.quartz.JobDetail;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.TriggerBuilder;
-import org.quartz.TriggerKey;
+import com.iv.common.dto.ObjectPageDto;
+import com.iv.common.util.spring.JWTUtil;
+import com.iv.operation.script.constant.ErrorMsg;
+import com.iv.operation.script.constant.OperatingSystemType;
+import com.iv.operation.script.constant.ScriptSourceType;
+import com.iv.operation.script.dao.impl.ScheduleTargetDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
+import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
+import com.iv.operation.script.dto.HostDto;
+import com.iv.operation.script.dto.OptResultDto;
+import com.iv.operation.script.dto.ScheduleHostsDto;
+import com.iv.operation.script.dto.ScheduleQueryDto;
+import com.iv.operation.script.entity.ScheduleTargetEntity;
+import com.iv.operation.script.entity.SingleTaskEntity;
+import com.iv.operation.script.entity.SingleTaskLifeEntity;
+import com.iv.operation.script.entity.SingleTaskScheduleEntity;
+import com.iv.operation.script.feign.client.IScriptServiceClient;
+import com.iv.operation.script.quartz.job.SingleTaskQuartzJob;
+import com.iv.operation.script.util.*;
+import com.iv.script.api.dto.TemporaryScriptDto;
+import com.jcraft.jsch.Session;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,30 +30,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
 
-import com.iv.common.dto.ObjectPageDto;
-import com.iv.common.util.spring.JWTUtil;
-import com.iv.operation.script.constant.ErrorMsg;
-import com.iv.operation.script.constant.ScriptSourceType;
-import com.iv.operation.script.dao.impl.ScheduleTargetDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
-import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
-import com.iv.operation.script.dto.ScheduleHostsDto;
-import com.iv.operation.script.dto.ScheduleQueryDto;
-import com.iv.operation.script.dto.HostDto;
-import com.iv.operation.script.dto.OptResultDto;
-import com.iv.operation.script.entity.ScheduleTargetEntity;
-import com.iv.operation.script.entity.SingleTaskEntity;
-import com.iv.operation.script.entity.SingleTaskLifeEntity;
-import com.iv.operation.script.entity.SingleTaskScheduleEntity;
-import com.iv.operation.script.feign.client.IScriptServiceClient;
-import com.iv.operation.script.quartz.job.SingleTaskQuartzJob;
-import com.iv.operation.script.util.SSHAccount;
-import com.iv.operation.script.util.SSHSessionFactory;
-import com.iv.operation.script.util.SSHUtil;
-import com.iv.operation.script.util.ThreadPoolUtil;
-import com.iv.script.api.dto.TemporaryScriptDto;
-import com.jcraft.jsch.Session;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
 
 /**
  * @author macheng 
@@ -196,7 +178,23 @@ public class OperationScriptQuartzService {
 	public List<ScheduleTargetEntity> excute (ScheduleHostsDto targetHostsDto) {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(targetHostsDto.getScheduleId());
 		List<ScheduleTargetEntity> taskTargetList = new ArrayList<ScheduleTargetEntity>();
-		CompletionService<ScheduleTargetEntity> completionService = doTask(scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+
+		SingleTaskEntity singleTask = scheduleEntity.getSingleTask();
+		OperatingSystemType systemType = singleTask.getSystemType();
+		CompletionService<ScheduleTargetEntity> completionService;
+
+		switch (systemType){
+			case LINUX:
+				completionService = doTask(scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+				break;
+			case WINDOWS:
+				completionService = doTaskWin(scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+				break;
+			default:
+				completionService = doTask(scheduleEntity, targetHostsDto.getTargetHosts(), taskTargetList);
+				break;
+		}
+
 		// 获取任务结果集
 		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
@@ -213,7 +211,7 @@ public class OperationScriptQuartzService {
 		scheduleTargetDao.batchSave(taskTargetList);
 
 		// 更新任务生命周期
-		SingleTaskLifeEntity lifeEntity = scheduleEntity.getSingleTask().getTaskLife();
+		SingleTaskLifeEntity lifeEntity = singleTask.getTaskLife();
 		lifeEntity.execNumAdd();
 		//lifeEntity.setExecDate(System.currentTimeMillis());
 		//lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
@@ -326,6 +324,70 @@ public class OperationScriptQuartzService {
 				+ scheduleEntity.getId();
 		String groupName = JWTUtil.getReqValue("curTenantId");
 		return TriggerKey.triggerKey(keyName, groupName);
+	}
+
+	/**
+	 * windows 定时任务
+	 * @param scheduleEntity
+	 * @param targetHosts
+	 * @param taskTargetList
+	 * @return
+	 */
+	private CompletionService<ScheduleTargetEntity> doTaskWin(SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<ScheduleTargetEntity> taskTargetList) {
+		SingleTaskEntity taskEntity = scheduleEntity.getSingleTask();
+		CompletionService<ScheduleTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
+		for (HostDto host : targetHosts) {
+			ResponseEntity<byte[]> fileStream = getFileStream(taskEntity.getScriptSrc(), taskEntity.getScriptId());// 获取执行脚本内容流
+			if(null == fileStream) {
+				// 没有该文件或脚本库服务未响应
+				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
+			if(null == temporaryScriptDto) {
+				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
+				taskTargetList.add(targetEntity);
+				continue;
+			}
+
+			//win telnet协议
+			TelnetClientUtil instance = new TelnetClientUtil(host.getHostIp(),host.getPort(),host.getAccount(), host.getPassword(),taskEntity.getTimeout());
+			try{
+				instance.connect();
+			}catch (Exception e){
+				// 连接失败
+				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
+						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
+						ErrorMsg.SSH_CONNECT_FAILED.getMsg());
+				taskTargetList.add(targetEntity);
+				instance.disconnect();
+				continue;
+			}
+			// 提交任务至线程池
+			completionService.submit(new Callable<ScheduleTargetEntity>() {
+
+				@Override
+				public ScheduleTargetEntity call() throws Exception {
+					// 上传脚本
+					ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
+							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
+					//执行脚本
+					String command = instance.sendCommand(new String(fileStream.getBody()));
+					instance.disconnect();
+
+					targetEntity.setSuccess(Boolean.TRUE);
+					targetEntity.setResult(command);
+					return targetEntity;
+				}
+			});
+
+		}
+		return completionService;
 	}
 
 }
