@@ -52,7 +52,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.requireCsrfProtectionMatcher(csrfRequestMatcher()).csrfTokenRepository(csrfTokenRepository()).and()
 				.addFilterAfter(csrfHeaderFilter(), CsrfFilter.class)*/
 				.addFilterAfter(oAuth2AuthenticationProcessingFilter(), AbstractPreAuthenticatedProcessingFilter.class)
-				.logout().logoutSuccessUrl("/v1/authentication/uaa/login").permitAll();
+				.logout().logoutUrl("/v1/logout").logoutSuccessUrl("http://passport.ivops.cn:7001/#/login").permitAll();
 		//http.csrf().disable();
 		
 		/*http

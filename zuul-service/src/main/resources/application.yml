@@ -4,7 +4,7 @@ eureka:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
   instance:
     prefer-ip-address: true
-    status-page-url: http://10.10.9.13:${server.port}/swagger-ui.html
+    status-page-url: http://10.10.9.26:${server.port}/swagger-ui.html
 spring:
   profiles:
     active:
@@ -84,6 +84,9 @@ zuul:
     api-17:
       path: /resource/**
       service-id: resource-service
+    api-18:
+      path: /operation/db/**
+      service-id: operation-db-service
 
 ribbon:
   ReadTimeout: 5000
@@ -94,15 +97,24 @@ ribbon:
 iv:
   public:
     uris: /v1/wechat/**,
-          /login,
-          /logout,
+          /v1/logout,
           /v1/authentication/uaa/**,
           /v1/uaa/**,
           /v1/alarm/aggregation/openalarm,
           /v1/user/bind/wechatInfo,
           /v1/user/register/account,
+          /v1/user/get/token,
           /swagger-ui.html,
-          /swagger-resources/**
+          /swagger-resources/**,
+          /v1/operation/script/**,
+          /v1/alarm/facade/**,
+          /v1/wechat/**,
+          /v1/alarm/report/**,
+          /v1/operation/db/**,
+          /v1/form/select/formByCallBack,
+          /v1/script/official/read,
+          /v1/script/temp/read
+          
 
   noToken:
     uris: /v1/authentication/uaa/login,
@@ -156,8 +168,9 @@ iv:
           /v1/permission/get/subTenantRoles,
           /v1/permission/subTenant/permissions,
           /v1/permission/subproject/Roles
-
-
+          /v1/form/downloadFile,
+          /v1/form/uploadFile,
+          /v1/form/del/file
 
 #jwt oauth2
 security:
@@ -196,3 +209,34 @@ spring:
   profiles: peer2
 server:
   port: 8121
+  
+#生产环境
+---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
+spring:
+  profiles: product-peer1
+server:
+  port: 8120
+logging:
+   file: /var/log/ivops/zuul-service/peer1/zuul-service.log
+   
+---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
+spring:
+  profiles: product-peer2
+server:
+  port: 8121
+logging:
+   file: /var/log/ivops/zuul-service/peer2/zuul-service.log
