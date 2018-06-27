@@ -1,10 +1,12 @@
 package com.iv.operation.script.dao.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import com.iv.common.dto.ObjectPageDto;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
@@ -79,8 +81,27 @@ public class SingleTaskScheduleDaoImpl implements ISingleTaskScheduleDao {
 
 	@Override
 	public ObjectPageDto selectPage(ScheduleQueryDto queryDto) throws RuntimeException {
-		// TODO Auto-generated method stub
-		return null;
+		return (ObjectPageDto) HibernateTemplate.execute(new HibernateCallBack() {
+
+			@SuppressWarnings("unchecked")
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				ObjectPageDto dto = new ObjectPageDto();
+				if (null != queryDto.getId()) {
+					dto.setTotal(1);
+					dto.setData(Arrays.asList(ses.get(SingleTaskScheduleEntity.class, queryDto.getId())));
+				}
+				int page = queryDto.getCurPage();
+				int items = queryDto.getItems();
+				String hql = "from SingleTaskScheduleEntity s where 1=1";
+				if (!StringUtils.isEmpty(queryDto.getTaskName())) {
+					hql = hql + " and s.singleTask.taskName like '%" + queryDto.getTaskName() + "%'";
+				}
+				dto.setTotal((long) ses.createQuery("select count(*) " + hql).uniqueResult());
+				dto.setData(ses.createQuery(hql).setFirstResult((page - 1) * items).setMaxResults(items).list());
+				return dto;
+			}
+		});
 	}
 
 }

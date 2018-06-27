@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.iv.common.requestInterceptor.FeignClientsConfigurationCustom;
+import com.iv.common.response.ResponseDto;
 import com.iv.script.api.dto.ScriptDto;
 import com.iv.script.api.dto.TemporaryScriptDto;
 import com.iv.script.api.service.IScriptService;
@@ -48,9 +49,15 @@ class ScriptServiceClientFallBack implements IScriptServiceClient {
 	}
 
 	@Override
-	public int tempWrite(String fileName, String type, byte[] content) {
+	public int tempWrite(String fileName, String type, byte[] content, Integer scriptId) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public ResponseDto deleteTemporaryScript(int scriptId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -99,7 +99,7 @@ public class OperationScriptController {
 	 * @param queryDto
 	 * @return
 	 */
-	@ApiOperation(value = "单脚本任务查询", notes = "90201")
+	@ApiOperation(value = "单脚本任务列表查询", notes = "90201")
 	@PostMapping("/get/single")
 	public ResponseDto singleTaskGet(@RequestBody SingleTaskQueryDto queryDto) {
 		try {

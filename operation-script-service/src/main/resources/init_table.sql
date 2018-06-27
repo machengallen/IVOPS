@@ -2,9 +2,7 @@ CREATE TABLE IF NOT EXISTS `single_task_life` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `crea_date` bigint(20) DEFAULT NULL,
   `creator` varchar(255) DEFAULT NULL,
-  `exec_date` bigint(20) DEFAULT NULL,
   `exec_num` int(11) NOT NULL,
-  `executor` varchar(255) DEFAULT NULL,
   `mod_date` bigint(20) DEFAULT NULL,
   `modifier` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -47,8 +45,13 @@ CREATE TABLE IF NOT EXISTS `immediate_target` (
 
 CREATE TABLE IF NOT EXISTS `single_task_schedule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
   `cron_exp` varchar(255) DEFAULT NULL,
   `single_task_id` int(11) DEFAULT NULL,
+  `crea_date` bigint(20) DEFAULT NULL,
+  `creator` varchar(255) DEFAULT NULL,
+  `mod_date` bigint(20) DEFAULT NULL,
+  `modifier` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FKb2m3pmtlwqpoy9ettuq7x2km2` (`single_task_id`),
   CONSTRAINT `FKb2m3pmtlwqpoy9ettuq7x2km2` FOREIGN KEY (`single_task_id`) REFERENCES `single_task` (`id`)
