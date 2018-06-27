@@ -60,12 +60,29 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
         }
 
 
-        //不需要验证的url
-        if (Arrays.asList(noAuthenticationUris).contains(requestURI)) {
-            return;
+        //不需要验证的url 正式版本
+//        if (Arrays.asList(noAuthenticationUris).contains(requestURI)) {
+//            return;
+//        }
+        // 不需要验证的url 临时版本
+        List<String> strings = Arrays.asList(noAuthenticationUris);
+        AntPathRequestMatcher matcherUrl;
+        for (String permissionUrl:strings){
+            matcherUrl = new AntPathRequestMatcher(permissionUrl);
+            if (matcherUrl.matches(request)) {
+                return;
+            }
         }
 
-        int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
+
+
+        int userId;
+        try{
+            userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
+        }catch (Exception e){
+            throw new AccessDeniedException("no right");
+        }
+
 
         //admin可以全部放出
         String userName = JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userName");
@@ -76,33 +93,27 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 
 
          // 读取缓存
-//        String key="authentication"+userId;
-//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
-//        List<String> apis = (List<String>)operations.get(key);
-//        if (apis.contains(requestURI)) {
-//            return;
-//        }
-
-        // 读取缓存
         String key="authentication"+userId;
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         List<String> apis = (List<String>)operations.get(key);
-        AntPathRequestMatcher matcherUrl;
-        for (String permissionUrl:apis){
-            matcherUrl = new AntPathRequestMatcher(permissionUrl);
-            if (matcherUrl.matches(request)) {
-                return;
-            }
+        if (apis.contains(requestURI)) {
+            return;
         }
 
-
-        //用户可操作的url 官方的匹配方法
-//        for (String permissionUrl : permissionUrlList) {
-//            matcher = new AntPathRequestMatcher(permissionUrl);
-//            if (matcher.matches(request)) {
+        // 读取缓存   官方的匹配方法
+//        String key="authentication"+userId;
+//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//        List<String> apis = (List<String>)operations.get(key);
+//        AntPathRequestMatcher matcherUrl;
+//        for (String permissionUrl:apis){
+//            matcherUrl = new AntPathRequestMatcher(permissionUrl);
+//            if (matcherUrl.matches(request)) {
 //                return;
 //            }
 //        }
+
+
+
         throw new AccessDeniedException("no right");
     }
 
