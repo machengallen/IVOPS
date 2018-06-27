@@ -45,7 +45,7 @@ public class SingleTaskScheduleEntity implements Serializable{
 	public void setName(String name) {
 		this.name = name;
 	}
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	public SingleTaskEntity getSingleTask() {
 		return singleTask;
 	}

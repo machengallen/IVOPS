@@ -1,5 +1,6 @@
 package com.iv.operation.script.dao.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import com.iv.common.dto.ObjectPageDto;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.operation.script.dto.ScheduleQueryDto;
+import com.iv.operation.script.dto.SingleTaskScheduleDto;
 import com.iv.operation.script.entity.SingleTaskScheduleEntity;
 
 @Repository
@@ -79,17 +81,19 @@ public class SingleTaskScheduleDaoImpl implements ISingleTaskScheduleDao {
 		});
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ObjectPageDto selectPage(ScheduleQueryDto queryDto) throws RuntimeException {
-		return (ObjectPageDto) HibernateTemplate.execute(new HibernateCallBack() {
+	public ObjectPageDto<SingleTaskScheduleDto> selectPage(ScheduleQueryDto queryDto) throws RuntimeException {
+		return (ObjectPageDto<SingleTaskScheduleDto>) HibernateTemplate.execute(new HibernateCallBack() {
 
-			@SuppressWarnings("unchecked")
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
-				ObjectPageDto dto = new ObjectPageDto();
+				ObjectPageDto<SingleTaskScheduleDto> dto = new ObjectPageDto<SingleTaskScheduleDto>();
 				if (null != queryDto.getId()) {
 					dto.setTotal(1);
-					dto.setData(Arrays.asList(ses.get(SingleTaskScheduleEntity.class, queryDto.getId())));
+					SingleTaskScheduleEntity scheduleEntity = ses.get(SingleTaskScheduleEntity.class, queryDto.getId());
+					dto.setData(Arrays.asList(entity2Dto(scheduleEntity, ses)));
+					return dto;
 				}
 				int page = queryDto.getCurPage();
 				int items = queryDto.getItems();
@@ -98,10 +102,33 @@ public class SingleTaskScheduleDaoImpl implements ISingleTaskScheduleDao {
 					hql = hql + " and s.singleTask.taskName like '%" + queryDto.getTaskName() + "%'";
 				}
 				dto.setTotal((long) ses.createQuery("select count(*) " + hql).uniqueResult());
-				dto.setData(ses.createQuery(hql).setFirstResult((page - 1) * items).setMaxResults(items).list());
+				List<SingleTaskScheduleEntity> scheduleEntities = ses.createQuery(hql).setFirstResult((page - 1) * items).setMaxResults(items).list();
+				List<SingleTaskScheduleDto> scheduleDtos = new ArrayList<SingleTaskScheduleDto>(scheduleEntities.size());
+				for (SingleTaskScheduleEntity scheduleEntity : scheduleEntities) {
+					scheduleDtos.add(entity2Dto(scheduleEntity, ses));
+				}
+				dto.setData(scheduleDtos);
 				return dto;
 			}
 		});
+	}
+	
+	@SuppressWarnings("unchecked")
+	private SingleTaskScheduleDto entity2Dto(SingleTaskScheduleEntity entity, Session ses) {
+		SingleTaskScheduleDto dto = new SingleTaskScheduleDto();
+		dto.setId(entity.getId());
+		dto.setCronExp(entity.getCronExp());
+		dto.setCreator(entity.getCreator());
+		dto.setCreaDate(entity.getCreaDate());
+		dto.setModifier(entity.getModifier());
+		dto.setModDate(entity.getModDate());
+		dto.setName(entity.getName());
+		dto.setTaskId(entity.getSingleTask().getId());
+		dto.setTaskName(entity.getSingleTask().getTaskName());
+		dto.setResults(ses.createQuery("from ScheduleTargetEntity s where s.taskSchedule.id=?").setParameter(0, entity.getId())
+				.list());
+		return dto;
+		
 	}
 
 }
