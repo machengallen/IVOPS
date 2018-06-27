@@ -168,7 +168,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
         return formInfoEntity;
@@ -429,7 +429,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
     }
@@ -646,7 +646,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
     }
@@ -717,7 +717,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
     }
@@ -769,7 +769,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
     }
 
@@ -820,7 +820,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
     }
@@ -871,7 +871,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code="";
+        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
     }
 

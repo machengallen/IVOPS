@@ -226,10 +226,10 @@ public class OperationScriptController {
 	 */
 	@ApiOperation(value = "定时作业规则新增", notes = "90205")
 	@GetMapping("/create/schedule")
-	public ResponseDto scheduleCreate(@RequestParam int taskId, @RequestParam String cronExp) {
+	public ResponseDto scheduleCreate(@RequestParam int taskId, @RequestParam String cronExp, @RequestParam String name) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(quartzService.singleTaskSchedule(taskId, cronExp));
+			responseDto.setData(quartzService.singleTaskSchedule(taskId, cronExp, name));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("定时任务创建失败", e);
@@ -281,10 +281,10 @@ public class OperationScriptController {
 	 */
 	@ApiOperation(value = "定时作业规则编辑", notes = "90207")
 	@GetMapping("/modify/schedule")
-	public ResponseDto scheduleModify(@RequestParam int scheduleId, @RequestParam String cronExp) {
+	public ResponseDto scheduleModify(@RequestParam int scheduleId, @RequestParam String cronExp, @RequestParam String name) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			responseDto.setData(quartzService.singleTaskScheduleMod(scheduleId, cronExp));
+			responseDto.setData(quartzService.singleTaskScheduleMod(scheduleId, cronExp, name));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("定时任务创建失败", e);
@@ -335,7 +335,7 @@ public class OperationScriptController {
 	 * @return
 	 */
 	@ApiOperation(value = "定时作业暂停", notes = "90211")
-	@PostMapping("/pause/schedule")
+	@GetMapping("/pause/schedule")
 	public ResponseDto schedulePause(@RequestParam int scheduleId) {
 
 		try {
@@ -354,7 +354,7 @@ public class OperationScriptController {
 	 * @return
 	 */
 	@ApiOperation(value = "定时作业重启", notes = "90212")
-	@PostMapping("/resume/schedule")
+	@GetMapping("/resume/schedule")
 	public ResponseDto scheduleResume(@RequestParam int scheduleId) {
 
 		try {

@@ -13,6 +13,9 @@ import com.iv.operation.script.dto.HostDto;
 import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.dto.ScheduleHostsDto;
 import com.iv.operation.script.dto.ScheduleQueryDto;
+import com.iv.operation.script.dto.SingleTaskScheduleDto;
+import com.iv.operation.script.dto.HostDto;
+import com.iv.operation.script.dto.OptResultDto;
 import com.iv.operation.script.entity.ScheduleTargetEntity;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
@@ -78,10 +81,11 @@ public class OperationScriptQuartzService {
 		scheduler.scheduleJob(jobDetail, cronTrigger);
 	}
 
-	public SingleTaskScheduleEntity singleTaskSchedule(int taskId, String cronExp) {
+	public SingleTaskScheduleEntity singleTaskSchedule(int taskId, String cronExp, String name) {
 		SingleTaskScheduleEntity scheduleEntity = new SingleTaskScheduleEntity();
 		scheduleEntity.setSingleTask(singleTaskDao.selectById(taskId));
 		scheduleEntity.setCronExp(cronExp);
+		scheduleEntity.setName(name);
 		long time = System.currentTimeMillis();
 		scheduleEntity.setCreator(JWTUtil.getReqValue("realName"));
 		scheduleEntity.setCreaDate(time);
@@ -94,24 +98,39 @@ public class OperationScriptQuartzService {
 	public List<ScheduleTargetEntity> scheduleTargetGet(int scheduleId) {
 		return scheduleTargetDao.selectByScheduleId(scheduleId);
 	}
-	
+
 	public List<SingleTaskScheduleEntity> scheduleGetByTask(int taskId) {
 		return singleTaskScheduleDao.selectByTaskId(taskId);
 	}
-	
-	public ObjectPageDto scheduleGetPage(ScheduleQueryDto queryDto) {
-		return singleTaskScheduleDao.selectPage(queryDto);
+
+	public ObjectPageDto<SingleTaskScheduleDto> scheduleGetPage(ScheduleQueryDto queryDto) throws SchedulerException {
+		Scheduler scheduler = schedulerFactory.getScheduler();
+		ObjectPageDto<SingleTaskScheduleDto> dtos = singleTaskScheduleDao.selectPage(queryDto);
+		for (SingleTaskScheduleDto dto : dtos.getData()) {
+			TriggerKey triggerKey = getTriggerKey(dto.getId(), dto.getTaskId());
+			dto.setState(scheduler.getTriggerState(triggerKey));
+			Trigger trigger = scheduler.getTrigger(triggerKey);
+			if (null != trigger) {
+				dto.setNextFireTime(trigger.getNextFireTime() == null ? null : trigger.getNextFireTime().getTime());
+				dto.setPreviousFireTime(
+						trigger.getPreviousFireTime() == null ? null : trigger.getPreviousFireTime().getTime());
+				dto.setStartTime(trigger.getStartTime().getTime());
+				dto.setEndTime(trigger.getEndTime() == null ? null : trigger.getEndTime().getTime());
+			}
+		}
+		return dtos;
 	}
 
-	public SingleTaskScheduleEntity singleTaskScheduleMod(int scheduleId, String cronExp) throws SchedulerException {
+	public SingleTaskScheduleEntity singleTaskScheduleMod(int scheduleId, String cronExp, String name) throws SchedulerException {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		scheduleEntity.setCronExp(cronExp);
+		scheduleEntity.setName(name);
 		scheduleEntity.setModifier(JWTUtil.getReqValue("realName"));
 		scheduleEntity.setModDate(System.currentTimeMillis());
 		singleTaskScheduleDao.save(scheduleEntity);
 		// 刷新执行中的定时任务
 		Scheduler scheduler = schedulerFactory.getScheduler();
-		TriggerKey triggerKey = getTriggerKey(scheduleEntity);
+		TriggerKey triggerKey = getTriggerKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId());
 		CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(cronExp);
 		trigger = trigger.getTriggerBuilder().withSchedule(schedBuilder).build();
@@ -134,27 +153,29 @@ public class OperationScriptQuartzService {
 		Scheduler scheduler = schedulerFactory.getScheduler();
 		scheduler.pauseTrigger(getTriggerKey(scheduleEntity));
 	}
-	
+
 	public void scheduleResume(int scheduleId) throws SchedulerException {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		Scheduler scheduler = schedulerFactory.getScheduler();
-		scheduler.resumeTrigger(getTriggerKey(scheduleEntity));
+		scheduler.resumeTrigger(getTriggerKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
 	}
-	
+
 	/**
 	 * 删除指定的定时作业
+	 *
 	 * @param scheduleId
-	 * @throws SchedulerException 
+	 * @throws SchedulerException
 	 */
 	public void scheduleDel(int scheduleId) throws SchedulerException {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		Scheduler scheduler = schedulerFactory.getScheduler();
-		scheduler.deleteJob(getJobKey(scheduleEntity));
+		scheduler.deleteJob(getJobKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
 		singleTaskScheduleDao.delById(scheduleId);
 	}
-	
+
 	/**
 	 * 删除指定任务的所有定时作业
+	 *
 	 * @param taskId
 	 * @return 删除的定时作业数
 	 * @throws SchedulerException
@@ -163,19 +184,19 @@ public class OperationScriptQuartzService {
 		// 移除任务下的所有定时作业
 		for (SingleTaskScheduleEntity scheduleEntity : singleTaskScheduleDao.selectByTaskId(taskId)) {
 			Scheduler scheduler = schedulerFactory.getScheduler();
-			scheduler.deleteJob(getJobKey(scheduleEntity));
-			//scheduler.unscheduleJob(triggerKey)
+			scheduler.deleteJob(getJobKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
+			// scheduler.unscheduleJob(triggerKey)
 		}
 		return singleTaskScheduleDao.delByTaskId(taskId);
 	}
-	
+
 	/**
 	 * 定时任务执行
 	 * 
 	 * @param targetHostsDto
 	 * @return
 	 */
-	public List<ScheduleTargetEntity> excute (ScheduleHostsDto targetHostsDto) {
+	public List<ScheduleTargetEntity> excute(ScheduleHostsDto targetHostsDto) {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(targetHostsDto.getScheduleId());
 		List<ScheduleTargetEntity> taskTargetList = new ArrayList<ScheduleTargetEntity>();
 
@@ -195,6 +216,8 @@ public class OperationScriptQuartzService {
 				break;
 		}
 
+		CompletionService<ScheduleTargetEntity> completionService = doTask(scheduleEntity,
+				targetHostsDto.getTargetHosts(), taskTargetList);
 		// 获取任务结果集
 		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
@@ -211,24 +234,25 @@ public class OperationScriptQuartzService {
 		scheduleTargetDao.batchSave(taskTargetList);
 
 		// 更新任务生命周期
-		SingleTaskLifeEntity lifeEntity = singleTask.getTaskLife();
+		SingleTaskLifeEntity lifeEntity = scheduleEntity.getSingleTask().getTaskLife();
 		lifeEntity.execNumAdd();
-		//lifeEntity.setExecDate(System.currentTimeMillis());
-		//lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
+		// lifeEntity.setExecDate(System.currentTimeMillis());
+		// lifeEntity.setExecutor(JWTUtil.getReqValue("realName"));
 		singleTaskLifeDao.save(lifeEntity);
-		
+
 		// TODO 调用微信服务发送模板消息
 		// TODO 调用邮箱服务发送邮件通知消息
 		return taskTargetList;
 
 	}
-	
-	private CompletionService<ScheduleTargetEntity> doTask(SingleTaskScheduleEntity scheduleEntity, List<HostDto> targetHosts, List<ScheduleTargetEntity> taskTargetList) {
+
+	private CompletionService<ScheduleTargetEntity> doTask(SingleTaskScheduleEntity scheduleEntity,
+			List<HostDto> targetHosts, List<ScheduleTargetEntity> taskTargetList) {
 		SingleTaskEntity taskEntity = scheduleEntity.getSingleTask();
 		CompletionService<ScheduleTargetEntity> completionService = getExecutorService(targetHosts.size());// 线程提交服务
 		for (HostDto host : targetHosts) {
 			ResponseEntity<byte[]> fileStream = getFileStream(taskEntity.getScriptSrc(), taskEntity.getScriptId());// 获取执行脚本内容流
-			if(null == fileStream) {
+			if (null == fileStream) {
 				// 没有该文件或脚本库服务未响应
 				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
@@ -236,8 +260,9 @@ public class OperationScriptQuartzService {
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
-			if(null == temporaryScriptDto) {
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient
+					.temporaryScriptInfoById(taskEntity.getScriptId());
+			if (null == temporaryScriptDto) {
 				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
@@ -278,7 +303,7 @@ public class OperationScriptQuartzService {
 		}
 		return completionService;
 	}
-	
+
 	private Session getSession(String ip, String userName, String password, Integer port) {
 		SSHAccount sshAccount = new SSHAccount(userName, password, ip);// 准备ssh连接
 		if (null != port && port != 22) {
@@ -286,42 +311,39 @@ public class OperationScriptQuartzService {
 		}
 		return SSHSessionFactory.getSession(sshAccount);
 	}
-	
+
 	private ResponseEntity<byte[]> getFileStream(ScriptSourceType scriptType, int scriptId) {
-		
+
 		ResponseEntity<byte[]> fileStream;
-		if(scriptType.name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
+		if (scriptType.name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
 			fileStream = scriptServiceClient.officialRead(scriptId);
 		} else {
 			fileStream = scriptServiceClient.tempRead(scriptId);
 		}
 		return fileStream;
 	}
-	
-	private <T> CompletionService<T> getExecutorService(int elements){
+
+	private <T> CompletionService<T> getExecutorService(int elements) {
 		final BlockingDeque<Future<T>> blockingDeque = new LinkedBlockingDeque<Future<T>>(elements);
-		final CompletionService<T> completionService = new ExecutorCompletionService<T>(
-				ThreadPoolUtil.getInstance(), blockingDeque);
+		final CompletionService<T> completionService = new ExecutorCompletionService<T>(ThreadPoolUtil.getInstance(),
+				blockingDeque);
 		return completionService;
 	}
-	
+
 	/**
 	 * 获取quartz jobkey
+	 *
 	 * @param scheduleEntity
 	 * @return
 	 */
-	private JobKey getJobKey(SingleTaskScheduleEntity scheduleEntity) {
-		String keyName = SingleTaskQuartzJob.class.getSimpleName() + "-" 
-						+ scheduleEntity.getSingleTask().getId() + "-"
-						+ scheduleEntity.getId();
+	private JobKey getJobKey(int scheduleId, int taskId) {
+		String keyName = SingleTaskQuartzJob.class.getSimpleName() + "-" + taskId + "-" + scheduleId;
 		String groupName = JWTUtil.getReqValue("curTenantId");
 		return JobKey.jobKey(keyName, groupName);
 	}
-	
-	private TriggerKey getTriggerKey(SingleTaskScheduleEntity scheduleEntity) {
-		String keyName = SingleTaskQuartzJob.class.getSimpleName() + "-" 
-				+ scheduleEntity.getSingleTask().getId() + "-"
-				+ scheduleEntity.getId();
+
+	private TriggerKey getTriggerKey(int scheduleId, int taskId) {
+		String keyName = SingleTaskQuartzJob.class.getSimpleName() + "-" + taskId + "-" + scheduleId;
 		String groupName = JWTUtil.getReqValue("curTenantId");
 		return TriggerKey.triggerKey(keyName, groupName);
 	}
