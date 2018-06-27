@@ -9,13 +9,7 @@ import com.iv.operation.script.dao.impl.ScheduleTargetDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskLifeDaoImpl;
 import com.iv.operation.script.dao.impl.SingleTaskScheduleDaoImpl;
-import com.iv.operation.script.dto.HostDto;
-import com.iv.operation.script.dto.OptResultDto;
-import com.iv.operation.script.dto.ScheduleHostsDto;
-import com.iv.operation.script.dto.ScheduleQueryDto;
-import com.iv.operation.script.dto.SingleTaskScheduleDto;
-import com.iv.operation.script.dto.HostDto;
-import com.iv.operation.script.dto.OptResultDto;
+import com.iv.operation.script.dto.*;
 import com.iv.operation.script.entity.ScheduleTargetEntity;
 import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
@@ -139,19 +133,18 @@ public class OperationScriptQuartzService {
 	}
 
 	public void scheduleExec(ScheduleHostsDto scheduleHostsDto) throws SchedulerException {
-		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao
-				.selectById(scheduleHostsDto.getScheduleId());
+		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleHostsDto.getScheduleId());
 		Map<String, Object> dataMap = new HashMap<String, Object>();
 		dataMap.put("targetHosts", scheduleHostsDto);
 		String keyName = SingleTaskQuartzJob.class.getSimpleName() + "-" + scheduleEntity.getSingleTask().getId() + "-"
 				+ scheduleEntity.getId();// job类名-任务id-定时策略id
 		addSchedulerTask(SingleTaskQuartzJob.class, scheduleEntity.getCronExp(), dataMap, keyName);
 	}
-	
+
 	public void schedulePause(int scheduleId) throws SchedulerException {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		Scheduler scheduler = schedulerFactory.getScheduler();
-		scheduler.pauseTrigger(getTriggerKey(scheduleEntity));
+		scheduler.pauseTrigger(getTriggerKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
 	}
 
 	public void scheduleResume(int scheduleId) throws SchedulerException {
@@ -216,8 +209,7 @@ public class OperationScriptQuartzService {
 				break;
 		}
 
-		CompletionService<ScheduleTargetEntity> completionService = doTask(scheduleEntity,
-				targetHostsDto.getTargetHosts(), taskTargetList);
+
 		// 获取任务结果集
 		int count = targetHostsDto.getTargetHosts().size() - taskTargetList.size();
 		for (int j = 1; j <= count; j++) {
@@ -315,7 +307,7 @@ public class OperationScriptQuartzService {
 	private ResponseEntity<byte[]> getFileStream(ScriptSourceType scriptType, int scriptId) {
 
 		ResponseEntity<byte[]> fileStream;
-		if (scriptType.name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
+		if(scriptType.name().equals(ScriptSourceType.SCRIPT_LIBRARY.name())) {
 			fileStream = scriptServiceClient.officialRead(scriptId);
 		} else {
 			fileStream = scriptServiceClient.tempRead(scriptId);
