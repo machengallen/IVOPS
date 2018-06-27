@@ -6,10 +6,10 @@ import org.springframework.context.annotation.PropertySource;
 @SpringCloudApplication
 @EnableFeignClients
 @PropertySource(value={"classpath:config.properties"}, encoding="utf-8")
-public class WechatServerApplication {
+public class WechatServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(WechatServerApplication.class, args);
+		SpringApplication.run(WechatServiceApplication.class, args);
 	}
 
 }
