@@ -674,6 +674,9 @@ public class FormService {
 
         //查询审核人员
         Set<LocalAuthDto> localAuthDtos = subTenantPermissionServiceClient.approveFormPerson("90120", curTenantId, formInfoEntity.getGroupId().shortValue());
+        if (localAuthDtos==null||localAuthDtos.size()==0){
+            throw new BusException(ErrorMsg.FORM_NO_AUDIT);
+        }
         for(LocalAuthDto localAuthDto:localAuthDtos){
             FormAuditPersonEntity formAuditPersonEntity = new FormAuditPersonEntity();
             formAuditPersonEntity.setFormId(formId);

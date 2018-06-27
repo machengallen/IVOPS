@@ -61,4 +61,9 @@ public class WechatServiceClientFallBack implements WechatServiceClient {
     public ResponseDto SendFormWeChatInfo(TemplateFormMessageDto templateFormMessageDto) {
         return null;
     }
+
+    @Override
+    public String getUnionid(String code) {
+        return null;
+    }
 }

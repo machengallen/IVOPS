@@ -18,8 +18,8 @@ SET FOREIGN_KEY_CHECKS=0;
 -- ----------------------------
 -- Table structure for act_evt_log
 -- ----------------------------
-DROP TABLE IF EXISTS `act_evt_log`;
-CREATE TABLE `act_evt_log` (
+
+CREATE TABLE IF NOT EXISTS `act_evt_log` (
   `LOG_NR_` bigint(20) NOT NULL AUTO_INCREMENT,
   `TYPE_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `PROC_DEF_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -38,8 +38,7 @@ CREATE TABLE `act_evt_log` (
 -- ----------------------------
 -- Table structure for act_ge_bytearray
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ge_bytearray`;
-CREATE TABLE `act_ge_bytearray` (
+CREATE TABLE IF NOT EXISTS `act_ge_bytearray` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `NAME_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -54,8 +53,7 @@ CREATE TABLE `act_ge_bytearray` (
 -- ----------------------------
 -- Table structure for act_ge_property
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ge_property`;
-CREATE TABLE `act_ge_property` (
+CREATE TABLE IF NOT EXISTS `act_ge_property` (
   `NAME_` varchar(64) COLLATE utf8_bin NOT NULL,
   `VALUE_` varchar(300) COLLATE utf8_bin DEFAULT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -65,8 +63,7 @@ CREATE TABLE `act_ge_property` (
 -- ----------------------------
 -- Table structure for act_hi_actinst
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_actinst`;
-CREATE TABLE `act_hi_actinst` (
+CREATE TABLE IF NOT EXISTS `act_hi_actinst` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_DEF_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_INST_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
@@ -91,8 +88,7 @@ CREATE TABLE `act_hi_actinst` (
 -- ----------------------------
 -- Table structure for act_hi_attachment
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_attachment`;
-CREATE TABLE `act_hi_attachment` (
+CREATE TABLE IF NOT EXISTS `act_hi_attachment` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `USER_ID_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -110,8 +106,7 @@ CREATE TABLE `act_hi_attachment` (
 -- ----------------------------
 -- Table structure for act_hi_comment
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_comment`;
-CREATE TABLE `act_hi_comment` (
+CREATE TABLE IF NOT EXISTS `act_hi_comment` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `TYPE_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `TIME_` datetime NOT NULL,
@@ -127,8 +122,7 @@ CREATE TABLE `act_hi_comment` (
 -- ----------------------------
 -- Table structure for act_hi_detail
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_detail`;
-CREATE TABLE `act_hi_detail` (
+CREATE TABLE IF NOT EXISTS `act_hi_detail` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `TYPE_` varchar(255) COLLATE utf8_bin NOT NULL,
   `PROC_INST_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -155,8 +149,7 @@ CREATE TABLE `act_hi_detail` (
 -- ----------------------------
 -- Table structure for act_hi_identitylink
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_identitylink`;
-CREATE TABLE `act_hi_identitylink` (
+CREATE TABLE IF NOT EXISTS `act_hi_identitylink` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `GROUP_ID_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `TYPE_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -172,8 +165,7 @@ CREATE TABLE `act_hi_identitylink` (
 -- ----------------------------
 -- Table structure for act_hi_procinst
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_procinst`;
-CREATE TABLE `act_hi_procinst` (
+CREATE TABLE IF NOT EXISTS `act_hi_procinst` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_INST_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `BUSINESS_KEY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -197,8 +189,7 @@ CREATE TABLE `act_hi_procinst` (
 -- ----------------------------
 -- Table structure for act_hi_taskinst
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_taskinst`;
-CREATE TABLE `act_hi_taskinst` (
+CREATE TABLE IF NOT EXISTS `act_hi_taskinst` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_DEF_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `TASK_DEF_KEY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -226,8 +217,7 @@ CREATE TABLE `act_hi_taskinst` (
 -- ----------------------------
 -- Table structure for act_hi_varinst
 -- ----------------------------
-DROP TABLE IF EXISTS `act_hi_varinst`;
-CREATE TABLE `act_hi_varinst` (
+CREATE TABLE IF NOT EXISTS `act_hi_varinst` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_INST_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
   `EXECUTION_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -252,7 +242,7 @@ CREATE TABLE `act_hi_varinst` (
 -- Table structure for act_id_group
 -- ----------------------------
 DROP TABLE IF EXISTS `act_id_group`;
-CREATE TABLE `act_id_group` (
+CREATE TABLE IF NOT EXISTS `act_id_group` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `NAME_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -264,7 +254,7 @@ CREATE TABLE `act_id_group` (
 -- Table structure for act_id_info
 -- ----------------------------
 DROP TABLE IF EXISTS `act_id_info`;
-CREATE TABLE `act_id_info` (
+CREATE TABLE IF NOT EXISTS `act_id_info` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `USER_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -280,7 +270,7 @@ CREATE TABLE `act_id_info` (
 -- Table structure for act_id_membership
 -- ----------------------------
 DROP TABLE IF EXISTS `act_id_membership`;
-CREATE TABLE `act_id_membership` (
+CREATE TABLE IF NOT EXISTS `act_id_membership` (
   `USER_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `GROUP_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   PRIMARY KEY (`USER_ID_`,`GROUP_ID_`),
@@ -293,7 +283,7 @@ CREATE TABLE `act_id_membership` (
 -- Table structure for act_id_user
 -- ----------------------------
 DROP TABLE IF EXISTS `act_id_user`;
-CREATE TABLE `act_id_user` (
+CREATE TABLE IF NOT EXISTS `act_id_user` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `FIRST_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -308,7 +298,7 @@ CREATE TABLE `act_id_user` (
 -- Table structure for act_procdef_info
 -- ----------------------------
 DROP TABLE IF EXISTS `act_procdef_info`;
-CREATE TABLE `act_procdef_info` (
+CREATE TABLE IF NOT EXISTS `act_procdef_info` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_DEF_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -325,7 +315,7 @@ CREATE TABLE `act_procdef_info` (
 -- Table structure for act_re_deployment
 -- ----------------------------
 DROP TABLE IF EXISTS `act_re_deployment`;
-CREATE TABLE `act_re_deployment` (
+CREATE TABLE IF NOT EXISTS `act_re_deployment` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `NAME_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
   `CATEGORY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -338,7 +328,7 @@ CREATE TABLE `act_re_deployment` (
 -- Table structure for act_re_model
 -- ----------------------------
 DROP TABLE IF EXISTS `act_re_model`;
-CREATE TABLE `act_re_model` (
+CREATE TABLE IF NOT EXISTS `act_re_model` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `NAME_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -365,7 +355,7 @@ CREATE TABLE `act_re_model` (
 -- Table structure for act_re_procdef
 -- ----------------------------
 DROP TABLE IF EXISTS `act_re_procdef`;
-CREATE TABLE `act_re_procdef` (
+CREATE TABLE IF NOT EXISTS `act_re_procdef` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `CATEGORY_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -388,7 +378,7 @@ CREATE TABLE `act_re_procdef` (
 -- Table structure for act_ru_event_subscr
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_event_subscr`;
-CREATE TABLE `act_ru_event_subscr` (
+CREATE TABLE IF NOT EXISTS `act_ru_event_subscr` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `EVENT_TYPE_` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -410,7 +400,7 @@ CREATE TABLE `act_ru_event_subscr` (
 -- Table structure for act_ru_execution
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_execution`;
-CREATE TABLE `act_ru_execution` (
+CREATE TABLE IF NOT EXISTS `act_ru_execution` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `PROC_INST_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -444,7 +434,7 @@ CREATE TABLE `act_ru_execution` (
 -- Table structure for act_ru_identitylink
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_identitylink`;
-CREATE TABLE `act_ru_identitylink` (
+CREATE TABLE IF NOT EXISTS `act_ru_identitylink` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `GROUP_ID_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -468,7 +458,7 @@ CREATE TABLE `act_ru_identitylink` (
 -- Table structure for act_ru_job
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_job`;
-CREATE TABLE `act_ru_job` (
+CREATE TABLE IF NOT EXISTS `act_ru_job` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `TYPE_` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -495,7 +485,7 @@ CREATE TABLE `act_ru_job` (
 -- Table structure for act_ru_task
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_task`;
-CREATE TABLE `act_ru_task` (
+CREATE TABLE IF NOT EXISTS `act_ru_task` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `EXECUTION_ID_` varchar(64) COLLATE utf8_bin DEFAULT NULL,
@@ -529,7 +519,7 @@ CREATE TABLE `act_ru_task` (
 -- Table structure for act_ru_variable
 -- ----------------------------
 DROP TABLE IF EXISTS `act_ru_variable`;
-CREATE TABLE `act_ru_variable` (
+CREATE TABLE IF NOT EXISTS `act_ru_variable` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
   `TYPE_` varchar(255) COLLATE utf8_bin NOT NULL,
@@ -556,7 +546,7 @@ CREATE TABLE `act_ru_variable` (
 -- Table structure for form_audit
 -- ----------------------------
 DROP TABLE IF EXISTS `form_audit`;
-CREATE TABLE `form_audit` (
+CREATE TABLE IF NOT EXISTS `form_audit` (
   `id` varchar(255) NOT NULL,
   `audit_type` int(11) DEFAULT NULL,
   `content` varchar(1000) DEFAULT NULL,
@@ -572,7 +562,7 @@ CREATE TABLE `form_audit` (
 -- Table structure for form_audit_person
 -- ----------------------------
 DROP TABLE IF EXISTS `form_audit_person`;
-CREATE TABLE `form_audit_person` (
+CREATE TABLE IF NOT EXISTS `form_audit_person` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `form_id` varchar(255) DEFAULT NULL,
   `group_id` smallint(6) DEFAULT NULL,
@@ -584,7 +574,7 @@ CREATE TABLE `form_audit_person` (
 -- Table structure for form_change_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `form_change_logs`;
-CREATE TABLE `form_change_logs` (
+CREATE TABLE IF NOT EXISTS `form_change_logs` (
   `id` varchar(64) NOT NULL COMMENT '流转记录表主键',
   `change_content` varchar(255) DEFAULT NULL,
   `create_by` int(11) DEFAULT NULL,
@@ -598,7 +588,7 @@ CREATE TABLE `form_change_logs` (
 -- Table structure for form_client
 -- ----------------------------
 DROP TABLE IF EXISTS `form_client`;
-CREATE TABLE `form_client` (
+CREATE TABLE IF NOT EXISTS `form_client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT NULL,
   `name` varchar(255) DEFAULT NULL,
@@ -618,7 +608,7 @@ CREATE TABLE `form_client` (
 -- Table structure for form_company
 -- ----------------------------
 DROP TABLE IF EXISTS `form_company`;
-CREATE TABLE `form_company` (
+CREATE TABLE IF NOT EXISTS `form_company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `create_by` int(11) DEFAULT NULL,
@@ -632,7 +622,7 @@ CREATE TABLE `form_company` (
 -- Table structure for form_demand
 -- ----------------------------
 DROP TABLE IF EXISTS `form_demand`;
-CREATE TABLE `form_demand` (
+CREATE TABLE IF NOT EXISTS `form_demand` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` varchar(64) DEFAULT NULL,
   `label` varchar(64) DEFAULT NULL,
@@ -646,7 +636,7 @@ CREATE TABLE `form_demand` (
 -- Table structure for form_evaluate
 -- ----------------------------
 DROP TABLE IF EXISTS `form_evaluate`;
-CREATE TABLE `form_evaluate` (
+CREATE TABLE IF NOT EXISTS `form_evaluate` (
   `id` varchar(255) NOT NULL,
   `client_opinion` varchar(1000) DEFAULT NULL,
   `end_time` bigint(20) DEFAULT NULL,
@@ -660,7 +650,7 @@ CREATE TABLE `form_evaluate` (
 -- Table structure for form_file
 -- ----------------------------
 DROP TABLE IF EXISTS `form_file`;
-CREATE TABLE `form_file` (
+CREATE TABLE IF NOT EXISTS `form_file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   `real_name` varchar(255) DEFAULT NULL,
@@ -673,7 +663,7 @@ CREATE TABLE `form_file` (
 -- Table structure for form_info
 -- ----------------------------
 DROP TABLE IF EXISTS `form_info`;
-CREATE TABLE `form_info` (
+CREATE TABLE IF NOT EXISTS `form_info` (
   `id` varchar(255) NOT NULL,
   `applicant_id` int(11) DEFAULT NULL,
   `demand_content` varchar(1000) DEFAULT NULL,
@@ -702,7 +692,7 @@ CREATE TABLE `form_info` (
 -- Table structure for form_marks
 -- ----------------------------
 DROP TABLE IF EXISTS `form_marks`;
-CREATE TABLE `form_marks` (
+CREATE TABLE IF NOT EXISTS `form_marks` (
   `id` varchar(64) NOT NULL COMMENT '标星id',
   `form_id` varchar(64) DEFAULT NULL COMMENT '工单Id',
   `create_by` int(11) DEFAULT NULL,
@@ -714,7 +704,7 @@ CREATE TABLE `form_marks` (
 -- Table structure for form_operate_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `form_operate_logs`;
-CREATE TABLE `form_operate_logs` (
+CREATE TABLE IF NOT EXISTS `form_operate_logs` (
   `id` varchar(255) NOT NULL,
   `create_date` bigint(20) DEFAULT NULL,
   `demand_type_code` int(11) DEFAULT NULL,
@@ -732,7 +722,7 @@ CREATE TABLE `form_operate_logs` (
 -- Table structure for form_priority
 -- ----------------------------
 DROP TABLE IF EXISTS `form_priority`;
-CREATE TABLE `form_priority` (
+CREATE TABLE IF NOT EXISTS `form_priority` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -742,7 +732,7 @@ CREATE TABLE `form_priority` (
 -- Table structure for form_state
 -- ----------------------------
 DROP TABLE IF EXISTS `form_state`;
-CREATE TABLE `form_state` (
+CREATE TABLE IF NOT EXISTS `form_state` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -752,7 +742,7 @@ CREATE TABLE `form_state` (
 -- Table structure for form_upgrade_logs
 -- ----------------------------
 DROP TABLE IF EXISTS `form_upgrade_logs`;
-CREATE TABLE `form_upgrade_logs` (
+CREATE TABLE IF NOT EXISTS `form_upgrade_logs` (
   `id` varchar(255) NOT NULL,
   `create_by` int(11) DEFAULT NULL,
   `create_date` bigint(20) DEFAULT NULL,
@@ -767,7 +757,7 @@ CREATE TABLE `form_upgrade_logs` (
 -- Table structure for form_user
 -- ----------------------------
 DROP TABLE IF EXISTS `form_user`;
-CREATE TABLE `form_user` (
+CREATE TABLE IF NOT EXISTS `form_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cur_tenant_id` varchar(255) DEFAULT NULL,
   `email` varchar(255) DEFAULT NULL,
@@ -783,7 +773,7 @@ CREATE TABLE `form_user` (
 -- Table structure for r_form_file
 -- ----------------------------
 DROP TABLE IF EXISTS `r_form_file`;
-CREATE TABLE `r_form_file` (
+CREATE TABLE IF NOT EXISTS `r_form_file` (
   `form_id` varchar(255) NOT NULL,
   `file_id` int(11) NOT NULL,
   PRIMARY KEY (`form_id`,`file_id`),

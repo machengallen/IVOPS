@@ -401,7 +401,7 @@ public class FormController implements IFormService {
             return  dto;
         } catch (BusException be){//业务异常
             dto.setErrorMsg(be.getErrorMsg());
-            LOGGER.info(ErrorMsg.FORM_SUBMIT_FAILED.toString(),be);
+            LOGGER.info(ErrorMsg.FORM_NO_AUDIT.toString(),be);
         } catch(Exception e) {
             LOGGER.info(ErrorMsg.FORM_SUBMIT_FAILED.toString(),e);
             dto.setErrorMsg(ErrorMsg.FORM_SUBMIT_FAILED);
