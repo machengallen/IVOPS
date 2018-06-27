@@ -25,6 +25,7 @@ public enum ErrorMsg implements IErrorMsg {
 	UPLOAD_ALL_SIZE_FAILED(50109,"上传文件的总的大小超出限制的最大值！！！"),//
 	UPLOAD_FAILED(50110,"文件上传失败"),//
 	UPLOAD_FILE_HAS_DEL(50111,"您要下载的资源已被删除！"),//
+	FORM_NO_AUDIT(50112,"请联系管理员配置审核人员"),//
 
 
 
