@@ -30,8 +30,8 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
     @Autowired
     private RedisTemplate redisTemplate;
 
-    @Value("${iv.noToken.uris}")
-    private String[] noTokenUris;
+    @Value("${iv.noAuthentication.uris}")
+    private String[] noAuthenticationUris;
 
     @Value("${iv.public.uris}")
     private String[] publicUris;
@@ -61,7 +61,7 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 
 
         //不需要验证的url
-        if (Arrays.asList(noTokenUris).contains(requestURI)) {
+        if (Arrays.asList(noAuthenticationUris).contains(requestURI)) {
             return;
         }
 
@@ -76,11 +76,23 @@ public class MyAccessDecisionManager implements AccessDecisionManager {
 
 
          // 读取缓存
+//        String key="authentication"+userId;
+//        ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
+//        List<String> apis = (List<String>)operations.get(key);
+//        if (apis.contains(requestURI)) {
+//            return;
+//        }
+
+        // 读取缓存
         String key="authentication"+userId;
         ValueOperations<Serializable, Object> operations = redisTemplate.opsForValue();
         List<String> apis = (List<String>)operations.get(key);
-        if (apis.contains(requestURI)) {
-            return;
+        AntPathRequestMatcher matcherUrl;
+        for (String permissionUrl:apis){
+            matcherUrl = new AntPathRequestMatcher(permissionUrl);
+            if (matcherUrl.matches(request)) {
+                return;
+            }
         }
 
 

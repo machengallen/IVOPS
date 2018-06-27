@@ -30,6 +30,7 @@ spring:
 
 
 zuul:
+  servlet-path: /
   prefix: /v1
   sensitive-headers: Cookie,Set-Cookie
   routes:
@@ -116,8 +117,8 @@ iv:
           /v1/script/temp/read
           
 
-  noToken:
-    uris: /v1/authentication/uaa/login,
+  noAuthentication:
+    uris: /v1/authentication/**,
           /v1/form/select/formListPage,
           /v1/form/select/formById,
           /v1/form/select/myFormListPage,
@@ -134,43 +135,18 @@ iv:
           /v1/form/select/demandTree,
           /v1/form/select/engineerList,
           /v1/form/select/formTrend,
-          /v1/group/select/groupUsersInfo,
-          /v1/group/select/groupUsersPageInfo,
-          /v1/group/select/groupsUsersInfo,
-          /v1/group/select/tenantUserPageInfo,
-          /v1/group/tenant/userInfos,
-          /v1/email/register/vcode,
-          /v1/tenant/mgt/apply/join/tenant,
-          /v1/tenant/mgt/apply/regis/tenant,
-          /v1/tenant/mgt/get/hisFlow/join/tenant,
-          /v1/tenant/mgt/get/hisFlow/regis/tenant,
-          /v1/tenant/mgt/get/tenant/conditions,
-          /v1/tenant/mgt/get/tenant/current,
-          /v1/tenant/mgt/get/tenant/joined,
-          /v1/tenant/mgt/switch,
-          /v1/alarm/aggregation/openalarm,
-          /v1/alarm/façade/get/myAlarm,
-          /v1/alarm/façade/refresh/alarmDetail,
-          /v1/alarm/strategy/get/strategy/all,
-          /v1/alarm/strategy/get/strategy/ids,
-          /v1/alarm/strategy/get/strategy/page,
-          /v1/user/bind/wechatInfo,
-          /v1/user/find/localAuthPassWord,
-          /v1/user/register/account,
-          /v1/user/saveOrUpdate/localAuth,
-          /v1/user/user/info,
-          /v1/wechat/wechat/getWechatLoginCode,
-          /v1/wechat/wechat/qrcodeCreate,
-          /v1/permission/get/subTenantRoles,
-          /v1/permission/subproject/Roles,
-          /v1/permission/formSys/permissions,
-          /v1/permission/get/personApis,
-          /v1/permission/get/subTenantRoles,
-          /v1/permission/subTenant/permissions,
-          /v1/permission/subproject/Roles
           /v1/form/downloadFile,
           /v1/form/uploadFile,
-          /v1/form/del/file
+          /v1/form/del/file,
+          /v1/group/**,
+          /v1/email/**,
+          /v1/tenant/**,
+          /v1/alarm/**,
+          /v1/user/**,
+          /v1/wechat/**,
+          /v1/permission/**
+
+
 
 #jwt oauth2
 security:
