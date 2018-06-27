@@ -129,7 +129,7 @@ public class OperationScriptService {
 		}*/
 		String fileName = file.getOriginalFilename();
 		String scriptType = fileName.substring(fileName.lastIndexOf(".") + 1);
-		int scriptId = scriptServiceClient.tempWrite(fileName, scriptType, file.getBytes());
+		int scriptId = scriptServiceClient.tempWrite(fileName, scriptType, file.getBytes(), null);
 		return taskSaveOrUpdate(dto, scriptId);
 	}
 
@@ -141,7 +141,7 @@ public class OperationScriptService {
 	 */
 	public SingleTaskEntity singleTaskCreate(SingleTaskDto dto, String context, String scriptType) {
 		//InputStream fileStream = new ByteArrayInputStream(context.getBytes());
-		int scriptId = scriptServiceClient.tempWrite(null, scriptType, context.getBytes());
+		int scriptId = scriptServiceClient.tempWrite(null, scriptType, context.getBytes(), null);
 		return taskSaveOrUpdate(dto, scriptId);
 	}
 
@@ -159,9 +159,9 @@ public class OperationScriptService {
 	public SingleTaskEntity singleTaskModify(SingleTaskDto dto, int taskId, int scriptId, MultipartFile file,
 			String context, String scriptType) throws IOException {
 
+		SingleTaskEntity taskEntity = singleTaskDao.selectById(dto.getTaskId());
 		switch (dto.getScriptSrc()) {
 		case SCRIPT_LIBRARY:
-			SingleTaskEntity taskEntity = singleTaskDao.selectById(dto.getTaskId());
 			if (taskEntity.getScriptSrc().name().equals(dto.getScriptSrc().name())) {
 				if(taskEntity.getScriptId() == scriptId) {
 					taskEntity = taskSaveOrUpdate(dto, scriptId);// 未修改脚本

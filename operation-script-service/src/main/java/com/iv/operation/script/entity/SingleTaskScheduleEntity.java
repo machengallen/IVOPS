@@ -20,6 +20,7 @@ public class SingleTaskScheduleEntity implements Serializable{
 	 */
 	private static final long serialVersionUID = 2704151605323403590L;
 	private int id;
+	private String name;
 	@JsonIgnore
 	private SingleTaskEntity singleTask;
 	private String cronExp;// cron触发器表达式
@@ -37,6 +38,12 @@ public class SingleTaskScheduleEntity implements Serializable{
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 	@ManyToOne(fetch = FetchType.LAZY)
 	public SingleTaskEntity getSingleTask() {
