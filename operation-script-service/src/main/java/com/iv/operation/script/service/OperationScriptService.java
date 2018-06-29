@@ -1,5 +1,7 @@
 package com.iv.operation.script.service;
 
+import com.iv.common.dto.BatchResultDto;
+import com.iv.common.dto.IdList;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.constant.ErrorMsg;
 import com.iv.operation.script.constant.OperatingSystemType;
@@ -171,11 +173,24 @@ public class OperationScriptService {
 		}
 	}
 	
-	public void singleTaskDel(int taskId) throws SchedulerException {
+	public BatchResultDto<Integer> singleTaskDel(IdList<Integer> taskIds) throws SchedulerException {
+		BatchResultDto<Integer> resultDto = new BatchResultDto<>();
+		List<Integer> failedIds = new ArrayList<>();
 		// 删除quartz定时作业
-		quartzService.removeSchedulerTask(taskId);
-		immediateTargetDao.delByTaskId(taskId);
-		singleTaskDao.delById(taskId);
+		for (Integer taskId : taskIds.getIds()) {
+			try {
+				quartzService.removeSchedulerTask(taskId);
+				immediateTargetDao.delByTaskId(taskId);
+				singleTaskDao.delById(taskId);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+				failedIds.add(taskId);
+			}
+		}
+		resultDto.setFailedMsg(failedIds);
+		resultDto.setTotal(taskIds.getIds().size());
+		resultDto.setFailed(failedIds.size());
+		return resultDto;
 	}
 	
 	/**
