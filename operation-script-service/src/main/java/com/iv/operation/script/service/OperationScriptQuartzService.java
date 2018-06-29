@@ -146,6 +146,9 @@ public class OperationScriptQuartzService {
 		Scheduler scheduler = schedulerFactory.getScheduler();
 		TriggerKey triggerKey = getTriggerKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId());
 		CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
+		if(null == trigger) {// 未提交quartz的任务,暂忽略
+			return null;
+		}
 		CronScheduleBuilder schedBuilder = CronScheduleBuilder.cronSchedule(cronExp);
 		trigger = trigger.getTriggerBuilder().withSchedule(schedBuilder).build();
 		scheduler.rescheduleJob(triggerKey, trigger);
@@ -183,6 +186,7 @@ public class OperationScriptQuartzService {
 		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
 		Scheduler scheduler = schedulerFactory.getScheduler();
 		scheduler.deleteJob(getJobKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
+		scheduleTargetDao.delByScheduleId(scheduleId);
 		singleTaskScheduleDao.delById(scheduleId);
 	}
 
