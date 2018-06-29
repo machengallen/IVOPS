@@ -49,9 +49,10 @@ public class WechatService {
             formContent.setRemark(new Note("请相关运维人员尽快处理","#FF0000"));
             templateFormMessageDto.setData(formContent);
             List<Integer> userIds = new ArrayList<>();
-            userIds.add(formInfoEntity.getHandlerId());
+            //userIds.add(formInfoEntity.getHandlerId());
+            userIds.add(9);
             templateFormMessageDto.setUserIds(userIds);
-            templateFormMessageDto.setRedirect_uri(redirectUri+"$"+code);
+            templateFormMessageDto.setRedirect_uri(redirectUri+code);
             wechatServiceClient.SendFormWeChatInfo(templateFormMessageDto);
         } catch (Exception e) {
             flag=false;

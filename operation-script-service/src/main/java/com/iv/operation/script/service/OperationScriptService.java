@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.*;
 
+
+
 /**
  * @author macheng
  * 2018年6月4日
@@ -345,15 +347,16 @@ public class OperationScriptService {
 			String fileName = temporaryScriptDto.getName();
 
 			//win telnet协议
-			TelnetClientUtil client = new TelnetClientUtil(host.getHostIp(),host.getPort(),host.getAccount(), host.getPassword());
+			TelnetClientUtil instance = new TelnetClientUtil(host.getHostIp(),host.getPort(),host.getAccount(), host.getPassword(),taskEntity.getTimeout());
 			try{
-				client.connect();
+				 instance.connect();
 			}catch (Exception e){
 				// 连接失败
 				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SSH_CONNECT_FAILED.getMsg());
 				taskTargetList.add(targetEntity);
+				instance.disconnect();
 				continue;
 			}
 
@@ -362,20 +365,21 @@ public class OperationScriptService {
 
 				@Override
 				public ImmediateTargetEntity call() throws Exception {
-					// 上传脚本
+
 					ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 							host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE, null);
+
 					//执行脚本
-                    String s = new String(fileStream.getBody());
-                    System.out.println(s);
-                    String command = client.sendCommand("md \"C:\\Newfolder1\"");
+                    String command = instance.sendCommand(new String(fileStream.getBody()));
+					instance.disconnect();
+
 					targetEntity.setSuccess(Boolean.TRUE);
 					targetEntity.setResult(command);
-
 					return targetEntity;
 				}
 			});
-			client.disconnect();
+
+
 		}
 		return completionService;
 	}
