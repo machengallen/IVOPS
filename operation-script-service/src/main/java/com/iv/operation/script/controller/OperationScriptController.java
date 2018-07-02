@@ -1,5 +1,6 @@
 package com.iv.operation.script.controller;
 
+import com.iv.common.dto.IdList;
 import com.iv.common.response.ResponseDto;
 import com.iv.operation.script.constant.ErrorMsg;
 import com.iv.operation.script.constant.OperatingSystemType;
@@ -148,11 +149,11 @@ public class OperationScriptController {
 	 */
 	@ApiOperation(value = "单脚本任务删除", notes = "90209")
 	@PostMapping("/del/single")
-	public ResponseDto singleTaskDel(@RequestParam int taskId) {
+	public ResponseDto singleTaskDel(@RequestBody IdList<Integer> taskIds) {
 
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			service.singleTaskDel(taskId);
+			responseDto.setData(service.singleTaskDel(taskIds));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("任务删除失败", e);
@@ -298,11 +299,11 @@ public class OperationScriptController {
 	 * @return
 	 */
 	@ApiOperation(value = "定时作业删除", notes = "90210")
-	@GetMapping("/del/schedule")
-	public ResponseDto scheduleDel(@RequestParam int scheduleId) {
+	@PostMapping("/del/schedule")
+	public ResponseDto scheduleDel(@RequestBody IdList<Integer> scheduleIds) {
 		try {
 			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
-			quartzService.scheduleDel(scheduleId);
+			responseDto.setData(quartzService.scheduleDel(scheduleIds));
 			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("定时作业删除失败", e);

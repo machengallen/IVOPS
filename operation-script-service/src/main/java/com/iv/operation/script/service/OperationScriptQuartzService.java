@@ -1,5 +1,7 @@
 package com.iv.operation.script.service;
 
+import com.iv.common.dto.BatchResultDto;
+import com.iv.common.dto.IdList;
 import com.iv.common.dto.ObjectPageDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.operation.script.constant.ErrorMsg;
@@ -162,12 +164,25 @@ public class OperationScriptQuartzService {
 	 * @param scheduleId
 	 * @throws SchedulerException
 	 */
-	public void scheduleDel(int scheduleId) throws SchedulerException {
-		SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
-		Scheduler scheduler = schedulerFactory.getScheduler();
-		scheduler.deleteJob(getJobKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
-		scheduleTargetDao.delByScheduleId(scheduleId);
-		singleTaskScheduleDao.delById(scheduleId);
+	public BatchResultDto<Integer> scheduleDel(IdList<Integer> scheduleIds) {
+		BatchResultDto<Integer> resultDto = new BatchResultDto<>();
+		List<Integer> failedIds = new ArrayList<>();
+		for (Integer scheduleId : scheduleIds.getIds()) {
+			try {
+				SingleTaskScheduleEntity scheduleEntity = singleTaskScheduleDao.selectById(scheduleId);
+				Scheduler scheduler = schedulerFactory.getScheduler();
+				scheduler.deleteJob(getJobKey(scheduleEntity.getId(), scheduleEntity.getSingleTask().getId()));
+				scheduleTargetDao.delByScheduleId(scheduleId);
+				singleTaskScheduleDao.delById(scheduleId);
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage());
+				failedIds.add(scheduleId);
+			}
+		}
+		resultDto.setFailedMsg(failedIds);
+		resultDto.setTotal(scheduleIds.getIds().size());
+		resultDto.setFailed(failedIds.size());
+		return resultDto;
 	}
 
 	/**
