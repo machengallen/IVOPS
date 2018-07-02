@@ -58,8 +58,8 @@ public class EmailService {
 
             formInfoTemplate.setFormInfoEntityDto(formInfoEntityDto);
             formInfoTemplate.setFormSendType(FormSendType.TOBETREATED);
-            //formInfoTemplate.setToEmails(new String[]{handler.getEmail()});
-            formInfoTemplate.setToEmails(new String[]{"liangk@inno-view.cn","494408452@qq.com"});
+            formInfoTemplate.setToEmails(new String[]{handler.getEmail()});
+            //formInfoTemplate.setToEmails(new String[]{"liangk@inno-view.cn","494408452@qq.com"});
             emailServiceClient.formToMail(formInfoTemplate);
         } catch (Exception e) {
              flag=false;

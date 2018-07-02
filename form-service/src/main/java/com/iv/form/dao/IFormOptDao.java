@@ -2,10 +2,7 @@ package com.iv.form.dao;
 
 import com.iv.dto.ClientConditionDto;
 import com.iv.dto.CommonPage;
-import com.iv.form.entity.FormClientEntity;
-import com.iv.form.entity.FormCompanyEntity;
-import com.iv.form.entity.FormDemandEntity;
-import com.iv.form.entity.FormFileEntity;
+import com.iv.form.entity.*;
 
 import java.util.List;
 import java.util.Map;
@@ -63,4 +60,8 @@ public interface IFormOptDao {
 
     //删除文件
     void delFile(Integer id);
+
+    List<FormStateEntity> selectFormStateList();
+
+    void saveOrUpdateFormState(FormStateEntity formStateEntity);
 }

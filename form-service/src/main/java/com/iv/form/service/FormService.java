@@ -168,7 +168,7 @@ public class FormService {
 
         //发邮件，以及微信
         emailService.sendEmail(formInfoEntity);
-        String code=formInfoEntity.getId()+"\\&"+JWTUtil.getReqValue("curTenantId");
+        String code=formInfoEntity.getId()+"$"+JWTUtil.getReqValue("curTenantId");
         wechatService.sendWechat(formInfoEntity,code);
 
         return formInfoEntity;
@@ -213,14 +213,14 @@ public class FormService {
      * @param formId
      * @return
      */
-    public Map selectFormByCallBack(String formId)throws BusException{
+    public Map selectFormByCallBack(String formId,String tenantId)throws BusException{
         //校验参数
         if(StringUtils.isEmpty(formId)){
             throw new BusException(ErrorMsg.FORM_HANDLER_ID_FAILED);
         }
 
         //查询信息
-        Map formInfo = FORM_DAO.selectFormMapByCallBack(formId);
+        Map formInfo = FORM_DAO.selectFormMapByCallBack(formId, tenantId);
 
 
         return formInfo;

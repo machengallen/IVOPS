@@ -24,7 +24,7 @@ public interface IFormDao {
     FormInfoEntity selectFormById(String formId);
     //根据工单Id查询工单信息Map
     Map selectFormMapById(String formId);
-    Map selectFormMapByCallBack(String formId);
+    Map selectFormMapByCallBack(String formId,String tenantId);
 
     //查询工单的流转记录
     List<FormChangeLogsEntity> selectFormChangeById(String formId);

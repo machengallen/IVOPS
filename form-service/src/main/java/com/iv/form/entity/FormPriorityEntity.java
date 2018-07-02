@@ -10,7 +10,8 @@ import javax.persistence.*;
 @Table(name = "form_priority")
 public class FormPriorityEntity {
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @GeneratedValue(strategy=GenerationType.TABLE,generator="tableGenerator")
+    @TableGenerator(name="tableGenerator",initialValue=0,allocationSize=1)
     private Integer id;
     private String name;
 

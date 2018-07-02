@@ -38,10 +38,14 @@ spring:
       max-file-size: 10Mb
       max-request-size: 10Mb
   datasource:
-    url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false&useOldAliasMetadataBehavior=true
+#    url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false&useOldAliasMetadataBehavior=true
+    url: jdbc:mysql://127.0.0.1:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false&useOldAliasMetadataBehavior=true
     username: root
-    password: 123@abcd
+#    password: 123@abcd
+    password: 123456
     driver-class-name: com.mysql.jdbc.Driver
+    data: classpath:/import.sql
+    sql-script-encoding: UTF-8
   jpa:
     database: mysql
     database-platform: mysql
@@ -52,7 +56,8 @@ spring:
         implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
         physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
     properties:
-      hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+#      hibernate.connection.url: jdbc:mysql://10.10.31.25:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://127.0.0.1:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: root
       hibernate.hbm2ddl.auto: update
       hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
@@ -61,11 +66,13 @@ spring:
       hibernate.multiTenancy: SCHEMA
       hibernate.tenant_identifier_resolver: com.iv.form.config.TenantIdResolver
       hibernate.multi_tenant_connection_provider: com.iv.form.config.MultiTenantConnectionProviderImpl
-      hibernate.connection.password: 123@abcd
+#      hibernate.connection.password: 123@abcd
+      hibernate.connection.password: 123456
       hibernate.connection.driver_class: com.mysql.jdbc.Driver
       hibernate.c3p0.minPoolSize: 5
       hibernate.c3p0.maxIdleTime: 120
       hibernate.c3p0.idleConnectionTestPeriod: 18000
+
   devtools:
     restart:
       enabled: false
@@ -89,7 +96,7 @@ iv:
     #设置上传文件总量的最大值，最大值=同时上传的多个文件的大小的最大值的和，目前设置为10MB
     sizeMax: 10485760
   wechat:
-    redirectUri: http://2038b2u538.iok.la/#/alarm/detail/
+    redirectUri: http://2038b2u538.iok.la/static/order/detail/
 
 
 
@@ -116,15 +123,29 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:4010/form_db?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://form_db:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
+    password: 123@abcd
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:4010/form_db?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://form_db:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
-  file: /var/log/ivops/operation/script/operation-script-service/peer1/operation-script-service.log
+  file: /opt/ivops/ops/form-service-peer1.log
+
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+#    instance-id: ${spring.cloud.client.ipAddress}:${server.port}
+#    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
+
+iv:
+  upload:
+    savePath: /opt/ivops/storage/form
 
 ---
 server:
@@ -132,18 +153,29 @@ server:
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:4010/form_db?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://form_db:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
+    password: 123@abcd
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:4010/form_db?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://form_db:3306/form_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
-  file: /var/log/ivops/operation/script/operation-script
+  file: /opt/ivops/ops/form-service-peer2.log
 
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+#    instance-id: ${spring.cloud.client.ipAddress}:${server.port}
+#    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
 
-
+iv:
+  upload:
+    savePath: /opt/ivops/storage/form
 
 
 

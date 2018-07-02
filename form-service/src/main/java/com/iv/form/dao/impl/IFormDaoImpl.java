@@ -7,6 +7,7 @@ import com.iv.form.dao.IFormDao;
 import com.iv.form.entity.*;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
+import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
@@ -143,8 +144,9 @@ public class IFormDaoImpl implements IFormDao {
      * @return
      */
     @Override
-    public Map selectFormMapByCallBack(String formId) {
-        return (Map) HibernateTemplate.execute(new HibernateCallBack() {
+    public Map selectFormMapByCallBack(String formId,String tenantId) {
+
+        return (Map) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
 
             @Override
             public Object doInHibernate(Session ses) throws HibernateException {
@@ -174,7 +176,9 @@ public class IFormDaoImpl implements IFormDao {
                 return ses.createSQLQuery(sql.toString())
                         .setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP).uniqueResult();
             }
-        });
+
+        }, "".equals(tenantId)?null:tenantId);
+
     }
 
     /**

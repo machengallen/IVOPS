@@ -241,7 +241,6 @@ CREATE TABLE IF NOT EXISTS `act_hi_varinst` (
 -- ----------------------------
 -- Table structure for act_id_group
 -- ----------------------------
-DROP TABLE IF EXISTS `act_id_group`;
 CREATE TABLE IF NOT EXISTS `act_id_group` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -253,7 +252,6 @@ CREATE TABLE IF NOT EXISTS `act_id_group` (
 -- ----------------------------
 -- Table structure for act_id_info
 -- ----------------------------
-DROP TABLE IF EXISTS `act_id_info`;
 CREATE TABLE IF NOT EXISTS `act_id_info` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -269,7 +267,6 @@ CREATE TABLE IF NOT EXISTS `act_id_info` (
 -- ----------------------------
 -- Table structure for act_id_membership
 -- ----------------------------
-DROP TABLE IF EXISTS `act_id_membership`;
 CREATE TABLE IF NOT EXISTS `act_id_membership` (
   `USER_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `GROUP_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
@@ -282,7 +279,6 @@ CREATE TABLE IF NOT EXISTS `act_id_membership` (
 -- ----------------------------
 -- Table structure for act_id_user
 -- ----------------------------
-DROP TABLE IF EXISTS `act_id_user`;
 CREATE TABLE IF NOT EXISTS `act_id_user` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -297,7 +293,6 @@ CREATE TABLE IF NOT EXISTS `act_id_user` (
 -- ----------------------------
 -- Table structure for act_procdef_info
 -- ----------------------------
-DROP TABLE IF EXISTS `act_procdef_info`;
 CREATE TABLE IF NOT EXISTS `act_procdef_info` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `PROC_DEF_ID_` varchar(64) COLLATE utf8_bin NOT NULL,
@@ -314,7 +309,6 @@ CREATE TABLE IF NOT EXISTS `act_procdef_info` (
 -- ----------------------------
 -- Table structure for act_re_deployment
 -- ----------------------------
-DROP TABLE IF EXISTS `act_re_deployment`;
 CREATE TABLE IF NOT EXISTS `act_re_deployment` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `NAME_` varchar(255) COLLATE utf8_bin DEFAULT NULL,
@@ -327,7 +321,6 @@ CREATE TABLE IF NOT EXISTS `act_re_deployment` (
 -- ----------------------------
 -- Table structure for act_re_model
 -- ----------------------------
-DROP TABLE IF EXISTS `act_re_model`;
 CREATE TABLE IF NOT EXISTS `act_re_model` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -354,7 +347,6 @@ CREATE TABLE IF NOT EXISTS `act_re_model` (
 -- ----------------------------
 -- Table structure for act_re_procdef
 -- ----------------------------
-DROP TABLE IF EXISTS `act_re_procdef`;
 CREATE TABLE IF NOT EXISTS `act_re_procdef` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -377,7 +369,6 @@ CREATE TABLE IF NOT EXISTS `act_re_procdef` (
 -- ----------------------------
 -- Table structure for act_ru_event_subscr
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_event_subscr`;
 CREATE TABLE IF NOT EXISTS `act_ru_event_subscr` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -399,7 +390,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_event_subscr` (
 -- ----------------------------
 -- Table structure for act_ru_execution
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_execution`;
 CREATE TABLE IF NOT EXISTS `act_ru_execution` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -433,7 +423,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_execution` (
 -- ----------------------------
 -- Table structure for act_ru_identitylink
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_identitylink`;
 CREATE TABLE IF NOT EXISTS `act_ru_identitylink` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -457,7 +446,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_identitylink` (
 -- ----------------------------
 -- Table structure for act_ru_job
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_job`;
 CREATE TABLE IF NOT EXISTS `act_ru_job` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -484,7 +472,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_job` (
 -- ----------------------------
 -- Table structure for act_ru_task
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_task`;
 CREATE TABLE IF NOT EXISTS `act_ru_task` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -518,7 +505,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_task` (
 -- ----------------------------
 -- Table structure for act_ru_variable
 -- ----------------------------
-DROP TABLE IF EXISTS `act_ru_variable`;
 CREATE TABLE IF NOT EXISTS `act_ru_variable` (
   `ID_` varchar(64) COLLATE utf8_bin NOT NULL,
   `REV_` int(11) DEFAULT NULL,
@@ -545,7 +531,6 @@ CREATE TABLE IF NOT EXISTS `act_ru_variable` (
 -- ----------------------------
 -- Table structure for form_audit
 -- ----------------------------
-DROP TABLE IF EXISTS `form_audit`;
 CREATE TABLE IF NOT EXISTS `form_audit` (
   `id` varchar(255) NOT NULL,
   `audit_type` int(11) DEFAULT NULL,
@@ -561,7 +546,6 @@ CREATE TABLE IF NOT EXISTS `form_audit` (
 -- ----------------------------
 -- Table structure for form_audit_person
 -- ----------------------------
-DROP TABLE IF EXISTS `form_audit_person`;
 CREATE TABLE IF NOT EXISTS `form_audit_person` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `form_id` varchar(255) DEFAULT NULL,
@@ -573,7 +557,6 @@ CREATE TABLE IF NOT EXISTS `form_audit_person` (
 -- ----------------------------
 -- Table structure for form_change_logs
 -- ----------------------------
-DROP TABLE IF EXISTS `form_change_logs`;
 CREATE TABLE IF NOT EXISTS `form_change_logs` (
   `id` varchar(64) NOT NULL COMMENT '流转记录表主键',
   `change_content` varchar(255) DEFAULT NULL,
@@ -587,7 +570,6 @@ CREATE TABLE IF NOT EXISTS `form_change_logs` (
 -- ----------------------------
 -- Table structure for form_client
 -- ----------------------------
-DROP TABLE IF EXISTS `form_client`;
 CREATE TABLE IF NOT EXISTS `form_client` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `email` varchar(255) DEFAULT NULL,
@@ -607,7 +589,6 @@ CREATE TABLE IF NOT EXISTS `form_client` (
 -- ----------------------------
 -- Table structure for form_company
 -- ----------------------------
-DROP TABLE IF EXISTS `form_company`;
 CREATE TABLE IF NOT EXISTS `form_company` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -621,7 +602,6 @@ CREATE TABLE IF NOT EXISTS `form_company` (
 -- ----------------------------
 -- Table structure for form_demand
 -- ----------------------------
-DROP TABLE IF EXISTS `form_demand`;
 CREATE TABLE IF NOT EXISTS `form_demand` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `content` varchar(64) DEFAULT NULL,
@@ -635,7 +615,6 @@ CREATE TABLE IF NOT EXISTS `form_demand` (
 -- ----------------------------
 -- Table structure for form_evaluate
 -- ----------------------------
-DROP TABLE IF EXISTS `form_evaluate`;
 CREATE TABLE IF NOT EXISTS `form_evaluate` (
   `id` varchar(255) NOT NULL,
   `client_opinion` varchar(1000) DEFAULT NULL,
@@ -649,7 +628,6 @@ CREATE TABLE IF NOT EXISTS `form_evaluate` (
 -- ----------------------------
 -- Table structure for form_file
 -- ----------------------------
-DROP TABLE IF EXISTS `form_file`;
 CREATE TABLE IF NOT EXISTS `form_file` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -662,7 +640,6 @@ CREATE TABLE IF NOT EXISTS `form_file` (
 -- ----------------------------
 -- Table structure for form_info
 -- ----------------------------
-DROP TABLE IF EXISTS `form_info`;
 CREATE TABLE IF NOT EXISTS `form_info` (
   `id` varchar(255) NOT NULL,
   `applicant_id` int(11) DEFAULT NULL,
@@ -691,7 +668,6 @@ CREATE TABLE IF NOT EXISTS `form_info` (
 -- ----------------------------
 -- Table structure for form_marks
 -- ----------------------------
-DROP TABLE IF EXISTS `form_marks`;
 CREATE TABLE IF NOT EXISTS `form_marks` (
   `id` varchar(64) NOT NULL COMMENT '标星id',
   `form_id` varchar(64) DEFAULT NULL COMMENT '工单Id',
@@ -703,7 +679,6 @@ CREATE TABLE IF NOT EXISTS `form_marks` (
 -- ----------------------------
 -- Table structure for form_operate_logs
 -- ----------------------------
-DROP TABLE IF EXISTS `form_operate_logs`;
 CREATE TABLE IF NOT EXISTS `form_operate_logs` (
   `id` varchar(255) NOT NULL,
   `create_date` bigint(20) DEFAULT NULL,
@@ -721,7 +696,6 @@ CREATE TABLE IF NOT EXISTS `form_operate_logs` (
 -- ----------------------------
 -- Table structure for form_priority
 -- ----------------------------
-DROP TABLE IF EXISTS `form_priority`;
 CREATE TABLE IF NOT EXISTS `form_priority` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -731,7 +705,6 @@ CREATE TABLE IF NOT EXISTS `form_priority` (
 -- ----------------------------
 -- Table structure for form_state
 -- ----------------------------
-DROP TABLE IF EXISTS `form_state`;
 CREATE TABLE IF NOT EXISTS `form_state` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) DEFAULT NULL,
@@ -741,7 +714,6 @@ CREATE TABLE IF NOT EXISTS `form_state` (
 -- ----------------------------
 -- Table structure for form_upgrade_logs
 -- ----------------------------
-DROP TABLE IF EXISTS `form_upgrade_logs`;
 CREATE TABLE IF NOT EXISTS `form_upgrade_logs` (
   `id` varchar(255) NOT NULL,
   `create_by` int(11) DEFAULT NULL,
@@ -756,7 +728,6 @@ CREATE TABLE IF NOT EXISTS `form_upgrade_logs` (
 -- ----------------------------
 -- Table structure for form_user
 -- ----------------------------
-DROP TABLE IF EXISTS `form_user`;
 CREATE TABLE IF NOT EXISTS `form_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cur_tenant_id` varchar(255) DEFAULT NULL,
@@ -772,7 +743,6 @@ CREATE TABLE IF NOT EXISTS `form_user` (
 -- ----------------------------
 -- Table structure for r_form_file
 -- ----------------------------
-DROP TABLE IF EXISTS `r_form_file`;
 CREATE TABLE IF NOT EXISTS `r_form_file` (
   `form_id` varchar(255) NOT NULL,
   `file_id` int(11) NOT NULL,
@@ -785,25 +755,5 @@ CREATE TABLE IF NOT EXISTS `r_form_file` (
 
 
 
-INSERT INTO `form_state` VALUES ('0', '未接手处理');
-INSERT INTO `form_state` VALUES ('1', '处理中');
-INSERT INTO `form_state` VALUES ('2', '事件升级中');
-INSERT INTO `form_state` VALUES ('3', '已解决');
-INSERT INTO `form_state` VALUES ('4', '待审核');
-INSERT INTO `form_state` VALUES ('5', '待评价');
-INSERT INTO `form_state` VALUES ('6', '已结案');
-INSERT INTO `form_state` VALUES ('7', '退回');
-INSERT INTO `form_state` VALUES ('8', '已删除');
 
 
-
-INSERT INTO `form_demand` VALUES ('2', '', '巡检', null);
-INSERT INTO `form_demand` VALUES ('3', '', '网络', null);
-INSERT INTO `form_demand` VALUES ('4', '测试', '服务器（非虚拟化）', null);
-INSERT INTO `form_demand` VALUES ('5', '', '存储', null);
-INSERT INTO `form_demand` VALUES ('6', '', '服务器虚拟化', null);
-INSERT INTO `form_demand` VALUES ('7', '', '桌面虚拟化', null);
-INSERT INTO `form_demand` VALUES ('8', '', '应用', null);
-INSERT INTO `form_demand` VALUES ('11', null, '巡检子1', '2');
-INSERT INTO `form_demand` VALUES ('12', null, '巡检子子1', '11');
-INSERT INTO `form_demand` VALUES ('24', '', '123', '3');

@@ -1,7 +1,6 @@
 package com.iv.form.config;
 
 import com.iv.jpa.util.hibernate.AbstractMultiTenantConnectionProvider;
-import org.hibernate.HibernateException;
 import org.hibernate.c3p0.internal.C3P0ConnectionProvider;
 
 import java.sql.Connection;
@@ -24,12 +23,12 @@ public class MultiTenantConnectionProviderImpl extends AbstractMultiTenantConnec
 
 	@Override
 	public void releaseConnection(String tenantIdentifier, Connection connection) throws SQLException {
-		try {
-			connection.createStatement().execute("use form_service");
-		} catch (SQLException e) {
-			throw new HibernateException(
-					"Could not alter JDBC connection to specified schema [" + tenantIdentifier + "]", e);
-		}
+//		try {
+//			connection.createStatement().execute("use form_service");
+//		} catch (SQLException e) {
+//			throw new HibernateException(
+//					"Could not alter JDBC connection to specified schema [" + tenantIdentifier + "]", e);
+//		}
 		connectionProvider.closeConnection(connection);
 
 	}

@@ -3,10 +3,7 @@ package com.iv.form.dao.impl;
 import com.iv.dto.ClientConditionDto;
 import com.iv.dto.CommonPage;
 import com.iv.form.dao.IFormOptDao;
-import com.iv.form.entity.FormClientEntity;
-import com.iv.form.entity.FormCompanyEntity;
-import com.iv.form.entity.FormDemandEntity;
-import com.iv.form.entity.FormFileEntity;
+import com.iv.form.entity.*;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import org.hibernate.HibernateException;
@@ -340,6 +337,29 @@ public class IFormOptDaoImpl implements IFormOptDao {
 //                if (null != esm) {
 //                    ses.delete(esm);
 //                }
+                return null;
+            }
+        });
+    }
+
+    @Override
+    public List<FormStateEntity> selectFormStateList() {
+        return (List<FormStateEntity>) HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                return ses.createQuery("from FormStateEntity").list();
+            }
+        });
+    }
+
+    @Override
+    public void saveOrUpdateFormState(FormStateEntity formStateEntity) {
+        HibernateTemplate.execute(new HibernateCallBack() {
+
+            @Override
+            public Object doInHibernate(Session ses) throws HibernateException {
+                ses.saveOrUpdate(formStateEntity);
                 return null;
             }
         });

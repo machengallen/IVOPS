@@ -3,6 +3,7 @@ package com.iv.form.controller;
 
 import com.iv.common.enumeration.CycleType;
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.ConstantContainer;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.constant.BusException;
 import com.iv.constant.ErrorMsg;
@@ -628,7 +629,8 @@ public class FormController implements IFormService {
         try {
             String[] split = formId.split("\\$");
             String form=split[0];
-            Map map = formService.selectFormByCallBack(form);
+            String tenantId=split[1];
+            Map map = formService.selectFormByCallBack(form,ConstantContainer.FORM_SERVICE + "_"+tenantId);
             dto.setData(map);
             dto.setErrorMsg(ErrorMsg.OK);
             return  dto;
