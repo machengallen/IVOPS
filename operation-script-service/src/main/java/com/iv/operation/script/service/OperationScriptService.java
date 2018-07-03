@@ -15,14 +15,17 @@ import com.iv.operation.script.entity.SingleTaskEntity;
 import com.iv.operation.script.entity.SingleTaskLifeEntity;
 import com.iv.operation.script.feign.client.IScriptServiceClient;
 import com.iv.operation.script.util.*;
+import com.iv.script.api.dto.ScriptDto;
 import com.iv.script.api.dto.TemporaryScriptDto;
 import com.jcraft.jsch.Session;
 import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -121,6 +124,9 @@ public class OperationScriptService {
 		String fileName = file.getOriginalFilename();
 		String scriptType = fileName.substring(fileName.lastIndexOf(".") + 1);
 		int scriptId = scriptServiceClient.tempWrite(fileName, scriptType, file.getBytes(), null);
+		if(0 == scriptId) {
+			throw new IOException("临时脚本存储失败");
+		}
 		return taskSaveOrUpdate(dto, scriptId);
 	}
 
@@ -135,7 +141,7 @@ public class OperationScriptService {
 		int scriptId = scriptServiceClient.tempWrite(null, scriptType, context.getBytes(), null);
 		return taskSaveOrUpdate(dto, scriptId);
 	}
-
+	
 	/**
 	 * 单脚本任务编辑
 	 * 
@@ -252,15 +258,14 @@ public class OperationScriptService {
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			TemporaryScriptDto temporaryScriptDto = scriptServiceClient.temporaryScriptInfoById(taskEntity.getScriptId());
-			if(null == temporaryScriptDto) {
+			String fileName = getFileName(taskEntity.getScriptSrc(), taskEntity.getScriptId());
+			if(StringUtils.isEmpty(fileStream)) {
 				ImmediateTargetEntity targetEntity = new ImmediateTargetEntity(taskEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			String fileName = temporaryScriptDto.getName();
 			Session session = getSession(host.getHostIp(), host.getAccount(), host.getPassword(), host.getPort());
 			if (null == session) {
 				// 获取ssh连接失败
@@ -312,6 +317,22 @@ public class OperationScriptService {
 			fileStream = scriptServiceClient.tempRead(scriptId);
 		}
 		return fileStream;
+	}
+	
+	private String getFileName(ScriptSourceType scriptType, int scriptId) {
+		switch (scriptType) {
+		case SCRIPT_LIBRARY:
+			ScriptDto scriptDto = scriptServiceClient
+			.scriptInfoById(scriptId);
+			return scriptDto == null ? null : scriptDto.getName();
+		case USER_LOCAL_LIBRARY:
+		case USER_ONLINE_EDIT:
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient
+			.temporaryScriptInfoById(scriptId);
+			return temporaryScriptDto == null ? null : temporaryScriptDto.getName();
+		default:
+			return null;
+		}
 	}
 	
 	private <T> CompletionService<T> getExecutorService(int elements){

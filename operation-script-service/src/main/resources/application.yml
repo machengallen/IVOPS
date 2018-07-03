@@ -16,7 +16,7 @@ spring:
     active:
     - dev-peer1
   application:
-    name: operation-script-service1
+    name: operation-script-service
   http:
     encoding:
       enabled: true

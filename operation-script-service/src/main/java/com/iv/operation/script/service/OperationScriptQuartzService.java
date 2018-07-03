@@ -19,6 +19,7 @@ import com.iv.operation.script.entity.SingleTaskScheduleEntity;
 import com.iv.operation.script.feign.client.IScriptServiceClient;
 import com.iv.operation.script.quartz.job.SingleTaskQuartzJob;
 import com.iv.operation.script.util.*;
+import com.iv.script.api.dto.ScriptDto;
 import com.iv.script.api.dto.TemporaryScriptDto;
 import com.jcraft.jsch.Session;
 import org.quartz.*;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -271,16 +273,14 @@ public class OperationScriptQuartzService {
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			TemporaryScriptDto temporaryScriptDto = scriptServiceClient
-					.temporaryScriptInfoById(taskEntity.getScriptId());
-			if (null == temporaryScriptDto) {
+			String fileName = getFileName(taskEntity.getScriptSrc(), taskEntity.getScriptId());
+			if (StringUtils.isEmpty(fileStream)) {
 				ScheduleTargetEntity targetEntity = new ScheduleTargetEntity(scheduleEntity, host.getHostIp(),
 						host.getPort(), host.getAccount(), host.getPassword(), Boolean.FALSE,
 						ErrorMsg.SCRIPT_NOT_EXIST.getMsg());
 				taskTargetList.add(targetEntity);
 				continue;
 			}
-			String fileName = temporaryScriptDto.getName();
 			Session session = getSession(host.getHostIp(), host.getAccount(), host.getPassword(), host.getPort());
 			if (null == session) {
 				// 获取ssh连接失败
@@ -321,6 +321,22 @@ public class OperationScriptQuartzService {
 			sshAccount.setPort(port);
 		}
 		return SSHSessionFactory.getSession(sshAccount);
+	}
+	
+	private String getFileName(ScriptSourceType scriptType, int scriptId) {
+		switch (scriptType) {
+		case SCRIPT_LIBRARY:
+			ScriptDto scriptDto = scriptServiceClient
+			.scriptInfoById(scriptId);
+			return scriptDto == null ? null : scriptDto.getName();
+		case USER_LOCAL_LIBRARY:
+		case USER_ONLINE_EDIT:
+			TemporaryScriptDto temporaryScriptDto = scriptServiceClient
+			.temporaryScriptInfoById(scriptId);
+			return temporaryScriptDto == null ? null : temporaryScriptDto.getName();
+		default:
+			return null;
+		}
 	}
 
 	private ResponseEntity<byte[]> getFileStream(ScriptSourceType scriptType, int scriptId) {
