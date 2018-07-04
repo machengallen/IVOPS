@@ -1,7 +1,7 @@
-eureka:
-  client:
-    service-url:
-      defaultZone: http://10.10.9.26:8100/eureka/
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://10.10.9.26:8100/eureka/
 spring:
   profiles:
     active:
@@ -12,7 +12,7 @@ spring:
     config:
       server:
         git:
-          uri: http://10.10.31.20:3000/ivops/config-profiles/
+          uri: http://10.10.31.20:3000/ivops/config-profiles.git
           username: mac@inno-view.cn
           password: 123@abcd
       label: 1.0.x
@@ -21,10 +21,10 @@ spring:
 spring:
   profiles: peer1
 server:
-  port: 8120
+  port: 8888
 
 ---
 spring:
   profiles: peer2
 server:
-  port: 8121
+  port: 8889
