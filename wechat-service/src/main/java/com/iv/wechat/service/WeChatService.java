@@ -4,6 +4,7 @@ package com.iv.wechat.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,8 +82,8 @@ public class WeChatService {
 	private String urlUserInfo;
 	@Value("${iv.wechat.focusTips}")
 	private String focusTips;
-	/*@Value("${iv.wechat.urlNodeBinding}")
-	private String urlNodeBinding;*/
+	@Value("${iv.wechat.urlNodeBinding}")
+	private String urlNodeBinding;
 	@Value("${iv.wechat.templateAlarm}")
 	private String templateAlarm;
 	@Value("${iv.wechat.templateRecovery}")
@@ -117,7 +119,10 @@ public class WeChatService {
 	public String getWechatLoginCode() throws UnsupportedEncodingException {
 		String loginRedirectUri = URLEncoder.encode(openRedirectUri,"utf-8");
 		String qrCode = String.format(loginQrCode, openAppId,loginRedirectUri);
-        return qrCode;	
+		LOGGER.info(qrCode);
+		System.out.println(qrCode);
+		LOGGER.error(qrCode);
+		return qrCode;	
 	}
 	
 	public ResponseDto wxLoginCallBack(String code, HttpServletRequest request) {
@@ -191,6 +196,7 @@ public class WeChatService {
 	 * @return
 	 */
 	public String processRequest(HttpServletRequest request) {
+		LOGGER.info("***************微信事件推送******************");
 		String respMessage = null;
 		try {
 			// 默认返回的文本消息内容
@@ -203,6 +209,7 @@ public class WeChatService {
 			// 从HashMap中取出消息中的字段；
 			// 发送方帐号（open_id）
 			String fromUserName = requestMap.get("FromUserName");
+			LOGGER.info(fromUserName);
 			// 公众帐号
 			String toUserName = requestMap.get("ToUserName");
 			// 创建时间
@@ -233,6 +240,8 @@ public class WeChatService {
 				String eventKey = null;
 				// String ticket = null;
 				if (eventType.equals(MessageUtil.EVENT_TYPE_SUBSCRIBE)) {// 订阅
+					System.out.println("订阅：");
+					LOGGER.error("订阅：");
 					// 获取关注用户的信息并存储
 					JSONObject jsonObject = initBean.getToWechat(urlUserInfo, "OPENID", fromUserName, null);
 					// 校验返回结果
@@ -245,6 +254,14 @@ public class WeChatService {
 					}
 					UserWechatEntity userWechatEntity = (UserWechatEntity) JSONObject.toBean(jsonObject,
 							UserWechatEntity.class);
+					Map<String, String> map = userWechatEntity.getPlatformSigns();
+					if(null == map) {
+						map = new HashMap<>();
+						map.put(appId, jsonObject.getString("openid"));
+					}else {
+						map.put(appId, jsonObject.getString("openid"));
+					}
+					userWechatEntity.setPlatformSigns(map);
 					userWechatEntity.filterEmoji();					
 					userWechatDao.saveOrUpdateUserWechat(userWechatEntity);
 					// 公众号关注提示
@@ -260,12 +277,21 @@ public class WeChatService {
 						eventKey = eventKey.split("_")[1];
 						if (!StringUtils.isEmpty(eventKey)) {
 							//boolean result = LOCAL_USER_DAO.updateOpenId(Integer.parseInt(eventKey), userWechatEntity);
-							UserOauthDto userOauthDto = userService.bindInfo(userWechatEntity.getUnionid(), LoginType.WECHAT);
-							if (null == userOauthDto) {
+							//公众号未绑定其他账号
+							/*UserOauthDto userOauthDto = userService.bindInfo(userWechatEntity.getUnionid(), LoginType.WECHAT);
+							//账号未绑定其他微信
+							UserOauthDto userOauthDto1 = userService.selectUserWechatUnionid(Integer.parseInt(eventKey), LoginType.WECHAT);*/
+							if (true) {
+								//userService.focusBindWechat(Integer.parseInt(eventKey), userWechatEntity.getUnionid());
+								/*UserOauthDto UserOauthDto = new UserOauthDto();
+								UserOauthDto.setLoginType(LoginType.WECHAT);
+								UserOauthDto.setUnionid(userWechatEntity.getUnionid());
+								UserOauthDto.setUserId(Integer.parseInt(eventKey));*/
+								
 								// 感知前端，页面跳转
-								/*ResponseDto responseDto = new ResponseDto();
+								ResponseDto responseDto = new ResponseDto();
 								responseDto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
-								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);*/
+								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
 								// 完善微信账户信息
 								/*LocalAuth localAuth = LOCAL_USER_DAO.selectUserAuthById(Integer.parseInt(eventKey));
 								userWechatEntity.setRemark(localAuth.getRealName());
@@ -273,9 +299,9 @@ public class WeChatService {
 								userDao.saveUserInfo(userWechatEntity);*/
 							} else {
 								// 感知前端，错误提示
-								/*ResponseDto responseDto = new ResponseDto();
+								ResponseDto responseDto = new ResponseDto();
 								responseDto.setErrorMsg(ErrorMsg.WECHAT_BINDING_ILLEGAL);
-								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);*/
+								SpringContextUtil.getBean(WechatUtil.class).httpPost(urlNodeBinding, null, responseDto);
 							}
 						}
 					}
@@ -285,7 +311,10 @@ public class WeChatService {
 					// 取消订阅后用户再收不到公众号发送的消息，因此不需要回复消息
 					// 删除事件消息
 					messageDao.deleteSubMessage(fromUserName);
-					// 微信解绑,并删除微信用户信息
+					// 微信解绑,并删除微信用户信息,删除微信公众号信息
+					UserWechatEntity userWechatEntity = userWechatDao.selectUserWechatByUnionid(fromUserName);
+					userWechatEntity.getPlatformSigns().remove(appId);
+					userWechatDao.saveOrUpdateUserWechat(userWechatEntity);
 					//LOCAL_USER_DAO.unboundWechat(userDao.selectUserWechatById(fromUserName));
 					//userDao.deleteUserInfoById(fromUserName);
 				} else if (eventType.equals(MessageUtil.EVENT_TYPE_CLICK)) {// 自定义菜单点击事件
@@ -382,19 +411,32 @@ public class WeChatService {
 		templateMessage.setUrl(url);	
 		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateMessageDto.getUserIds(),LoginType.WECHAT);
 		Set<String> unionids = userService.selectUsersWechatUnionid(UsersQueryDto);
-		List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
-		String token = wechatUtil.getToken().getAccessToken();
-		String uri = urlTemplateMsg;
-		for (UserWechatEntity userWechatEntity : userWechatEntitys) {
-			String openId = userWechatEntity.getPlatformSigns().get(appId);			
-			templateMessage.setTouser(openId);		
-			JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
-			if (null == jsonObject) {
-				// token异常，重新获取
-				System.out.println("****************更新 wechat token****************");
-				jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
-			}
-		}				
+		//有绑定账号的用户
+		if(!CollectionUtils.isEmpty(unionids)) {
+			List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
+			String token = wechatUtil.getToken().getAccessToken();
+			String uri = urlTemplateMsg;
+			for (UserWechatEntity userWechatEntity : userWechatEntitys) {
+				String openId = userWechatEntity.getPlatformSigns().get(appId);	
+				System.out.println(openId);
+				//已关注微信公众号
+				if(!StringUtils.isEmpty(openId)) {
+					templateMessage.setTouser(openId);		
+					JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
+					if (null == jsonObject) {
+						// token异常，重新获取
+						System.out.println("****************更新 wechat token****************");
+						jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
+					}
+				}else {
+					LOGGER.info("****************" + userWechatEntity.getNickname() + "未关注微信公众号****************");
+				}
+				
+			}	
+		}else {
+			LOGGER.info("****************推送账号均为绑定微信****************");
+		}
+					
 		
 	}
 	
@@ -406,6 +448,9 @@ public class WeChatService {
 	public boolean ifFocusWechat(int userId) {
 		boolean ifFocus = false;
 		UserOauthDto userOauthDto = userService.selectUserWechatUnionid(userId,LoginType.WECHAT);
+		if(null == userOauthDto) {
+			return ifFocus;
+		}
 		UserWechatEntity userWechatEntity = userWechatDao.selectUserWechatByUnionid(userOauthDto.getUnionid());
 		if(!StringUtils.isEmpty(userWechatEntity.getPlatformSigns().get(appId))) {
 			ifFocus = true;
@@ -429,19 +474,29 @@ public class WeChatService {
 		templateMessage.setUrl(url);	
 		UsersQueryDto UsersQueryDto = new UsersQueryDto(templateFormMessageDto.getUserIds(),LoginType.WECHAT);
 		Set<String> unionids = userService.selectUsersWechatUnionid(UsersQueryDto);
-		List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
-		String token = wechatUtil.getToken().getAccessToken();
-		String uri = urlTemplateMsg;
-		for (UserWechatEntity userWechatEntity : userWechatEntitys) {
-			String openId = userWechatEntity.getPlatformSigns().get(appId);			
-			templateMessage.setTouser(openId);		
-			JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
-			if (null == jsonObject) {
-				// token异常，重新获取
-				System.out.println("****************更新 wechat token****************");
-				jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
-			}
-		}				
+		if(!CollectionUtils.isEmpty(unionids)) {
+			List<UserWechatEntity> userWechatEntitys = userWechatDao.selectUserWechatsByUnionids(unionids);
+			String token = wechatUtil.getToken().getAccessToken();
+			String uri = urlTemplateMsg;
+			for (UserWechatEntity userWechatEntity : userWechatEntitys) {
+				String openId = userWechatEntity.getPlatformSigns().get(appId);	
+				if(!StringUtils.isEmpty(openId)) {
+					templateMessage.setTouser(openId);		
+					JSONObject jsonObject = wechatUtil.httpPost(uri, token, templateMessage);
+					if (null == jsonObject) {
+						// token异常，重新获取
+						System.out.println("****************更新 wechat token****************");
+						jsonObject = wechatUtil.httpPost(uri, wechatUtil.getTokenDirect().getAccessToken(), templateMessage);
+					}
+				}else {
+					LOGGER.info("****************" + userWechatEntity.getNickname() + "未关注微信公众号****************");
+				}
+				
+			}	
+		}else {
+			LOGGER.info("****************推送账号均为绑定微信****************");
+		}
+					
 		
 	
 	}
@@ -452,7 +507,10 @@ public class WeChatService {
 	 * @return
 	 */
 	public String getUnionid(String code) {
-		WeixinOauth2Token weixinOauth2Token = authorizationUtil.getAccessToken(appId, secret, code);            
-        return weixinOauth2Token.getUnionid();
+		WeixinOauth2Token weixinOauth2Token = authorizationUtil.getAccessToken(appId, secret, code); 
+		if(null != weixinOauth2Token) {
+			return weixinOauth2Token.getUnionid();
+		}
+        return null;
 	}
 }

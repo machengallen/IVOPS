@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.Constants;
 import com.iv.dto.TemplateFormMessageDto;
 import com.iv.dto.TemplateMessageDto;
 import com.iv.dto.WeChat;
@@ -77,13 +78,16 @@ public class WeChatController implements IWechatService{
 
 	@Override
 	@ApiOperation(value = "微信服务器认证")
-	@ApiIgnore
 	public String xxtInterface(WeChat wc) {
 		// TODO Auto-generated method stub
 		String signature = wc.getSignature(); // 微信加密签名
 		String timestamp = wc.getTimestamp(); // 时间戳
 		String nonce = wc.getNonce();// 随机数
 		String echostr = wc.getEchostr();// 随机字符串s
+		LOGGER.info(signature);
+		LOGGER.info(timestamp);
+		LOGGER.info(nonce);
+		LOGGER.info(echostr);
 		// 通过检验signature对请求进行校验，若校验成功则原样返回echostr，表示接入成功，否则接入失败
 		if (SignUtil.checkSignature(signature, timestamp, nonce, signToken)) {
 			return echostr;
@@ -100,7 +104,7 @@ public class WeChatController implements IWechatService{
 		try {
 			QrcodeTicket qrcodeTicket = weChatService.qrcodeCreate(userId);
 			dto.setData(qrcodeTicket);
-			dto.setErrorMsg(ErrorMsg.WECHAT_UNBOUNDED);
+			dto.setErrorMsg(ErrorMsg.OK);
 			return dto;	
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -111,8 +115,7 @@ public class WeChatController implements IWechatService{
 	}
 
 	@Override
-	@ApiOperation(value = "微信服务器推送消息入口")
-	@ApiIgnore
+	@ApiOperation(value = "微信服务器推送消息入口")	
 	public String getWeiXinMessage(HttpServletRequest request) throws Exception {
 		// TODO Auto-generated method stub
 		// 将请求、响应的编码均设置为UTF-8（防止中文乱码）

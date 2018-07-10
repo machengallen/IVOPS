@@ -65,7 +65,7 @@ public class TulingApiProcess {
 	 * 描述：@param args
 	 * 描述：@throws IOException
 	 */
-	public static void main(String[] args) throws IOException { 
+	/*public static void main(String[] args) throws IOException { 
 
 	     String APIKEY = "438cc658c632496fa4dc33511cb2674d"; 
 	     //String INFO = URLEncoder.encode("合肥天气", "utf-8"); 
@@ -100,7 +100,7 @@ public class TulingApiProcess {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	
 }

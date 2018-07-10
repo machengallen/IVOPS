@@ -56,8 +56,8 @@ public class InitBean implements InitializingBean {
 
 	@Autowired
 	private WechatUtil wechatUtil;
-	@Autowired
-	private TokenDaoImpl tokenDao;
+	/*@Autowired
+	private TokenDaoImpl tokenDao;*/
 	@Autowired
 	private UserWechatDaoImpl userWechatDao;
 	
@@ -67,6 +67,7 @@ public class InitBean implements InitializingBean {
 	/**
 	 * 容器初始化时，首次获取公众号关注用户的信息
 	 */
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
@@ -147,6 +148,7 @@ public class InitBean implements InitializingBean {
 	 * 
 	 * @param openIdList
 	 */
+	@SuppressWarnings({ "deprecation", "unchecked" })
 	private void batchWechatUserInfoList(UserOpenIdList openIdList) {
 
 		try {

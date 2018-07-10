@@ -74,9 +74,4 @@ public class SignUtil {
 		String s = new String(tempArr);
 		return s;
 	}
-
-	public static void main(String[] args) {
-
-	}
-
 }
