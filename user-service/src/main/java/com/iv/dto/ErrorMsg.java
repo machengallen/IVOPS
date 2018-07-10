@@ -32,7 +32,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	CODE_NULL(42212,"code为空"),
 	
-	CODE_ILLEGAL(42213,"code非法");
+	CODE_ILLEGAL(42213,"code非法"),
+	
+	WECHAT_UNBINDING_FAILED(42214,"微信解绑失败");
 
 	private int code;
     private String msg;

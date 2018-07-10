@@ -35,11 +35,27 @@ public class UserController implements IUserService {
 	private UserService userService;
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 	
+	/*@ApiOperation(value = "获取用户信息-前端", notes = "82204")
+	@GetMapping("/user/info")
+	public ResponseDto userInfo(HttpServletRequest request) {
+		ResponseDto dto = new ResponseDto();
+		try {
+			LocalAuthDto localAuthDto = userService.getUserDetailInfo(request);
+			dto.setData(localAuthDto);
+			dto.setErrorMsg(ErrorMsg.OK);
+			return dto;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block			
+			LOGGER.error("系统内部错误", e);
+			dto.setErrorMsg(com.iv.common.response.ErrorMsg.UNKNOWN);
+			return dto;
+		}
+	}*/
+	
 	/**
 	 * 例子
 	 */
 	@Override
-	@ApiOperation(value = "获取用户信息", notes = "82204")
 	public ResponseDto getUserInfo(HttpServletRequest request) {
 		ResponseDto dto = new ResponseDto();
 		try {
@@ -220,5 +236,24 @@ public class UserController implements IUserService {
 		// TODO Auto-generated method stub
 		return userService.getToken(code);
 	}
+	
+	/**
+	 * 账号解绑微信
+	 * @param userId
+	 * @return
+	 */
+	@ApiOperation("微信账号解绑")
+	@RequestMapping(value = "/unbind/wechat",method = RequestMethod.GET)
+	public ResponseDto unbindWechat(@RequestParam("userId") int userId) {
+		try {
+			userService.unbindWechat(userId);
+			return ResponseDto.builder(ErrorMsg.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.info("微信解绑失败");
+			return ResponseDto.builder(ErrorMsg.WECHAT_UNBINDING_FAILED);
+		}
+	}
+
 	
 }

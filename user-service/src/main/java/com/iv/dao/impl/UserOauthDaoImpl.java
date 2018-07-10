@@ -78,4 +78,21 @@ public class UserOauthDaoImpl implements UserOauthDao {
 			}
 		});
 	}
+
+	/**
+	 * 解绑微信
+	 */
+	@Override
+	public void deleteUserOauthById(String id) throws RuntimeException {
+		// TODO Auto-generated method stub
+		HibernateTemplate.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				// TODO Auto-generated method stub
+				ses.delete(ses.load(UserOauth.class, id));
+				return null;
+			}
+		});
+	}
 }

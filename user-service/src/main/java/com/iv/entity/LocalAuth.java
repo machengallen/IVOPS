@@ -29,8 +29,7 @@ public class LocalAuth implements Serializable {
 	 */
 	private static final long serialVersionUID = -7617899464978271941L;
 	private int id;
-	private String userName;
-	@JsonIgnore
+	private String userName;	
 	private String passWord;	
 	private String realName;
 	private String nickName;

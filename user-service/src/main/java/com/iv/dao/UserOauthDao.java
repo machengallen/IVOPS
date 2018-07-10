@@ -20,4 +20,6 @@ public interface UserOauthDao {
 	List<UserOauth> selectUsersWechatUnionid(List<Integer> userIds, LoginType loginType) throws RuntimeException;
 	
 	UserOauth saveOrUpdateUserOauth(UserOauth userOauth) throws RuntimeException;
+	
+	void deleteUserOauthById(String id) throws RuntimeException;
 }

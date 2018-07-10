@@ -9,6 +9,8 @@ import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import com.iv.common.enumeration.YesOrNo;
 import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.Constants;
 import com.iv.common.util.spring.JWTUtil;
@@ -35,6 +38,7 @@ import com.iv.external.service.WechatServiceClient;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.outer.dto.SubTenantRoleDto;
 import com.iv.outer.dto.UserOauthDto;
+import com.iv.outer.dto.UserWechatInfoDto;
 
 /**
  * 
@@ -44,6 +48,8 @@ import com.iv.outer.dto.UserOauthDto;
  */
 @Service
 public class UserService {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(UserService.class);
 	
 	@Autowired
 	private LocalAuthDaoImpl localAuthDao;
@@ -62,13 +68,45 @@ public class UserService {
 	private IAuthenticationServiceClient authenticationServiceClient;
 	
 	/**
+	 * 获取用户详细信息：微信信息等
+	 * @param request
+	 * @return
+	 *//*
+	public LocalAuthDto getUserDetailInfo(HttpServletRequest request) {
+		int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
+		LocalAuthDto localAuthDto =  selectLocalAuthById(userId);
+		UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, LoginType.WECHAT);	
+		boolean ifFocusWechat = wechatService.ifFocusWechat(userId);
+		localAuthDto.setIfFocusWechat(ifFocusWechat);
+		if(null != userOauth) {
+			UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());
+			UserWechatInfoDto WechatInfo= new UserWechatInfoDto();
+			BeanCopier copy=BeanCopier.create(UserWechatEntityDto.class, UserWechatInfoDto.class, false);
+			copy.copy(userWechatEntityDto, WechatInfo, null);
+			localAuthDto.setUserWechatInfo(WechatInfo);				
+		}
+		return localAuthDto;
+	}*/
+	
+	/**
 	 * 获取用户信息
 	 * @param request
 	 * @return
 	 */
 	public LocalAuthDto getUserInfo(HttpServletRequest request) {
 		int userId = Integer.parseInt(JWTUtil.getJWtJson(request.getHeader("Authorization")).getString("userId"));
-		return selectLocalAuthById(userId);
+		LocalAuthDto localAuthDto =  selectLocalAuthById(userId);
+		UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, LoginType.WECHAT);	
+		boolean ifFocusWechat = wechatService.ifFocusWechat(userId);
+		localAuthDto.setIfFocusWechat(ifFocusWechat);
+		if(null != userOauth) {
+			UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());
+			UserWechatInfoDto WechatInfo= new UserWechatInfoDto();
+			BeanCopier copy=BeanCopier.create(UserWechatEntityDto.class, UserWechatInfoDto.class, false);
+			copy.copy(userWechatEntityDto, WechatInfo, null);
+			localAuthDto.setUserWechatInfo(WechatInfo);
+		}
+		return localAuthDto;
 	}
 	public UserOauthDto bindInfo(String unionid, LoginType loginType) {
 		UserOauth userOauth = userOauthDao.selectUserOauthByUnionid(unionid, loginType);		
@@ -111,8 +149,11 @@ public class UserService {
 		userOauth.setUserId(localAuth.getId());
 		userOauth.setLoginType(LoginType.WECHAT);
 		userOauth.setUnionid(accountDto.getUnionid());
-		userOauthDao.saveOrUpdateUserOauth(userOauth);
+		/*UserOauth userOauthNew = */
+		userOauthDao.saveOrUpdateUserOauth(userOauth);		
 		dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
+		LOGGER.info(authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuth.getUserName() + Constants.THREE_PARTY_LOGIN, localAuth.getPassWord()) + "");
+		dto.setData(authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuth.getUserName() + Constants.THREE_PARTY_LOGIN, localAuth.getPassWord()));
 		return dto;
 	}
 	
@@ -155,6 +196,9 @@ public class UserService {
 					userOauthDao.saveOrUpdateUserOauth(userOauth);
 				}				
 				dto.setErrorMsg(com.iv.common.response.ErrorMsg.OK);
+				//dto.setData(localAuth);
+				LOGGER.info(authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuth.getUserName() + Constants.THREE_PARTY_LOGIN, localAuth.getPassWord()) + "");
+				dto.setData(authenticationServiceClient.token(Constants.OAUTH2_CLIENT_BASIC, "password", localAuth.getUserName() + Constants.THREE_PARTY_LOGIN, localAuth.getPassWord()));
 				return dto;
 			} else {
 				dto.setErrorMsg(ErrorMsg.PASSWORD_DIFF);
@@ -420,24 +464,29 @@ public class UserService {
 		List<Integer> userIds = usersWechatsQuery.getUserIds();
 		LocalAuthDto localAuthDto = new LocalAuthDto();
 		List<LocalAuthDto> UserInfos = new ArrayList<LocalAuthDto>();
-		for (Integer userId : userIds) {
-			LocalAuth localAuth = localAuthDao.selectLocalAuthById(userId);
-			localAuthDto = convertLocalAuthDto(localAuth);
-			//查询用户微信头像信息
-			if(!StringUtils.isEmpty(usersWechatsQuery.getLoginType())) {
-				UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
-				if(null != userOauth) {
-					UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());					
-					localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
-				}				
-			}	
-			/*//查询用户角色名称列表信息（为匹配用户角色使用）
-			Set<SubTenantRoleDto> subTenantRoleDtos = subTenantPermissionService.selectPersonRole(userId,tenantId);
-			if(!CollectionUtils.isEmpty(subTenantRoleDtos)) {
-				localAuthDto.setRoles(subTenantRoleDtos);
-			}*/
-			UserInfos.add(localAuthDto);
+		if(!CollectionUtils.isEmpty(userIds)) {
+			for (Integer userId : userIds) {
+				LocalAuth localAuth = localAuthDao.selectLocalAuthById(userId);
+				localAuthDto = convertLocalAuthDto(localAuth);
+				//查询用户微信头像信息
+				if(!StringUtils.isEmpty(usersWechatsQuery.getLoginType())) {
+					UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, loginType);
+					if(null != userOauth) {
+						UserWechatEntityDto userWechatEntityDto = wechatService.selectUserWechatByUnionid(userOauth.getUnionid());					
+						localAuthDto.setHeadimgurl(userWechatEntityDto.getHeadimgurl());
+					}				
+				}	
+				/*//查询用户角色名称列表信息（为匹配用户角色使用）
+				Set<SubTenantRoleDto> subTenantRoleDtos = subTenantPermissionService.selectPersonRole(userId,tenantId);
+				if(!CollectionUtils.isEmpty(subTenantRoleDtos)) {
+					localAuthDto.setRoles(subTenantRoleDtos);
+				}*/
+				UserInfos.add(localAuthDto);
+			}
+		}else {
+			LOGGER.info("*****无用户id*****");
 		}
+		
 		return UserInfos;
 	}
 	
@@ -461,5 +510,22 @@ public class UserService {
 			return ResponseDto.builder(ErrorMsg.CODE_ILLEGAL);
 		}
 		
+	}
+	
+	/**
+	 * 解绑微信
+	 * @param userId
+	 */
+	public void unbindWechat(int userId) {
+		UserOauth userOauth = userOauthDao.selectUserWechatUnionid(userId, LoginType.WECHAT); 
+		userOauthDao.deleteUserOauthById(userOauth.getId());
+	}
+	
+	public void focusBindWechat(Integer userId, String unionid) {
+		UserOauth userOauth = new UserOauth();
+		userOauth.setLoginType(LoginType.WECHAT);
+		userOauth.setUnionid(unionid);
+		userOauth.setUserId(userId);
+		userOauthDao.saveOrUpdateUserOauth(userOauth);
 	}
 }
