@@ -58,7 +58,7 @@ public interface IWechatService {
 	 * @return
 	 * @throws Exception
 	 */
-	@RequestMapping(value = "/wechat", method = RequestMethod.GET, produces = "text/xml;charset=UTF-8")
+	@RequestMapping(value = "/wechat", method = RequestMethod.POST, produces = "text/xml;charset=UTF-8")
 	public String getWeiXinMessage(@RequestParam("request") HttpServletRequest request) throws Exception;				
 	
 	/**
@@ -100,6 +100,7 @@ public interface IWechatService {
 	 */
 	@RequestMapping(value = "/get/unionid", method = RequestMethod.GET)
 	String getUnionid(@RequestParam("code") String code);
+	
 	
 	
 }
