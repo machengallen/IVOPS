@@ -10,6 +10,16 @@ spring:
     - peer1
   application:
     name: email-service
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000    
 ---
 #redis连接
 spring:
@@ -49,15 +59,50 @@ server:
   port: 8250
 spring:
   profiles: product-peer1
+  redis:
+    host: 10.10.31.43
+    database: 1
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
 logging:
   file: /var/log/ivops/email/email-service/peer1/email-service.log
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
+  
    
 ---
 server:
   port: 8251
 spring:
   profiles: product-peer2
+  redis:
+    host: 10.10.31.43
+    database: 1
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
 logging:
-  file: /var/log/ivops/email/email-service/peer2/email-service.log     
+  file: /var/log/ivops/email/email-service/peer2/email-service.log   
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/  
 
     
