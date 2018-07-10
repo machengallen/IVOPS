@@ -7,6 +7,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
+
+import com.iv.common.util.spring.ConstantContainer;
+import com.iv.common.util.spring.Constants;
 import com.iv.dto.UserIdsPagingDto;
 import com.iv.entity.GroupEntity;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
@@ -46,7 +49,7 @@ public class IGroupDaoImpl implements IGroupDao {
 				// TODO Auto-generated method stub
 				return ses.get(GroupEntity.class, id);
 			}
-		}, tenantId);
+		}, ConstantContainer.GROUP_DB + "_" + tenantId);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -250,7 +253,7 @@ public class IGroupDaoImpl implements IGroupDao {
 				return ses.createQuery("select u from GroupEntity g join g.userIds u where g.groupId=?")
 						.setParameter(0, groupId).list();
 			}
-		}, subTenantId);
+		}, ConstantContainer.GROUP_DB + "_" + subTenantId);
 	}
 
 
