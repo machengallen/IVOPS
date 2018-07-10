@@ -34,7 +34,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	MY_APPLIED_SCRIPT_FAILED(46113, "我审批的脚本申请列表查询失败"),
 	
-	SELECT_SCRIPT_INFO_FAILED(46114, "获取脚本详细信息失败");
+	SELECT_SCRIPT_INFO_FAILED(46114, "获取脚本详细信息失败"),
+	
+	DELETE_TEMPORARY_SCRIPT_FAILED(46115, "删除临时文件失败");
 	private int code;
     private String msg;
 	
