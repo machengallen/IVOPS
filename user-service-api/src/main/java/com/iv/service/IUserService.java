@@ -127,4 +127,6 @@ public interface IUserService {
 	 */
 	@RequestMapping(value = "/select/usersUnionid",method = RequestMethod.POST)
 	Set<String> selectUsersWechatUnionid(@RequestBody UsersQueryDto UsersQueryDto);
+	
+	
 }

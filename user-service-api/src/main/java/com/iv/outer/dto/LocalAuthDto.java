@@ -1,6 +1,7 @@
 package com.iv.outer.dto;
 
 import java.util.Set;
+import com.iv.common.enumeration.YesOrNo;
 
 /**
  * 用户基础信息供其他服务调用类（无三方登录信息）
@@ -17,6 +18,8 @@ public class LocalAuthDto {
 	private String tel;	
 	private String curTenantId;
 	private String headimgurl;
+	private boolean ifFocusWechat;
+	private UserWechatInfoDto userWechatInfo;
 	private String passWord;
 	private Set<SubTenantRoleDto> roles;
 	public int getId() {
@@ -74,13 +77,26 @@ public class LocalAuthDto {
 	public void setPassWord(String passWord) {
 		this.passWord = passWord;
 	}	
-		
-	
+			
+	public boolean isIfFocusWechat() {
+		return ifFocusWechat;
+	}
+	public void setIfFocusWechat(boolean ifFocusWechat) {
+		this.ifFocusWechat = ifFocusWechat;
+	}
 	public Set<SubTenantRoleDto> getRoles() {
 		return roles;
 	}
 	public void setRoles(Set<SubTenantRoleDto> roles) {
 		this.roles = roles;
+	}
+		
+	
+	public UserWechatInfoDto getUserWechatInfo() {
+		return userWechatInfo;
+	}
+	public void setUserWechatInfo(UserWechatInfoDto userWechatInfo) {
+		this.userWechatInfo = userWechatInfo;
 	}
 	@Override
 	public int hashCode() {
