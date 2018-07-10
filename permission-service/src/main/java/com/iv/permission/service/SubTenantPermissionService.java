@@ -6,8 +6,9 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cglib.beans.BeanCopier;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -18,7 +19,6 @@ import com.iv.common.response.ResponseDto;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.enter.dto.UsersQueryDto;
 import com.iv.enumeration.LoginType;
-import com.iv.outer.dto.GroupEntityDto;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.permission.api.dto.FunctionInfoDto;
 import com.iv.permission.api.dto.IdsDto;
@@ -308,9 +308,9 @@ public class SubTenantPermissionService {
 		}
 		Set<Integer> set = new HashSet<Integer>(subFunctionIds);	
 		//List<SubTenantRole> subTenantRoles = subTenantRoleDao.selectSubTenantRoleByIds(set);
-		List<Integer> permissionIds = subTenantRoleDao.selectSubTenantRoleIds(set);
+		List<Integer> permissionIds = subTenantRoleDao.selectRoleIdsWithTenantId(set,curTenantId);
 		Set<Integer> permissionIdsSet = new HashSet<Integer>(permissionIds);
-		List<SubTenantRole> subTenantRoles = subTenantRoleDao.selectSubTenantRoleByIds(permissionIdsSet);
+		List<SubTenantRole> subTenantRoles = subTenantRoleDao.selectRolesWithTenantId(permissionIdsSet, curTenantId);
 		List<SubTenantRoleFunctionDto> subTenantRoleFunctionDtos = new ArrayList<SubTenantRoleFunctionDto>();
 		if(!CollectionUtils.isEmpty(subTenantRoles)) {
 			for (SubTenantRole subTenantRole : subTenantRoles) {
@@ -404,12 +404,8 @@ public class SubTenantPermissionService {
 			if(functionIds.contains(functionInfo.getId())) {
 				subFunctionIds.add(functionInfo.getId());
 			}
-		}
-		Set<Integer> set = new HashSet<Integer>(subFunctionIds);
-		List<FunctionInfo> subFunctions = functionInfoDao.selectFunctionByIds(subFunctionIds);
-		//subFunctions.retainAll(functions);
-		//去functions subFunctions的交集
-		
+		}		
+		List<FunctionInfo> subFunctions = functionInfoDao.selectFunctionByIds(subFunctionIds);		
 		return subFunctions;
 	}
 	

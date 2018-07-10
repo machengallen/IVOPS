@@ -6,6 +6,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
+import com.iv.common.util.spring.ConstantContainer;
+import com.iv.common.util.spring.Constants;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
@@ -50,7 +52,7 @@ public class SubTenantUserRoleDaoImpl implements SubTenantUserRoleDao {
 						.setParameterList("funcIds", funcIds).list();	
 				
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 
 	@Override
@@ -67,7 +69,7 @@ public class SubTenantUserRoleDaoImpl implements SubTenantUserRoleDao {
 				ses.saveOrUpdate(subTenantUserRole);
 				return null;
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class SubTenantUserRoleDaoImpl implements SubTenantUserRoleDao {
 				return ses.createQuery("select sr.subTenantRoles from SubTenantUserRole sr where sr.userId=?")
 						.setParameter(0, userId).list();
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 
 }

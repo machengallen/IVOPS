@@ -7,6 +7,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
+import com.iv.common.util.spring.ConstantContainer;
+import com.iv.common.util.spring.Constants;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
@@ -48,7 +50,7 @@ public class SubTenantRoleDaoImpl implements SubTenantRoleDao {
 				ses.saveOrUpdate(subTenantRole);
 				return null;
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 
 	@Override
@@ -135,6 +137,43 @@ public class SubTenantRoleDaoImpl implements SubTenantRoleDao {
 						.setParameterList("ids", Permissionids).list();
 			}
 		});
+	}
+
+	/**
+	 * 根据权限ids,租户id查询角色id
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Integer> selectRoleIdsWithTenantId(Set<Integer> Permissionids, String tenantId)
+			throws RuntimeException {
+		// TODO Auto-generated method stub
+		return (List<Integer>) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				// TODO Auto-generated method stub
+				return ses.createQuery("select s.id from SubTenantRole s join s.subTenantPermissions sp where sp.groupPermissionId in :ids")
+						.setParameterList("ids", Permissionids).list();
+			}
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
+	}
+
+	/**
+	 * 根据id集合查询角色列表
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<SubTenantRole> selectRolesWithTenantId(Set<Integer> ids, String tenantId) throws RuntimeException {
+		// TODO Auto-generated method stub
+		return (List<SubTenantRole>) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+			
+			@Override
+			public Object doInHibernate(Session ses) throws HibernateException {
+				// TODO Auto-generated method stub
+				return ses.createQuery("from SubTenantRole s where s.id in :ids")
+						.setParameterList("ids", ids).list();
+			}
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 	
 

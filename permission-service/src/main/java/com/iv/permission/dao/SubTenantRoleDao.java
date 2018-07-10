@@ -21,4 +21,8 @@ public interface SubTenantRoleDao {
 	
 	List<Integer> selectSubTenantRoleIds(Set<Integer> Permissionids) throws RuntimeException;
 	
+	List<Integer> selectRoleIdsWithTenantId(Set<Integer> Permissionids, String tenantId) throws RuntimeException;
+	
+	List<SubTenantRole> selectRolesWithTenantId(Set<Integer> ids, String tenantId) throws RuntimeException;
+	
 }

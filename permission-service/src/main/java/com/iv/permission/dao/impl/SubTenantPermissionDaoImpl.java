@@ -8,6 +8,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
 
+import com.iv.common.util.spring.ConstantContainer;
+import com.iv.common.util.spring.Constants;
 import com.iv.jpa.util.hibernate.HibernateCallBack;
 import com.iv.jpa.util.hibernate.HibernateTemplate;
 import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
@@ -66,7 +68,7 @@ public class SubTenantPermissionDaoImpl implements SubTenantPermissionDao {
 				// TODO Auto-generated method stub
 				return ses.createQuery("select sp.groupPermissionId from SubTenantPermission sp").list();
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 
 	/**
@@ -85,7 +87,7 @@ public class SubTenantPermissionDaoImpl implements SubTenantPermissionDao {
 				}
 				return null;
 			}
-		}, tenantId);
+		}, ConstantContainer.PERMISSION_SERVICE + "_" + tenantId);
 	}
 	
 }
