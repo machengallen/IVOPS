@@ -8,6 +8,16 @@ eureka:
 feign:
   hystrix:
     enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000
       
 spring:
   profiles:
@@ -52,6 +62,10 @@ spring:
       database-schema: script_service
       jpa-enabled: true
       db-identity-used: true
+#文件传输大小限制
+server:
+  max-http-header-size: 1048576
+  
 
 logging:
   level:
@@ -86,10 +100,20 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3220/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://base_db:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
 logging:
    file: /var/log/ivops/script/peer1/script-service.log
+iv:
+  script:
+    repositoryPath: /opt/ivops/storage/script/mas-file-storage/
+    temporaryPath: /opt/ivops/storage/script/mas-file-temp-storage/
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
    
 ---
 server:
@@ -97,7 +121,17 @@ server:
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3220/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://base_db:3306/script_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
 logging:
-   file: /var/log/ivops/script/peer2/script-service.log       
+   file: /var/log/ivops/script/peer2/script-service.log  
+iv:
+  script:
+    repositoryPath: /opt/ivops/storage/script/mas-file-storage/
+    temporaryPath: /opt/ivops/storage/script/mas-file-temp-storage/
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/     
