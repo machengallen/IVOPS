@@ -45,6 +45,16 @@ spring:
 security:
   basic:
     enabled: false
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000
 ---
 server:
   port: 8280
@@ -63,30 +73,42 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3280/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://group_db:3306/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3280/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://group_db:3306/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
   file: /var/log/ivops/group/group-service/peer1/group-service.log
-   
+  
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/   
 ---
 server:
   port: 8281
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3280/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://group_db:3306/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3280/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://group_db:3306/group_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
 logging:
   file: /var/log/ivops/group/group-service/peer2/group-service.log
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
 
       
