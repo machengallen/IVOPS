@@ -445,9 +445,8 @@ public class ScriptService {
 	 */
 	public List<String> findScriptApprover(DelegateExecution execution){
 		List<String> approvers = new ArrayList<String>();
-		approvers.add("1");
-		approvers.add("2");
-		approvers.add("3");
+		LocalAuthDto localAuthDto = userServiceClient.selectLocalauthInfoByName("admin");
+		approvers.add(String.valueOf(localAuthDto.getId()));		
 		return approvers;
 	}
 	
@@ -716,7 +715,7 @@ public class ScriptService {
 	 */
 	public ResponseEntity<byte[]> officialRead(int scriptId) throws IOException {
 		ScriptEntity scriptInfo= docScriptDaoImpl.selectById(scriptId);
-		File file = new File(scriptRepositoryPath + scriptInfo.getName());
+		File file = new File(scriptRepositoryPath + scriptInfo.getItemType() + "\\" + scriptInfo.getName());
 	    byte[] body = null;
 	    InputStream is = new FileInputStream(file);
 	    body = new byte[is.available()];

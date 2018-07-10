@@ -17,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+
+import com.iv.common.response.ResponseDto;
+import com.iv.script.api.constant.ErrorMsg;
 import com.iv.script.api.dto.TemporaryScriptDto;
 import com.iv.script.dao.TemporaryScriptDaoImpl;
 import com.iv.script.entity.TemporaryScriptEntity;
@@ -43,33 +46,25 @@ public class TemporaryScriptService {
 	}
 	
 	/**
-	 * 临时文件存储
+	 * 临时文件存储/编辑
 	 * @param fileName
 	 * @param type
 	 * @param inputStream
 	 * @return 
 	 * @throws IOException 
 	 */
-	public int tempWrite(String fileName, String type, byte[] content) throws IOException {		
-		TemporaryScriptEntity temporaryScriptInfo = toSaveTempScript(fileName, type);
+	public int tempWrite(String fileName, String type, byte[] content, Integer scriptId) throws IOException {		
+		TemporaryScriptEntity temporaryScriptInfo = toSaveTempScript(fileName, type, scriptId);
 		//存储临时文件流
-		File file = new File(temporaryPath + temporaryScriptInfo.getName());
-		//File file = new File(temporaryPath);
+		File file = new File(temporaryPath + temporaryScriptInfo.getName());		
 		if (!file.getParentFile().exists()) {
 			 file.getParentFile().mkdir();  
 		}
 		file.createNewFile();			
-		try {			
-			/*int index;  
-		    byte[] bytes = new byte[1024]; */ 
-		    FileOutputStream downloadFile = new FileOutputStream(file); 
-		   /* while ((index = inputStream.read(bytes)) != -1) {  
-		        downloadFile.write(bytes, 0, index);  
-		        downloadFile.flush();  
-		    }  */
+		try {						
+		    FileOutputStream downloadFile = new FileOutputStream(file); 		   
 		    downloadFile.write(content);
-		    downloadFile.close();  
-		   // inputStream.close();  
+		    downloadFile.close();  		  
 	        return temporaryScriptInfo.getId();
 		} catch (IllegalStateException | IOException e) {
 			// 回滚数据库文件信息
@@ -82,17 +77,34 @@ public class TemporaryScriptService {
 	}
 	
 	/**
-	 * 保存临时文件信息
+	 * 保存/编辑临时文件信息
 	 * @param fileName
 	 * @param type
 	 * @return
 	 */
-	private TemporaryScriptEntity toSaveTempScript(String fileName, String type) {
-		//临时文件信息存储
-		TemporaryScriptEntity TemporaryScriptInfo = new TemporaryScriptEntity();		
-		TemporaryScriptInfo.setType(type);
+	private TemporaryScriptEntity toSaveTempScript(String fileName, String type, Integer scriptId) {
+		TemporaryScriptEntity temporaryScriptInfo = null;
+		if(null != scriptId) {
+			//临时文件编辑
+			temporaryScriptInfo = temporaryScriptDao.selectById(scriptId);
+			//删除对应的临时文件
+			try {
+				File file = new File(temporaryPath + temporaryScriptInfo.getName());			
+				if(file.exists()) {
+					file.delete();
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
+				LOGGER.error("临时文件删除失败");
+			}
+			
+		}else {
+			//临时文件信息存储
+			temporaryScriptInfo = new TemporaryScriptEntity();
+		}				
+		temporaryScriptInfo.setType(type);
 		long creaDate = System.currentTimeMillis();
-		TemporaryScriptInfo.setCreDate(creaDate);
+		temporaryScriptInfo.setCreDate(creaDate);
 		StringBuilder nameBuilder = new StringBuilder();		
 		int radm = (int)(1+Math.random()*(100));
 		if(StringUtils.isEmpty(fileName)) {
@@ -105,13 +117,13 @@ public class TemporaryScriptService {
 		nameBuilder.append(".");
 		nameBuilder.append(type);
 		String name = nameBuilder.toString();
-		TemporaryScriptInfo.setName(name);
+		temporaryScriptInfo.setName(name);
 		if(StringUtils.isEmpty(fileName)) {
-			TemporaryScriptInfo.setAlias(name);
+			temporaryScriptInfo.setAlias(name);
 		}else {
-			TemporaryScriptInfo.setAlias(fileName);
+			temporaryScriptInfo.setAlias(fileName);
 		}		
-		TemporaryScriptEntity temporaryScriptInfo = temporaryScriptDao.saveOrUpdate(TemporaryScriptInfo);
+		temporaryScriptInfo = temporaryScriptDao.saveOrUpdate(temporaryScriptInfo);
 		return temporaryScriptInfo;
 	}
 	
@@ -135,5 +147,27 @@ public class TemporaryScriptService {
 	    HttpStatus statusCode = HttpStatus.OK;
 	    ResponseEntity<byte[]> entity = new ResponseEntity<byte[]>(body, headers, statusCode);
 	    return entity;
+	}
+	
+	/**
+	 * 删除临时文件
+	 * @param scriptId
+	 * @return
+	 */
+	public ResponseDto deleteTemporaryScript(int scriptId){
+		TemporaryScriptEntity temporaryScriptInfo = temporaryScriptDao.selectById(scriptId);
+		//删除对应的临时文件
+		try {
+			File file = new File(temporaryPath + temporaryScriptInfo.getName());			
+			if(file.exists()) {
+				file.delete();
+			}
+			temporaryScriptDao.delById(temporaryScriptInfo.getId());
+			return ResponseDto.builder(ErrorMsg.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("临时文件删除失败");
+			return ResponseDto.builder(ErrorMsg.DELETE_TEMPORARY_SCRIPT_FAILED);
+		}
 	}
 }

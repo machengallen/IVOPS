@@ -166,10 +166,10 @@ public class ScriptController implements IScriptService{
 
 	@Override
 	@ApiOperation(value = "临时文件流存储")
-	public int tempWrite(String fileName, String type, byte[] content) {
+	public int tempWrite(String fileName, String type, byte[] content, Integer scriptId) {
 		// TODO Auto-generated method stub
 		try {
-			return temporaryScriptService.tempWrite(fileName, type, content);
+			return temporaryScriptService.tempWrite(fileName, type, content, scriptId);
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.info("临时文件流存储失败");
@@ -378,10 +378,17 @@ public class ScriptController implements IScriptService{
 			return ResponseDto.builder(ErrorMsg.SELECT_SCRIPT_INFO_FAILED);
 		}
 	}
-	
-	
-	/*public ResponseDto scriptSearch() {
-		
-	}*/
-	
+
+	@ApiOperation(value = "临时脚本删除", notes = "827112")
+	@Override
+	public ResponseDto deleteTemporaryScript(int scriptId) {
+		// TODO Auto-generated method stub
+		try {
+			return temporaryScriptService.deleteTemporaryScript(scriptId);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.info("临时脚本删除失败");
+			return ResponseDto.builder(ErrorMsg.DELETE_TEMPORARY_SCRIPT_FAILED);
+		}		
+	}
 }
