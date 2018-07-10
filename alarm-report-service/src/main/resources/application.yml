@@ -4,6 +4,16 @@ eureka:
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000
 spring:
   profiles:
     active:
@@ -56,5 +66,51 @@ server:
   port: 8451
 spring:
   profiles: peer2
+  
+  #生产环境#  
+---
+server:
+  port: 8450
+spring:
+  profiles: product-peer1
+  datasource:
+    url: jdbc:mysql://aggregation_db:3306/alarm_report_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_report_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
+logging:
+  file: /var/log/ivops/alarm/report/alarm-report-service/peer1/alarm-report-service.log
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
+   
+---
+server:
+  port: 8451
+spring:
+  profiles: product-peer2
+  datasource:
+    url: jdbc:mysql://aggregation_db:3306/alarm_report_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
+  #------------------------以下多租户配置属性---------------------------#
+  jpa:
+    properties:
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_report_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
+logging:
+  file: /var/log/ivops/alarm/report/alarm-report-service/peer2/alarm-report-service.log
+  
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
 
       
