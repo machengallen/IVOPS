@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: form-service
+  cloud:
+    config:
+      label: 1.0.x
+      profile: test
+      uri: http://10.10.31.21:8888
