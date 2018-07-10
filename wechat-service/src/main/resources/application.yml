@@ -47,6 +47,16 @@ spring:
 security:
   basic:
     enabled: false
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000    
 ---
 server:
   port: 8240
@@ -65,21 +75,56 @@ server:
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3220/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://base_db:3306/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivop
+  redis:
+    host: 10.10.31.43
+    database: 1
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
 logging:
   file: /var/log/ivops/wechat/wechat-service/peer1/wechat-service.log
-   
+  
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/   
 ---
 server:
   port: 8241
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3220/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://base_db:3306/wechat_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
+  redis:
+    host: 10.10.31.43
+    database: 1
+    port: 6379
+    password: 123@abcd
+    timeout: 5000
+    pool:
+      max-active: 50
+      max-idle: 20
+      max-wait: -1
+      min-idle: 0
 logging:
-  file: /var/log/ivops/wechat/wechat-service/peer2/wechat-service.log     
+  file: /var/log/ivops/wechat/wechat-service/peer2/wechat-service.log    
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/ 
+   
 
     
       
