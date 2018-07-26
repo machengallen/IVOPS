@@ -24,9 +24,10 @@ import com.iv.common.enumeration.NoticeType;
  * aggregation-1.3.0-SNAPSHOT
  * 
  */
-@Entity
-@Table(indexes = {@Index(columnList = "user_id")})
-public class AlarmMsgEntity implements Serializable{
+@Deprecated
+//@Entity
+//@Table(indexes = {@Index(columnList = "user_id")})
+public class Alarm1MsgEntity implements Serializable{
 
 	/**
 	 * 

@@ -8,9 +8,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	GET_SYS_MESSAGE_FAILED(42701,"获取消息失败"),
 	
-	CLEAR_MSG_FAILED(42702,"清除消息失败"),
+	UPDATE_MSG_FAILED(42702,"操作更新失败"),
 	
-	PRODUCE_MSG_FAILED(42703,"消息生成失败");
+	PRODUCE_MSG_FAILED(42703,"消息处理失败");
 	
 	private int code;
     private String msg;

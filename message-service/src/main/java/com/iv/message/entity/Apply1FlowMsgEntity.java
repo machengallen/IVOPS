@@ -15,20 +15,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.iv.common.enumeration.WorkflowType;
 
 /**
- * 待审批消息体
+ * 申请流审批结果消息体
  * @author macheng
  * 2018年1月26日
  * aggregation-1.3.0-SNAPSHOT
  * 
  */
-@Entity
-@Table(indexes = {@Index(columnList = "user_id")})
-public class ApproveFlowMsgEntity implements Serializable{
+@Deprecated
+//@Entity
+//@Table(indexes = {@Index(columnList = "user_id")})
+public class Apply1FlowMsgEntity implements Serializable{
 
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 7529175435450614072L;
+	private static final long serialVersionUID = 8395567024955116185L;
 	/*
 	 * 消息类属性
 	 */
@@ -42,10 +43,12 @@ public class ApproveFlowMsgEntity implements Serializable{
 	 * 业务类属性
 	 */
 	private WorkflowType type;// 工作流类型
-	private long applyTime;// 申请时间
-	private String applicant;// 申请人
+	private long approveTime;// 审批时间
+	private boolean approved;// 审批结果
+	private String remark;// 审批人备注
 	private String enterprise;// 企业名称
 	private String subEnterprise;// 项目组名称
+	
 	@Id
 	@GenericGenerator(name="idGenerator", strategy="uuid")
 	@GeneratedValue(generator="idGenerator")
@@ -65,6 +68,12 @@ public class ApproveFlowMsgEntity implements Serializable{
 	public boolean isConfirmed() {
 		return confirmed;
 	}
+	public String getSubEnterprise() {
+		return subEnterprise;
+	}
+	public void setSubEnterprise(String subEnterprise) {
+		this.subEnterprise = subEnterprise;
+	}
 	public void setConfirmed(boolean confirmed) {
 		this.confirmed = confirmed;
 	}
@@ -74,29 +83,29 @@ public class ApproveFlowMsgEntity implements Serializable{
 	public void setMsgDate(long msgDate) {
 		this.msgDate = msgDate;
 	}
-	public String getSubEnterprise() {
-		return subEnterprise;
-	}
-	public void setSubEnterprise(String subEnterprise) {
-		this.subEnterprise = subEnterprise;
-	}
 	public WorkflowType getType() {
 		return type;
 	}
 	public void setType(WorkflowType type) {
 		this.type = type;
 	}
-	public long getApplyTime() {
-		return applyTime;
+	public long getApproveTime() {
+		return approveTime;
 	}
-	public void setApplyTime(long applyTime) {
-		this.applyTime = applyTime;
+	public void setApproveTime(long approveTime) {
+		this.approveTime = approveTime;
 	}
-	public String getApplicant() {
-		return applicant;
+	public boolean isApproved() {
+		return approved;
 	}
-	public void setApplicant(String applicant) {
-		this.applicant = applicant;
+	public void setApproved(boolean approved) {
+		this.approved = approved;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	public String getEnterprise() {
 		return enterprise;
