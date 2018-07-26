@@ -36,18 +36,21 @@ spring:
         hibernate.dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         hibernate.event.merge.entity_copy_observer: allow
         #------------------------以下多租户配置属性---------------------------#
-        hibernate.multiTenancy: SCHEMA
-        hibernate.tenant_identifier_resolver: com.iv.message.util.TenantIdResolver
-        hibernate.multi_tenant_connection_provider: com.iv.message.util.MultiTenantConnectionProviderImpl
-        hibernate.connection.password: 123@abcd
-        hibernate.connection.driver_class: com.mysql.jdbc.Driver
-        hibernate.c3p0.minPoolSize: 5
-        hibernate.c3p0.maxIdleTime: 120
-        hibernate.c3p0.idleConnectionTestPeriod: 18000
-
+#        hibernate.multiTenancy: SCHEMA
+#        hibernate.tenant_identifier_resolver: com.iv.message.util.TenantIdResolver
+#        hibernate.multi_tenant_connection_provider: com.iv.message.util.MultiTenantConnectionProviderImpl
+#        hibernate.connection.password: 123@abcd
+#        hibernate.connection.driver_class: com.mysql.jdbc.Driver
+#        hibernate.c3p0.minPoolSize: 5
+#        hibernate.c3p0.maxIdleTime: 120
+#        hibernate.c3p0.idleConnectionTestPeriod: 18000
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.23
+    port: 5672
 logging:
-  level:
-    root: info
   file: E:\workspace\mas.log
   
 #自定义变量#
@@ -70,33 +73,61 @@ spring:
 
 #生产环境#  
 ---
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+    ip-address: message
+    hostname: message
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
 server:
   port: 8270
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://10.10.31.43:3280/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://10.10.31.43:3280/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.43
+    port: 5672
 logging:
-   file: /var/log/ivops/message/peer1/message-service.log
+   file: /opt/ivops/logs/message-service-peer1.log
    
 ---
+eureka:
+  instance:
+    status-page-url: http://10.10.31.42:${server.port}/swagger-ui.html
+    ip-address: message
+    hostname: message
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.42:8110/eureka/
 server:
   port: 8271
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://db.mas.ivops:3306/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: mas
+    url: jdbc:mysql://10.10.31.43:3280/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: ivops
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
-      hibernate.connection.username: mas
+      hibernate.connection.url: jdbc:mysql://10.10.31.43:3280/message_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.username: ivops
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.43
+    port: 5672
 logging:
-   file: /var/log/ivops/message/peer2/message-service.log       
+   file: /opt/ivops/logs/message-service-peer2.log
