@@ -120,6 +120,36 @@ public class LocalAuthDto {
 		if (id != other.id)
 			return false;
 		return true;
-	}	
+	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("LocalAuthDto [id=");
+		builder.append(id);
+		builder.append(", userName=");
+		builder.append(userName);
+		builder.append(", realName=");
+		builder.append(realName);
+		builder.append(", nickName=");
+		builder.append(nickName);
+		builder.append(", email=");
+		builder.append(email);
+		builder.append(", tel=");
+		builder.append(tel);
+		builder.append(", curTenantId=");
+		builder.append(curTenantId);
+		builder.append(", headimgurl=");
+		builder.append(headimgurl);
+		builder.append(", ifFocusWechat=");
+		builder.append(ifFocusWechat);
+		builder.append(", userWechatInfo=");
+		builder.append(userWechatInfo);
+		builder.append(", passWord=");
+		builder.append(passWord);
+		builder.append(", roles=");
+		builder.append(roles);
+		builder.append("]");
+		return builder.toString();
+	}
 	
 }

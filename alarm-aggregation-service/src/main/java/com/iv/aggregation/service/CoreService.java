@@ -27,6 +27,7 @@ import com.iv.aggregation.entity.AlarmSourceEntity;
 import com.iv.aggregation.feign.clients.IAlarmStrategyClient;
 import com.iv.aggregation.util.DataConvert;
 import com.iv.aggregation.util.DispatchUtil;
+import com.iv.aggregation.util.TenantIdHolder;
 import com.iv.aggregation.util.TimerPending;
 import com.iv.aggregation.util.WechatProxyClient;
 import com.iv.common.enumeration.AlarmStatus;
@@ -81,6 +82,7 @@ public class CoreService {
 
 	public AlarmLifeEntity alarmTrigger(AlarmSourceEntity alarmSourceEntity) throws Exception {
 
+		TenantIdHolder.set(alarmSourceEntity.getTenantId());
 		// 存储告警触发数据
 		alarmSourceEntity = ALARM_LIFE_DAO.saveAlarmSource(alarmSourceEntity);
 		// 创建告警生命周期对象
@@ -132,6 +134,7 @@ public class CoreService {
 
 	public void alarmRecovery(AlarmRecoveryEntity alarmRecoveryEntity) throws Exception {
 
+		TenantIdHolder.set(alarmRecoveryEntity.getAlarmSourceEntity().getTenantId());
 		// 存储告警恢复数据
 		alarmRecoveryEntity = ALARM_LIFE_DAO.saveAlarmRecovery(alarmRecoveryEntity);
 		Object map0 = redisTemplate.opsForValue().get(alarmRecoveryEntity.getAlarmSourceEntity().getTenantId());
@@ -148,9 +151,9 @@ public class CoreService {
 		lifeEntity.getLogs()
 				.add(AlarmLogEntity.builder(new Date(recdate), OpsType.RECOVER, null, null, 0));
 		// 发送模板消息
-		wechatProxyClient.alarmRecovery(lifeEntity);
 		lifeEntity.setAlarmStatus(AlarmStatus.CLOSED);
 		lifeEntity.setHandlerLast(lifeEntity.getHandlerCurrent());
+		wechatProxyClient.alarmRecovery(lifeEntity);
 		// 同步数据库
 		ALARM_LIFE_DAO.saveAlarmLife(lifeEntity);
 	}
@@ -165,7 +168,8 @@ public class CoreService {
 		String[] strs = lifeId.split("\\$");
 		lifeId = strs[0];
 		String tenantId = strs[1];
-		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(lifeId, tenantId);
+		TenantIdHolder.set(tenantId);
+		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(lifeId);
 		return alarmLifeEntity;
 	}
 
@@ -179,7 +183,8 @@ public class CoreService {
 		String[] strs = lifeId.split("#");
 		lifeId = strs[0];
 		String tenantId = strs[1];
-		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(lifeId, tenantId);
+		TenantIdHolder.set(tenantId);
+		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeById(lifeId);
 		return alarmLifeEntity;
 	}
 

@@ -21,6 +21,7 @@ import com.iv.aggregation.dao.impl.AlarmCleanStrategyDaoImpl;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
 import com.iv.aggregation.entity.AlarmCleanStrategyEntity;
 import com.iv.aggregation.feign.clients.ITenantServiceClient;
+import com.iv.aggregation.util.TenantIdHolder;
 import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
 
 @Component
@@ -46,16 +47,17 @@ public class ScheduledTasks {
 				for (SubEnterpriseInfoDto subEnterpriseInfoDto : subEnterpriseInfoDtos) {
 					
 					String tenantId = subEnterpriseInfoDto.getTenantId();
+					TenantIdHolder.set(tenantId);
 					LOGGER.info(
 							"租户：" + subEnterpriseInfoDto.getEnterprise().getName() + " 项目组：" + subEnterpriseInfoDto.getName());
 					Calendar calendar = Calendar.getInstance(Locale.CHINA);
-					AlarmCleanStrategyEntity strategyEntity = strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId);
+					AlarmCleanStrategyEntity strategyEntity = strategyDao.selectById(IAlarmCleanStrategyDao.id);
 					if (null == strategyEntity) {
-						strategyEntity = initStrategy(tenantId);
+						strategyEntity = initStrategy();
 					}
 					calendar.add(Calendar.MONTH, strategyEntity.getCycleType().getMonths());
 					// System.out.println(dao.selectById(IAlarmCleanStrategyDao.id).getCycleType().getMonths());
-					ALARM_LIFE_DAO.delBeforeTimestamp(calendar.getTimeInMillis(), tenantId);
+					ALARM_LIFE_DAO.delBeforeTimestamp(calendar.getTimeInMillis());
 				}
 			}
 		} catch (RuntimeException e) {
@@ -78,13 +80,14 @@ public class ScheduledTasks {
 				for (SubEnterpriseInfoDto subEnterpriseInfoDto : subEnterpriseInfoDtos) {
 
 					String tenantId = subEnterpriseInfoDto.getTenantId();
+					TenantIdHolder.set(tenantId);
 					// 初始化告警清理规则
-					if (null == strategyDao.selectById(IAlarmCleanStrategyDao.id, tenantId)) {
+					if (null == strategyDao.selectById(IAlarmCleanStrategyDao.id)) {
 						// 默认告警数据保留三个月
 						AlarmCleanStrategyEntity cleanStrategyEntity = new AlarmCleanStrategyEntity();
 						cleanStrategyEntity.setCycleType(StrategyCycle.THREE_MONTHS);
 						cleanStrategyEntity.setId(IAlarmCleanStrategyDao.id);
-						strategyDao.saveStrategy(cleanStrategyEntity, tenantId);
+						strategyDao.saveStrategy(cleanStrategyEntity);
 					}
 				}
 			}
@@ -93,11 +96,11 @@ public class ScheduledTasks {
 		}
 	}
 
-	public AlarmCleanStrategyEntity initStrategy(String tenantId) {
+	public AlarmCleanStrategyEntity initStrategy() {
 		AlarmCleanStrategyEntity cleanStrategyEntity = new AlarmCleanStrategyEntity();
 		cleanStrategyEntity.setCycleType(StrategyCycle.THREE_MONTHS);
 		cleanStrategyEntity.setId(IAlarmCleanStrategyDao.id);
-		cleanStrategyEntity = strategyDao.saveStrategy(cleanStrategyEntity, tenantId);
+		cleanStrategyEntity = strategyDao.saveStrategy(cleanStrategyEntity);
 		return cleanStrategyEntity;
 	}
 }

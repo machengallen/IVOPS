@@ -28,8 +28,6 @@ public interface IAlarmLifeDao {
 
 	AlarmLifeEntity selectAlarmLifeById(String id) throws RuntimeException;
 	
-	AlarmLifeEntity selectAlarmLifeById(String id, String tenantId) throws RuntimeException;
-
 	/*void updateAlarmStatus(String alarmId, Integer hireHandlerCurrent, Integer hireHandlerLast,
 			AlarmRecoveryEntity recovery, AlarmStatus alarmStatus, Byte upgrade) throws RuntimeException;*/
 
@@ -59,7 +57,7 @@ public interface IAlarmLifeDao {
 	
 	List<Object[]> selectBatchByIds(String[] ids) throws RuntimeException;
 	
-	void delBeforeTimestamp(long timestamp, String tenantId) throws RuntimeException;
+	void delBeforeTimestamp(long timestamp) throws RuntimeException;
 	
 	AlarmLifeEntity saveOrUpdateAlarmLife(AlarmLifeEntity alarmLifeEntity) throws RuntimeException;
 	
@@ -69,7 +67,7 @@ public interface IAlarmLifeDao {
 
 	AlarmRecoveryEntity saveAlarmRecovery(AlarmRecoveryEntity alarmRecoveryEntity) throws RuntimeException;
 
-	AlarmSourceEntity selectAlarmSourceByEventId(String eventId, String monitorIp, String tenantId,
+	AlarmSourceEntity selectAlarmSourceByEventId(String eventId, String monitorIp,
 			AgentType agentType) throws RuntimeException;
 
 	

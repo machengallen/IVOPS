@@ -5,12 +5,23 @@ eureka:
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+  
 security:
   basic:
     enabled: false
 feign:
   hystrix:
     enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000 
 spring:
   profiles:
     active:
@@ -95,12 +106,20 @@ spring:
 
 #生产环境#  
 ---
+eureka:
+  instance:
+    status-page-url: http://localhost:${server.port}/swagger-ui.html
+    ip-address: alarm-aggregation
+    hostname: alarm-aggregation
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8410
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://aggregation_db/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://aggregation_db:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
   redis:
     host: redis.mas.ivops
@@ -114,18 +133,24 @@ spring:
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: ivops
 logging:
-   file: /var/log/ivops/alarm/alarm-aggregation-service/peer1/alarm-aggregation-service.log
+   file: /opt/ivops/logs/alarm-aggregation-service-peer1.log
    
 ---
+eureka:
+  instance:
+    status-page-url: http://localhost:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8411
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://aggregation_db/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://aggregation_db:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
   redis:
     host: redis.mas.ivops
@@ -139,7 +164,7 @@ spring:
   #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_aggregation_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: ivops
 logging:
-   file: /var/log/ivops/alarm/alarm-aggregation-service/peer2/alarm-aggregation-service.log       
+   file: /opt/ivops/logs/alarm-aggregation-service-peer2.log

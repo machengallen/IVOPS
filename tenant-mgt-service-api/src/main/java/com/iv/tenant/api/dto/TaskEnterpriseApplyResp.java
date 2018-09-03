@@ -10,14 +10,14 @@ public class TaskEnterpriseApplyResp {
 	private String email;
 	private String tel;
 	private TenantInfoDto tenantInfo;
-	private String createTime;
+	private long createTime;
 	
 	public TaskEnterpriseApplyResp() {
 		super();
 	}
 
 	public TaskEnterpriseApplyResp(String taskId, WorkflowType type, String applicant, String email, String tel,
-			TenantInfoDto tenantInfo, String createTime) {
+			TenantInfoDto tenantInfo, long createTime) {
 		super();
 		this.taskId = taskId;
 		this.type = type;
@@ -40,10 +40,10 @@ public class TaskEnterpriseApplyResp {
 	public void setTenantInfo(TenantInfoDto tenantInfo) {
 		this.tenantInfo = tenantInfo;
 	}
-	public String getCreateTime() {
+	public long getCreateTime() {
 		return createTime;
 	}
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
 	}
 	public String getTaskId() {

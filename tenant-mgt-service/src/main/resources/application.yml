@@ -12,6 +12,16 @@ security:
 feign:
   hystrix:
     enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000 
 spring:
   profiles:
     active:
@@ -50,7 +60,12 @@ spring:
 #        hibernate.c3p0.minPoolSize: 5
 #        hibernate.c3p0.maxIdleTime: 120
 #        hibernate.c3p0.idleConnectionTestPeriod: 18000
-
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.23
+    port: 5672
   activiti:
     database-schema: tenant_mgt_service
     jpa-enabled: true
@@ -71,33 +86,61 @@ spring:
   
 #生产环境#  
 ---
+eureka:
+  instance:
+    status-page-url: http://10.10.31.49:${server.port}/swagger-ui.html
+    ip-address: tenant
+    hostname: tenant
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka:8110/eureka/
 server:
   port: 8230
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://base_db/tenant_mgt_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.43:3220/tenant_mgt_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
 #------------------------以下多租户配置属性---------------------------#
 #  jpa:
 #    properties:
 #      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
 #      hibernate.connection.username: mas
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.43
+    port: 5672
 logging:
-   file: /var/log/ivops/tenant/tenant-mgt-service/peer1/tenant-mgt-service.log
+   file: /opt/ivops/logs/tenant-mgt-service-peer1.log
    
 ---
+eureka:
+  instance:
+    status-page-url: http://10.10.31.49:${server.port}/swagger-ui.html
+    ip-address: tenant
+    hostname: tenant
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka:8110/eureka/
 server:
   port: 8231
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://base_db/tenant_mgt_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://10.10.31.43:3220/tenant_mgt_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
 #------------------------以下多租户配置属性---------------------------#
 #  jpa:
 #    properties:
 #      hibernate.connection.url: jdbc:mysql://db.mas.ivops:3306/iv_ops_shared?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
 #      hibernate.connection.username: mas
+  rabbitmq:
+    virtual-host: /mas
+    username: admin
+    password: 123@abcd
+    host: 10.10.31.43
+    port: 5672
 logging:
-   file: /var/log/ivops/tenant/tenant-mgt-service/peer2/tenant-mgt-service.log
+   file: /opt/ivops/logs/tenant-mgt-service-peer2.log

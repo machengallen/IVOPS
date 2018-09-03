@@ -11,7 +11,7 @@ public interface IAlarmStrategyDao {
 
 	void saveStrategy(AlarmStrategyEntity alarmLifeStrategy) throws RuntimeException;
 	
-	AlarmStrategyEntity selectStrategy(Severity severity, String itemType,  String tenantId) throws RuntimeException;
+	AlarmStrategyEntity selectStrategy(Severity severity, String itemType) throws RuntimeException;
 	
 	AlarmStrategyEntity selectById(String id) throws RuntimeException;
 	

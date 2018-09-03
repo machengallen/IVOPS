@@ -5,6 +5,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.iv.aggregation.feign.clients.IUserServiceClient;
@@ -18,6 +20,7 @@ import com.iv.outer.dto.UserOauthDto;
 @Component
 public class UserServiceClientFallBack implements IUserServiceClient {
 
+	private final static Logger LOGGER = LoggerFactory.getLogger(UserServiceClientFallBack.class);
 	@Override
 	public ResponseDto bindWechatInfo(AccountDto accountDto) {
 		// TODO Auto-generated method stub
@@ -33,18 +36,21 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	@Override
 	public LocalAuthDto selectLocalAuthById(int userId) throws RuntimeException {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
 	@Override
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
 	@Override
 	public ResponseDto saveOrUpdateUserAuth(AccountDto accountDto) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
@@ -64,12 +70,14 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	@Override
 	public Set<String> selectUsersWechatUnionid(UsersQueryDto UsersQueryDto) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
 	@Override
 	public UserOauthDto selectUserWechatUnionid(int userId, LoginType loginType) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
@@ -82,12 +90,14 @@ public class UserServiceClientFallBack implements IUserServiceClient {
 	@Override
 	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery, String tenantId) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 
 	@Override
 	public List<LocalAuthDto> selectUserInfos(UsersQueryDto usersWechatsQuery) {
 		// TODO Auto-generated method stub
+		LOGGER.error("用户服务调用失败");
 		return null;
 	}
 

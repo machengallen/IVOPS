@@ -98,13 +98,13 @@ public class AlarmReportService {
 			int num = alarms.size();
 			totalAnalysisDataDto.setItemType("totalAnalysisDataDto");
 			totalAnalysisDataDto.setAlarmCounts(num);
-			totalAnalysisDataDto.setEscalationRate((float)Math.round(upAlarmsItempType.get("count")*100*100/num)/100);
+			totalAnalysisDataDto.setEscalationRate(0 == num ? 0 : (float)Math.round(upAlarmsItempType.get("count")*100*100/num)/100);
 			totalAnalysisDataDto.setFaultDutyRatio((float)100);
 			totalAnalysisDataDto.setFaultTimes(alarmAnalysisUtil.formatTime(new BigDecimal(alarmsList.get(5).get("totalfaultTimes")).longValue()));
 			totalAnalysisDataDto.setMtta(alarmAnalysisUtil.formatTime(new BigDecimal(alarmsList.get(5).get("totalmtta")).longValue()));
 			totalAnalysisDataDto.setMttr(alarmAnalysisUtil.formatTime(new BigDecimal(alarmsList.get(5).get("totalmttr")).longValue()));
 			totalAnalysisDataDto.setPressAlarms(pressAlarmsItempType.get("count"));
-			totalAnalysisDataDto.setPressDutyRatio((float)Math.round(pressAlarmsItempType.get("count")*100*100/num)/100);
+			totalAnalysisDataDto.setPressDutyRatio(0 == num ? 0 : (float)Math.round(pressAlarmsItempType.get("count")*100*100/num)/100);
 			totalAnalysisDataDto.setUpAlarms(upAlarmsItempType.get("count"));	
 			totalAnalysisDataDto.setTotalDutyRatio((float)100);
 			alarmAnalysisDataDtos.add(totalAnalysisDataDto);

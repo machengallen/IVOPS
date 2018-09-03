@@ -5,7 +5,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
-    
 spring:
   profiles:
     active:
@@ -26,10 +25,20 @@ spring:
       min-idle: 0
 feign:
   hystrix:
-    enabled: true    
-logging:
-  level:
-    org.springframework : DEBUG
+    enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000    
+#logging:
+#  level:
+#    org.springframework : DEBUG
 #logging:
 #  level:
 #    org.springframework : DEBUG
@@ -61,7 +70,26 @@ spring:
 server:
   port: 8211
 
-
-
+#生产环境
+---
+eureka:
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+  instance:
+    ip-address: authentication
+    hostname: authentication
+spring:
+  profiles: product-peer1
+server:
+  port: 8210
   
-      
+---
+eureka:
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@10.10.31.21:8110/eureka/
+spring:
+  profiles: product-peer2
+server:
+  port: 8211

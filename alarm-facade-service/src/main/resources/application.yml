@@ -7,6 +7,16 @@ eureka:
 feign:
   hystrix:
     enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000 
 security:
   basic:
     enabled: false
@@ -36,17 +46,29 @@ spring:
   
 #生产环境#  
 ---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8420
 spring:
   profiles: product-peer1
 logging:
-   file: /var/log/ivops/alarm/alarm-facade-service/peer1/alarm-facade-service.log
+   file: /opt/ivops/logs/alarm-facade-service-peer1.log
    
 ---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8421
 spring:
   profiles: product-peer2
 logging:
-   file: /var/log/ivops/alarm/alarm-facade-service/peer2/alarm-facade-service.log
+   file: /opt/ivops/logs/alarm-facade-service-peer2.log

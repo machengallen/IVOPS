@@ -8,6 +8,16 @@ eureka:
 feign:
   hystrix:
     enabled: true
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
+ribbon:
+  ReadTimeout: 5000
+  ConnectTimeout: 3000 
 spring:
   profiles:
     active:
@@ -63,33 +73,47 @@ spring:
   
 #生产环境#  
 ---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8440
 spring:
   profiles: product-peer1
   datasource:
-    url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://aggregation_db:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
 #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: ivops
 logging:
-   file: /var/log/ivops/alarm/alarm-strategy-service/peer1/alarm-strategy-service.log
+   file: /opt/ivops/logs/alarm-strategy-service-peer1.log
    
 ---
+eureka:
+  instance:
+    status-page-url: http://${spring.application.name}:${server.port}/swagger-ui.html
+    prefer-ip-address: true
+  client:
+    service-url:
+      defaultZone: http://ivops:123abcd@eureka-server:8110/eureka/
 server:
   port: 8441
 spring:
   profiles: product-peer2
   datasource:
-    url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://aggregation_db:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
     username: ivops
 #------------------------以下多租户配置属性---------------------------#
   jpa:
     properties:
-      hibernate.connection.url: jdbc:mysql://aggregation_db/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
+      hibernate.connection.url: jdbc:mysql://aggregation_db:3306/alarm_strategy_service?createDatabaseIfNotExist=true&serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&useSSL=false
       hibernate.connection.username: ivops
 logging:
-   file: /var/log/ivops/alarm/alarm-strategy-service/peer2/alarm-strategy-service.log
+   file: /opt/ivops/logs/alarm-strategy-service-peer2.log

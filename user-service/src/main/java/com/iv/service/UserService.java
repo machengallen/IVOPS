@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import com.iv.common.enumeration.YesOrNo;
 import com.iv.common.response.ResponseDto;
+import com.iv.common.util.spring.ConstantContainer;
 import com.iv.common.util.spring.Constants;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.dao.impl.LocalAuthDaoImpl;
@@ -187,6 +188,7 @@ public class UserService {
 				localAuth.setEmail(accountDto.getEmail());
 				localAuth.setNickName(accountDto.getNickName());
 				localAuth.setRealName(accountDto.getRealName());
+				localAuth.setCurTenantId(ConstantContainer.TOURIST);
 				localAuth = localAuthDao.saveOrUpdateLocalAuth(localAuth);
 				if(!StringUtils.isEmpty(accountDto.getUnionid())) {
 					UserOauth userOauth = new UserOauth();

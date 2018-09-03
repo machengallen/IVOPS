@@ -50,13 +50,11 @@ spring:
 server:
   port: 8110
 eureka:
-  instance:
-    prefer-ip-address: true
-#    ip-address: 10.10.9.26
-#    hostname: eureka-server-2
   client:
+    register-with-eureka: false
+    fetch-registry: false
     serviceUrl:
-      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.55:8111/eureka/
+      defaultZone: http://${security.user.name}:${security.user.password}@10.10.9.26:8110/eureka/
 
 ---
 spring:

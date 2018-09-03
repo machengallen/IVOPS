@@ -53,7 +53,7 @@ public class SubEnterpriseEntity implements Serializable{
 	public void setTenantId(String tenantId) {
 		this.tenantId = tenantId;
 	}
-	@Column(unique = true, nullable = false)
+	@Column(nullable = false)
 	public String getName() {
 		return name;
 	}

@@ -20,6 +20,10 @@ public class TenantIdResolver implements CurrentTenantIdentifierResolver {
 
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		if(null == requestAttributes) {
+			String tenantId = TenantIdHolder.get();
+			if(!StringUtils.isEmpty(tenantId)) {
+				return ConstantContainer.ALARM_AGGREGATION_DB + "_" + tenantId;
+			}
 			return ConstantContainer.ALARM_AGGREGATION_DB;
 		}
 		HttpServletRequest request = ((ServletRequestAttributes) requestAttributes).getRequest();

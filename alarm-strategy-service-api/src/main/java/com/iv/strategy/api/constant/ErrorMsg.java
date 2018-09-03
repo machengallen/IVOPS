@@ -14,7 +14,9 @@ public enum ErrorMsg implements IErrorMsg {
 	
 	DELETE_STRATRGY_FAILED(44403,"删除策略失败"),
 	
-	ALARM_CLEAN_SET_FAILED(44404,"更新告警清理配置失败");
+	ALARM_CLEAN_SET_FAILED(44404,"更新告警清理配置失败"),
+	
+	NOT_FOCUS_WECHAT(44405,"未关注公众号");
 	
 	private int code;
     private String msg;

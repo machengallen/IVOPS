@@ -14,29 +14,16 @@ import com.iv.jpa.util.hibernate.HibernateTemplateWithTenant;
 public class AlarmCleanStrategyDaoImpl implements IAlarmCleanStrategyDao {
 
 	@Override
-	public void saveStrategy(AlarmCleanStrategyEntity entity) throws RuntimeException {
-
-		HibernateTemplate.execute(new HibernateCallBack() {
-			
-			@Override
-			public Object doInHibernate(Session ses) throws HibernateException {
-				ses.save(entity);
-				return null;
-			}
-		});
-	}
-	
-	@Override
-	public AlarmCleanStrategyEntity saveStrategy(AlarmCleanStrategyEntity entity, String tenantId) throws RuntimeException {
+	public AlarmCleanStrategyEntity saveStrategy(AlarmCleanStrategyEntity entity) throws RuntimeException {
 		
-		return (AlarmCleanStrategyEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmCleanStrategyEntity) HibernateTemplate.execute(new HibernateCallBack() {
 			
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				ses.save(entity);
 				return entity;
 			}
-		}, tenantId);
+		});
 	}
 
 	@Override
@@ -51,16 +38,4 @@ public class AlarmCleanStrategyDaoImpl implements IAlarmCleanStrategyDao {
 		});
 	}
 	
-	@Override
-	public AlarmCleanStrategyEntity selectById(int id, String tenantId) throws RuntimeException {
-		
-		return (AlarmCleanStrategyEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
-			
-			@Override
-			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.get(AlarmCleanStrategyEntity.class, id);
-			}
-		}, tenantId);
-	}
-
 }

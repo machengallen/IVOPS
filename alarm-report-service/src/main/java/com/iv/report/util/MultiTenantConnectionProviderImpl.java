@@ -1,9 +1,12 @@
 package com.iv.report.util;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.hibernate.c3p0.internal.C3P0ConnectionProvider;
 
+import com.iv.common.util.spring.ConstantContainer;
 import com.iv.jpa.util.hibernate.AbstractMultiTenantConnectionProvider;
 
 
@@ -31,6 +34,23 @@ public class MultiTenantConnectionProviderImpl extends AbstractMultiTenantConnec
 		}*/
 		connectionProvider.closeConnection(connection);
 
+	}
+	
+	@Override
+	public Connection getConnection(String tenantIdentifier) throws SQLException {
+		final Connection connection = super.getAnyConnection();
+		PreparedStatement ps = connection.prepareStatement(
+				"SELECT count(sc.SCHEMA_NAME) FROM information_schema.SCHEMATA sc where sc.SCHEMA_NAME=?");
+		ps.setString(1, tenantIdentifier);
+		ResultSet rs = ps.executeQuery();
+		if (rs.next()) {
+			if (rs.getInt(1) == 0) {
+				connection.createStatement().execute("use " + ConstantContainer.ALARM_AGGREGATION_DB);
+			}else {
+				connection.createStatement().execute("use " + tenantIdentifier);
+			}
+		}
+		return connection;
 	}
 
 	@Override

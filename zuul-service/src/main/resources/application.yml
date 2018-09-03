@@ -88,37 +88,40 @@ zuul:
     api-18:
       path: /operation/db/**
       service-id: operation-db-service
+  host:
+    socket-timeout-millis: 40000
+    connect-timeout-millis: 40000
 
 ribbon:
-  ReadTimeout: 5000
+  ReadTimeout: 20000
   ConnectTimeout: 5000
   MaxAutoRetries: 3
   MaxAutoRetriesNextServer: 1
-  
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 30000
 iv:
   public:
     uris: /v1/wechat/**,
-          /v1/logout,
           /v1/authentication/uaa/**,
-          /v1/uaa/**,
           /v1/alarm/aggregation/openalarm,
           /v1/user/bind/wechatInfo,
           /v1/user/register/account,
           /v1/user/get/token,
           /swagger-ui.html,
           /swagger-resources/**,
-          /v1/operation/script/**,
-          /v1/alarm/facade/**,
-          /v1/wechat/**,
-          /v1/alarm/report/**,
-          /v1/operation/db/**,
+          /v1/email/**,
           /v1/form/select/formByCallBack,
-          /v1/script/official/read,
-          /v1/script/temp/read
+          /v1/message/**
           
 
   noAuthentication:
     uris: /v1/authentication/**,
+          /logout,
           /v1/form/select/formListPage,
           /v1/form/select/formById,
           /v1/form/select/myFormListPage,
@@ -144,7 +147,11 @@ iv:
           /v1/alarm/**,
           /v1/user/**,
           /v1/wechat/**,
-          /v1/permission/**
+          /v1/permission/**,
+          /v1/tenant/mgt/**,
+          /v1/alarm/report/**,
+          /v1/operation/**,
+          /v1/script/**
 
 
 

@@ -15,17 +15,16 @@ import org.springframework.util.CollectionUtils;
 
 import com.iv.aggregation.api.constant.NoticeModel;
 import com.iv.aggregation.api.constant.OpsType;
+import com.iv.aggregation.binding.BinderConfiguration;
 import com.iv.aggregation.dao.IAlarmLifeDao;
 import com.iv.aggregation.dao.impl.AlarmLifeDaoImpl;
 import com.iv.aggregation.entity.AlarmLifeEntity;
 import com.iv.aggregation.entity.AlarmLogEntity;
 import com.iv.aggregation.entity.AlarmSourceEntity;
 import com.iv.aggregation.feign.clients.IAlarmStrategyClient;
-import com.iv.aggregation.feign.clients.IMessageServiceClient;
 import com.iv.aggregation.service.CoreService;
 import com.iv.common.enumeration.NoticeType;
 import com.iv.common.util.spring.SpringContextUtil;
-import com.iv.message.api.dto.AlarmMsgDto;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
 import com.iv.strategy.api.dto.StrategyQueryDto;
 
@@ -60,9 +59,10 @@ public class TimerPending implements Runnable {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
+		TenantIdHolder.set(alarmSourceEntity.getTenantId());
 		IAlarmStrategyClient alarmStrategyClient = SpringContextUtil.getBean(IAlarmStrategyClient.class);
 		WechatProxyClient wechatProxyClient = SpringContextUtil.getBean(WechatProxyClient.class);
-		IMessageServiceClient messageServiceClient = SpringContextUtil.getBean(IMessageServiceClient.class);
+		BinderConfiguration msgSender = SpringContextUtil.getBean(BinderConfiguration.class);
 		RedisTemplate redisTemplate = SpringContextUtil.getBean("redisTemplate", RedisTemplate.class);
 		
 		AlarmLifeEntity alarmLifeEntity = ALARM_LIFE_DAO.selectAlarmLifeByAlarmSrc(this.alarmSourceEntity);
@@ -118,21 +118,9 @@ public class TimerPending implements Runnable {
 				 * groupDao.saveGroupInTenant(groupEntity,
 				 * alarmLifeEntity.getAlarm().getTenantId());
 				 */
-				// 保存告警消息体
+				// 发送web消息
 				if (!CollectionUtils.isEmpty(toUserIds)) {
-					AlarmMsgDto msgDto = new AlarmMsgDto();
-					msgDto.setUserIds(toUserIds);
-					msgDto.setTenantId(alarmLifeEntity.getAlarm().getTenantId());
-					msgDto.setMsgDate(System.currentTimeMillis());
-					msgDto.setAlarmId(alarmLifeEntity.getId());
-					msgDto.setType(NoticeType.ALARM);
-					msgDto.setTitle(alarmLifeEntity.getAlarm().getTitle());
-					msgDto.setHostName(alarmLifeEntity.getAlarm().getHostName());
-					msgDto.setHostIp(alarmLifeEntity.getAlarm().getHostIp());
-					msgDto.setTriDate(alarmLifeEntity.getTriDate());
-					msgDto.setAlarmStatus(alarmLifeEntity.getAlarmStatus());
-					// 调用用户消息服务
-					messageServiceClient.produceAlarmMsg(msgDto);
+					msgSender.alarmMsgSend(alarmLifeEntity, toUserIds, NoticeType.ALARM);
 				}
 			}
 
@@ -176,5 +164,5 @@ public class TimerPending implements Runnable {
 	public void setAlarmSourceEntity(AlarmSourceEntity alarmSourceEntity) {
 		this.alarmSourceEntity = alarmSourceEntity;
 	}
-
+	
 }

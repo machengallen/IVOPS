@@ -162,7 +162,9 @@ public class UserController implements IUserService {
 	public LocalAuthDto selectLocalauthInfoByName(String userName) {
 		// TODO Auto-generated method stub
 		try {
-			return userService.selectLocalauthInfoByName(userName);
+			LocalAuthDto authDto = userService.selectLocalauthInfoByName(userName);
+			System.out.println(authDto.toString());
+			return authDto;
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error("系统错误：获取用户信息失败", e);	

@@ -73,8 +73,8 @@ public class AlarmFacadeController {
 
 		try {
 			
-			return alarmAggregationClient.transferAlarm(dto);
-
+			ResponseDto responseDto = alarmAggregationClient.transferAlarm(dto);
+			return responseDto;
 		} catch (Exception e) {
 			LOGGER.error("系统内部错误：", e);
 			return ResponseDto.builder(ErrorMsg.UNKNOWN);

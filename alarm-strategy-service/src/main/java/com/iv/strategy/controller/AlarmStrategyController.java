@@ -17,6 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -34,6 +35,7 @@ import com.iv.strategy.api.constant.ErrorMsg;
 import com.iv.strategy.api.constant.OpsStrategy;
 import com.iv.strategy.api.constant.StrategyCycle;
 import com.iv.strategy.api.dto.AlarmStrategyDto;
+import com.iv.strategy.api.dto.NoticeStrategyDto;
 import com.iv.strategy.api.dto.StrategyLogDto;
 import com.iv.strategy.api.dto.StrategyQueryDto;
 import com.iv.strategy.api.dto.UpgadeStrategyDto;
@@ -41,12 +43,16 @@ import com.iv.strategy.api.service.IAlarmStrategyService;
 import com.iv.strategy.dao.IAlarmStrategyDao;
 import com.iv.strategy.dao.StrategyPaging;
 import com.iv.strategy.dao.impl.AlarmStrategyDaoImpl;
+import com.iv.strategy.dao.impl.NoticeStrategyDaoImpl;
 import com.iv.strategy.entity.AlarmStrategyEntity;
+import com.iv.strategy.entity.NoticeStrategyEntity;
 import com.iv.strategy.entity.StrategyLogEntity;
 import com.iv.strategy.feign.client.IAlarmAggregationClient;
 import com.iv.strategy.feign.client.IGroupServiceClient;
+import com.iv.strategy.feign.client.IWechatServiceClient;
 import com.iv.strategy.front.dto.AlarmStrategyFrontDto;
 import com.iv.strategy.front.dto.StrategyPagingDto;
+import com.iv.strategy.util.TenantIdHolder;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -63,14 +69,59 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 	private IGroupServiceClient groupServiceClient;
 	@Autowired
 	private IAlarmAggregationClient alarmAggregationClient;
+	@Autowired
+	private NoticeStrategyDaoImpl noticeStrategyDaoImpl;
+	@Autowired
+	private IWechatServiceClient wechatServiceClient;
 
+	@GetMapping("/config/notice")
+	public ResponseDto configNotice(@RequestParam boolean wechatNotice, @RequestParam boolean emailNotice) {
+		try {
+			int userId = Integer.parseInt(JWTUtil.getReqValue("userId"));
+			if(wechatNotice) {
+				if(!wechatServiceClient.ifFocusWechat(userId)) {
+					return ResponseDto.builder(ErrorMsg.NOT_FOCUS_WECHAT);
+				}
+			}
+			NoticeStrategyEntity noticeStrategyEntity = new NoticeStrategyEntity();
+			noticeStrategyEntity.setUserId(userId);
+			noticeStrategyEntity.setEmailNotice(emailNotice);
+			noticeStrategyEntity.setWechatNotice(wechatNotice);
+			noticeStrategyDaoImpl.save(noticeStrategyEntity);
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(noticeStrategyEntity);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("通知策略配置失败：", e);
+			return ResponseDto.builder(ErrorMsg.CONFIG_STRATEGY_FAILED);
+		}
+	}
+	
+	@GetMapping("/get/notice")
+	public ResponseDto getNotice() {
+		try {
+			int userId = Integer.parseInt(JWTUtil.getReqValue("userId"));
+			NoticeStrategyEntity noticeStrategyEntity = noticeStrategyDaoImpl.selectByUserId(userId);
+			if(!wechatServiceClient.ifFocusWechat(userId)) {
+				noticeStrategyEntity.setWechatNotice(Boolean.FALSE);
+			}
+			ResponseDto responseDto = ResponseDto.builder(ErrorMsg.OK);
+			responseDto.setData(noticeStrategyEntity);
+			return responseDto;
+		} catch (Exception e) {
+			LOGGER.error("通知策略获取失败：", e);
+			return ResponseDto.builder(ErrorMsg.CONFIG_STRATEGY_FAILED);
+		}
+	}
+	
 	@ApiIgnore
 	@ApiOperation("查询指定分派策略")
 	@Override
 	public AlarmStrategyDto getStrategy(@RequestBody StrategyQueryDto queryDto) {
 		try {
+			TenantIdHolder.set(queryDto.getTenantId());
 			AlarmStrategyEntity entity = ALARM_STRATEGY_DAO.selectStrategy(queryDto.getSeverity(),
-					queryDto.getItemType(), queryDto.getTenantId());
+					queryDto.getItemType());
 			if(null == entity) {
 				return null;
 			}
@@ -347,6 +398,15 @@ public class AlarmStrategyController implements IAlarmStrategyService {
 			return true;
 		}
 		return false;
+	}
+
+	@Override
+	@ApiIgnore
+	public NoticeStrategyDto selectNoticeStrategy(Integer userId) {
+		NoticeStrategyEntity noticeStrategyEntity = noticeStrategyDaoImpl.selectByUserId(userId);
+		NoticeStrategyDto noticeStrategyDto = new NoticeStrategyDto();
+		BeanUtils.copyProperties(noticeStrategyEntity, noticeStrategyDto);
+		return noticeStrategyDto;
 	}
 
 }

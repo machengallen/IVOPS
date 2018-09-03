@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.encoding.Md5PasswordEncoder;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import com.iv.authentication.service.MyUserDetailsService;
@@ -33,8 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	}
 	
 	protected void config(HttpSecurity http) throws Exception {
-		http.formLogin().loginPage("/login").permitAll().and().authorizeRequests().antMatchers("/health", "/css/**")
-		.anonymous().and().authorizeRequests().anyRequest().authenticated();
+		/*http.formLogin().loginPage("/login").permitAll().and().authorizeRequests().antMatchers("/health", "/css/**")
+		.anonymous().and().authorizeRequests().anyRequest().permitAll();*/
+		//http.logout().logoutSuccessUrl("/bye").permitAll();
+		http.authorizeRequests().anyRequest().permitAll();
 		http.csrf().disable();
 	}
 	
@@ -53,5 +56,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		 * .roles("admin");
 		 */
 	}
+
+	/*@Override
+	public void configure(WebSecurity web) throws Exception {
+		web.ignoring().antMatchers("/oauth/**");
+	}*/
 	
 }

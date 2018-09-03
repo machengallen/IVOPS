@@ -34,4 +34,11 @@ CREATE TABLE IF NOT EXISTS `alarm_strategy_logs` (
   CONSTRAINT `FKk4ygbwgeymj48ou33v1ccl759` FOREIGN KEY (`alarm_strategy_entity_id`) REFERENCES `alarm_strategy` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+CREATE TABLE IF NOT EXISTS `notice_strategy` (
+  `user_id` int(11) NOT NULL,
+  `email_notice` bit(1) NOT NULL,
+  `wechat_notice` bit(1) NOT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
 end

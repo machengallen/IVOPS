@@ -458,4 +458,16 @@ public class TenantController implements ITenantFacadeService {
 
 	}
 
+	@Override
+	public SubEnterpriseInfoDto getSubEnterpriseByTenantIdBack(String tenantId) {
+		
+		try {
+			return service.getSubEnterpriseByTenantIdBack(tenantId);
+		} catch (Exception e) {
+			LOGGER.error("获取项目组信息失败", e);
+			return null;
+		}
+
+	}
+
 }

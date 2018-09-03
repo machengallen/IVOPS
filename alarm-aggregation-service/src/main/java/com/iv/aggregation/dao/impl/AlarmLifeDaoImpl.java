@@ -43,7 +43,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 
 	@Override
 	public AlarmLifeEntity saveAlarmLife(final AlarmLifeEntity alarmLifeEntity) throws RuntimeException {
-		return (AlarmLifeEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmLifeEntity) HibernateTemplate.execute(new HibernateCallBack() {
 			
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -51,12 +51,12 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 				// ses.saveOrUpdate(alarmLifeEntity);
 				return alarmLifeEntity;
 			}
-		}, alarmLifeEntity.getAlarm().getTenantId());
+		});
 	}
 
 	@Override
 	public AlarmLifeEntity saveOrUpdateAlarmLife(final AlarmLifeEntity alarmLifeEntity) throws RuntimeException {
-		return (AlarmLifeEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmLifeEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -64,12 +64,12 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 				ses.saveOrUpdate(alarmLifeEntity);
 				return alarmLifeEntity;
 			}
-		}, alarmLifeEntity.getAlarm().getTenantId());
+		});
 	}
 
 	@Override
 	public AlarmLifeEntity selectAlarmLifeByAlarmSrc(final AlarmSourceEntity sourceEntity) throws RuntimeException {
-		return (AlarmLifeEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmLifeEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -77,7 +77,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 						.add(Restrictions.eq("a.alarm", sourceEntity)).uniqueResult();
 				return alarmLifeEntity;
 			}
-		}, sourceEntity.getTenantId());
+		});
 	}
 
 	/*@Override
@@ -108,17 +108,6 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 			}
 		});
 	}*/
-
-	@Override
-	public AlarmLifeEntity selectAlarmLifeById(final String id, final String tenantId) throws RuntimeException {
-		return (AlarmLifeEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
-
-			@Override
-			public Object doInHibernate(Session ses) throws HibernateException {
-				return ses.get(AlarmLifeEntity.class, id);
-			}
-		}, tenantId);
-	}
 
 	@Override
 	public AlarmLifeEntity selectAlarmLifeById(final String id) throws RuntimeException {
@@ -349,8 +338,8 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 	}*/
 
 	@Override
-	public void delBeforeTimestamp(long timestamp, String tenantId) throws RuntimeException {
-		HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+	public void delBeforeTimestamp(long timestamp) throws RuntimeException {
+		HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -363,7 +352,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 				// timestamp).executeUpdate();
 				return null;
 			}
-		}, tenantId);
+		});
 	}
 
 	@Override
@@ -543,34 +532,34 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 	
 	@Override
 	public AlarmSourceEntity saveAlarmSource(final AlarmSourceEntity alarmSourceEntity) throws RuntimeException {
-		return (AlarmSourceEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmSourceEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				ses.saveOrUpdate(alarmSourceEntity);
 				return alarmSourceEntity;
 			}
-		}, alarmSourceEntity.getTenantId());
+		});
 
 	}
 
 	@Override
 	public AlarmRecoveryEntity saveAlarmRecovery(final AlarmRecoveryEntity alarmRecoveryEntity)
 			throws RuntimeException {
-		return (AlarmRecoveryEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmRecoveryEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				ses.saveOrUpdate(alarmRecoveryEntity);
 				return alarmRecoveryEntity;
 			}
-		}, alarmRecoveryEntity.getAlarmSourceEntity().getTenantId());
+		});
 	}
 
 	@Override
 	public AlarmSourceEntity selectAlarmSourceByEventId(final String eventId, final String monitorIp,
-			final String tenantId, final AgentType agentType) throws RuntimeException {
-		return (AlarmSourceEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+			final AgentType agentType) throws RuntimeException {
+		return (AlarmSourceEntity) HibernateTemplate.execute(new HibernateCallBack() {
 
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
@@ -583,7 +572,7 @@ public class AlarmLifeDaoImpl implements IAlarmLifeDao {
 
 				return entities.get(entities.size() - 1);
 			}
-		}, tenantId);
+		});
 	}
 	
 	/*@SuppressWarnings("unchecked")

@@ -37,6 +37,7 @@ import com.iv.common.util.spring.Constants;
 import com.iv.common.util.spring.JWTUtil;
 import com.iv.enter.dto.AccountDto;
 import com.iv.enter.dto.UsersQueryDto;
+import com.iv.message.api.constant.MsgType;
 import com.iv.outer.dto.LocalAuthDto;
 import com.iv.tenant.api.constant.ErrorMsg;
 import com.iv.tenant.api.dto.HisProTenantApplyReq;
@@ -46,12 +47,12 @@ import com.iv.tenant.api.dto.SubEnterpriseInfoDto;
 import com.iv.tenant.api.dto.TaskEnterpriseApplyResp;
 import com.iv.tenant.api.dto.TenantInfoDto;
 import com.iv.tenant.api.dto.UserListDto;
+import com.iv.tenant.binding.BinderConfiguration;
 import com.iv.tenant.dao.EnterpriseDaoImpl;
 import com.iv.tenant.dao.SubEnterpriseDaoImpl;
 import com.iv.tenant.entity.EnterpriseEntity;
 import com.iv.tenant.entity.SubEnterpriseEntity;
 import com.iv.tenant.feign.client.IAuthenticationServiceClient;
-import com.iv.tenant.feign.client.IMessageServiceClient;
 import com.iv.tenant.feign.client.IPermissionServiceClient;
 import com.iv.tenant.feign.client.ISubTenantPermissionServiceClient;
 import com.iv.tenant.feign.client.IUserServiceClient;
@@ -79,8 +80,6 @@ public class TenantService {
 	@Autowired
 	private IdentityService identityService;
 	@Autowired
-	private IMessageServiceClient messageServiceClient;
-	@Autowired
 	private IUserServiceClient userServiceClient;
 	@Autowired
 	private IPermissionServiceClient permissionServiceClient;
@@ -88,6 +87,8 @@ public class TenantService {
 	private ISubTenantPermissionServiceClient subTenantPermissionServiceClient;
 	@Autowired
 	private IAuthenticationServiceClient authenticationServiceClient;
+	@Autowired
+	private BinderConfiguration msgSender;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(TenantService.class);
 
@@ -297,7 +298,7 @@ public class TenantService {
 			TenantInfoDto tenantInfoDto = (TenantInfoDto) variables.get("tenantDto");
 			TaskEnterpriseApplyResp dto = new TaskEnterpriseApplyResp(task.getId(), WorkflowType.APPLY_REGIS_TENANT,
 					applicantDto.getRealName(), applicantDto.getEmail(), applicantDto.getTel(), tenantInfoDto,
-					task.getCreateTime().toLocaleString());
+					task.getCreateTime().getTime());
 			list.add(dto);
 
 		}
@@ -327,7 +328,7 @@ public class TenantService {
 			LocalAuthDto applicantDto = userServiceClient.selectLocalAuthById(applicantId);
 			TaskEnterpriseApplyResp tenantApplyResp = new TaskEnterpriseApplyResp();
 			// 流程第一个task，时间和process相同
-			tenantApplyResp.setCreateTime(task.getCreateTime().toLocaleString());
+			tenantApplyResp.setCreateTime(task.getCreateTime().getTime());
 			tenantApplyResp.setTaskId(task.getId());
 			tenantApplyResp.setApplicant(applicantDto.getRealName());
 			tenantApplyResp.setEmail(applicantDto.getEmail());
@@ -599,11 +600,10 @@ public class TenantService {
 		int userId = (int) execution.getVariable("userId");
 		LocalAuthDto applicant = userServiceClient.selectLocalAuthById(userId);
 		// 调用通知管理服务
-		for (LocalAuthDto localAuthDto : authDtos) {
-			messageServiceClient.produceApproveMsg(applicant.getRealName() + "(" + applicant.getUserName() + ")",
-					localAuthDto.getId(), tenantInfoDto.getSubEnterpriseName(), tenantInfoDto.getName(),
-					WorkflowType.APPLY_REGIS_TENANT);
-		}
+		List<Integer> approverIds = new ArrayList<Integer>(1);
+		approvers.forEach(n -> approverIds.add(Integer.parseInt(n)));
+		msgSender.pendingMsgSend(approverIds, applicant.getRealName() + "(" + applicant.getUserName(),
+				tenantInfoDto.getName(), tenantInfoDto.getSubEnterpriseName(), MsgType.TNT_NEW_PENDING);
 		return approvers;
 	}
 
@@ -671,11 +671,11 @@ public class TenantService {
 				enterpriseEntity = initEnterprise(dto, user);
 			}
 			// 初始化项目组空间
-			initSubEnterprise(enterpriseEntity, user, enterpriseEntity.getIdentifier());
+			initSubEnterprise(enterpriseEntity, user, dto.getSubEnterpriseName());
 		}
 		// 制造消息通知
-		messageServiceClient.produceApplyMsg(userId, isCreate, dto.getSubEnterpriseName(), dto.getName(), remark,
-				WorkflowType.APPLY_REGIS_TENANT);
+		msgSender.resultMsgSend(Arrays.asList(userId), isCreate, dto.getName(), dto.getSubEnterpriseName(), remark,
+				MsgType.TNT_NEW_RESULT);
 
 	}
 
@@ -801,11 +801,10 @@ public class TenantService {
 		authDtos.forEach(n -> approvers.add(String.valueOf(n.getId())));
 		// 制造用户消息
 		LocalAuthDto applicant = userServiceClient.selectLocalAuthById(userId);
-		for (String approverId : approvers) {
-			messageServiceClient.produceApproveMsg(applicant.getRealName() + "(" + applicant.getUserName() + ")",
-					Integer.parseInt(approverId), subEnterpriseEntity.getName(),
-					subEnterpriseEntity.getEnterprise().getName(), WorkflowType.APPLY_JOIN_TENANT);
-		}
+		List<Integer> approverIds = new ArrayList<>();
+		approvers.forEach(n -> approverIds.add(Integer.parseInt(n)));
+		msgSender.pendingMsgSend(approverIds, applicant.getRealName() + "(" + applicant.getUserName() + ")",
+				subEnterpriseEntity.getEnterprise().getName(), subEnterpriseEntity.getName(), MsgType.TNT_JOIN_PENDING);
 
 		return approvers;
 	}
@@ -834,10 +833,9 @@ public class TenantService {
 				user.setCurTenantId(tenantId);
 			}
 		}
-
 		// 制造消息通知
-		messageServiceClient.produceApplyMsg(userId, isApproved, subEnterpriseEntity.getName(),
-				subEnterpriseEntity.getEnterprise().getName(), remark, WorkflowType.APPLY_JOIN_TENANT);
+		msgSender.resultMsgSend(Arrays.asList(userId), isApproved, subEnterpriseEntity.getEnterprise().getName(),
+				subEnterpriseEntity.getName(), remark, MsgType.TNT_JOIN_RESULT);
 	}
 
 	/**
@@ -890,85 +888,13 @@ public class TenantService {
 		return dto;
 	}
 
-	/*
-	 * public ResponseDto createSubTenant(int creator, String name, List<Integer>
-	 * userIds) {
-	 * 
-	 * 
-	 * if (null != subEnterpriseDao.selectByName(name)) { return
-	 * ResponseDto.builder(ErrorMsg.SUB_ENTERPRISE_EXIST); }
-	 * 
-	 * LocalAuthDto authDetails = userServiceClient.selectLocalAuthById(creator);
-	 * String tenantId = authDetails.getCurTenantId(); EnterpriseEntity
-	 * enterpriseEntity =
-	 * subEnterpriseDao.selectByTenantId(tenantId).getEnterprise();
-	 * SubEnterpriseEntity subEnterpriseEntity = new SubEnterpriseEntity();
-	 * subEnterpriseEntity.setName(name);
-	 * subEnterpriseEntity.setEnterprise(enterpriseEntity); SubEnterpriseEntity
-	 * previousEntity = subEnterpriseDao.countWithEnterprise(enterpriseEntity);
-	 * String identifier =
-	 * String.valueOf(Integer.parseInt(previousEntity.getSubIdentifier()) + 1);
-	 * String identifier = null; if (null != previousEntity) { // 已存在项目组 identifier
-	 * = String.valueOf(Integer.parseInt(previousEntity.getSubIdentifier()) + 1); }
-	 * else { // 第一个项目组 identifier = enterpriseEntity.getIdentifier() + 1; }
-	 * subEnterpriseEntity.setSubIdentifier(identifier);
-	 * subEnterpriseEntity.setTenantId("t" + identifier);
-	 * userIds.add(authDetails.getId()); addUserToSubEnter(subEnterpriseEntity,
-	 * userIds);// 添加用户至项目组 subEnterpriseDao.save(subEnterpriseEntity);
-	 * 
-	 * // 初始化项目组管理员角色
-	 * permissionServiceClient.createSubEnterpriseAdmin(subEnterpriseEntity.getId(),
-	 * creator);
-	 * 
-	 * return ResponseDto.builder(ErrorMsg.OK); }
-	 */
-
-	/*
-	 * public void manuallyAddUserToSubTenant(String subTenantId, List<String>
-	 * userIds) { List<Integer> idList = new ArrayList<Integer>();
-	 * userIds.forEach(id -> idList.add(Integer.parseInt(id)));
-	 * addUserToSubEnter(subEnterpriseDao.selectBySubTenantId(subTenantId), idList);
-	 * }
-	 */
-
-	/*
-	 * private void addUserToSubEnter(SubEnterpriseEntity subEnterpriseEntity,
-	 * List<Integer> userIds) {
-	 * 
-	 * if (!CollectionUtils.isEmpty(subEnterpriseEntity.getUserIds())) {
-	 * subEnterpriseEntity.getUserIds().addAll(userIds); } else {
-	 * subEnterpriseEntity.setUserIds(new HashSet<Integer>(userIds)); }
-	 * 
-	 * }
-	 */
-
-	/*
-	 * public void deleteSubTenant(int id, String refreshToken, String token) {
-	 * 
-	 * SubEnterpriseEntity entity = subEnterpriseDao.selectById(id); for (Integer
-	 * userId : entity.getUserIds()) { LocalAuthDto user =
-	 * userServiceClient.selectLocalAuthById(userId); if
-	 * (entity.getTenantId().equals(user.getCurTenantId())) {
-	 * user.setCurTenantId(ConstantContainer.TOURIST);// 切换至游客 } } // TODO
-	 * (引入mq，发布topic)删除项目组相关角色信息、团队信息、告警信息等
-	 * 
-	 * 
-	 * 
-	 * // 删除项目组 subEnterpriseDao.delById(id); // 切换当前操作用户至游客
-	 * switchTenant(ConstantContainer.TOURIST, refreshToken, token); }
-	 */
-
-	/*
-	 * public List<EnterpriseInfoDto> getEnterpriseAll() { List<EnterpriseEntity>
-	 * enterpriseList = enterpriseDao.selectAll(); List<EnterpriseInfoDto> dtos =
-	 * new ArrayList<EnterpriseInfoDto>(); for (EnterpriseEntity enterpriseEntity :
-	 * enterpriseList) { EnterpriseInfoDto dto = new EnterpriseInfoDto();
-	 * BeanUtils.copyProperties(enterpriseEntity, dto); dtos.add(dto); } return
-	 * dtos;
-	 * 
-	 * }
-	 */
-
+	public SubEnterpriseInfoDto getSubEnterpriseByTenantIdBack(String tenantId) {
+		SubEnterpriseEntity enterpriseEntity = subEnterpriseDao.selectByTenantId(tenantId);
+		SubEnterpriseInfoDto enterpriseInfoDto = new SubEnterpriseInfoDto();
+		BeanUtils.copyProperties(enterpriseEntity, enterpriseInfoDto, "enterprise");
+		return enterpriseInfoDto;
+	}
+	
 	/**
 	 * 验证该租户申请（active状态）是否存在
 	 * 

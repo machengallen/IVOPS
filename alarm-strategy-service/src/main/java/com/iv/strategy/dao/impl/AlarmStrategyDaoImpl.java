@@ -42,9 +42,9 @@ public class AlarmStrategyDaoImpl implements IAlarmStrategyDao {
 	}
 
 	@Override
-	public AlarmStrategyEntity selectStrategy(Severity severity, String itemType, String tenantId)
+	public AlarmStrategyEntity selectStrategy(Severity severity, String itemType)
 			throws RuntimeException {
-		return (AlarmStrategyEntity) HibernateTemplateWithTenant.execute(new HibernateCallBack() {
+		return (AlarmStrategyEntity) HibernateTemplate.execute(new HibernateCallBack() {
 			@Override
 			public Object doInHibernate(Session ses) throws HibernateException {
 				AlarmStrategyEntity lifeStrategyEntity = (AlarmStrategyEntity) ses.createQuery(
@@ -58,7 +58,7 @@ public class AlarmStrategyDaoImpl implements IAlarmStrategyDao {
 				 */
 				return lifeStrategyEntity;
 			}
-		}, tenantId);
+		});
 	}
 
 	@SuppressWarnings("unchecked")

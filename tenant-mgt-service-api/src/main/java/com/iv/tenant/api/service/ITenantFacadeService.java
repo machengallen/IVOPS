@@ -68,6 +68,14 @@ public interface ITenantFacadeService {
 			@RequestParam("page") int page, @RequestParam("items") int items);
 
 	/**
+	 * 根据项目组tenantId查询项目组信息
+	 * @param tenantId
+	 * @return
+	 */
+	@RequestMapping(value = "/get/tenant/info/backend", method = RequestMethod.GET)
+	SubEnterpriseInfoDto getSubEnterpriseByTenantIdBack(@RequestParam("tenantId") String tenantId);
+	
+	/**
 	 * 申请流审批(管理员权限)
 	 * 
 	 * @param dto
